@@ -1,0 +1,432 @@
+<style>
+/* ============================================================
+   YÖN C — "Sıcak Yaratıcı"
+   KOBİ satıcısına yakın: yumuşak köşeler, davetkâr, rehberli akış.
+   Sıcak nötrler + tek kardinal accent = baharatlı turuncu (#d9662c).
+   Klişeden kaçış: krem+serif+terracotta YOK; sıcak gri + sistem sans.
+   ÇİFT-TEMA (açık + sıcak koyu). Namespace: .wc
+   ============================================================ */
+
+.wc, .wc *, .wc *::before, .wc *::after { box-sizing: border-box; }
+
+.wc {
+  --bg: #f6f4f0; --panel: #ffffff; --panel-2: #f2efe8; --panel-3: #ece7dd;
+  --line: #e7e1d7; --line-2: #dbd3c5;
+  --text: #221f19; --text-2: #6a6355; --text-3: #9a9080;
+  --accent: #d9662c; --accent-2: #c2551d; --accent-soft: rgba(217,102,44,.10); --accent-tint: #fbeee3;
+  --good: #2f8f68; --good-soft: rgba(47,143,104,.13);
+  --normal: #b98525; --normal-soft: rgba(185,133,37,.14);
+  --weak: #cd5044; --weak-soft: rgba(205,80,68,.12);
+  --shadow: 0 1px 3px rgba(80,60,30,.06), 0 8px 24px rgba(80,60,30,.07);
+  --shadow-lg: 0 16px 40px rgba(60,40,20,.16), 0 3px 10px rgba(60,40,20,.08);
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text); background: var(--bg); min-height: 100vh;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-size: 14px; line-height: 1.5; letter-spacing: -0.006em;
+}
+@media (prefers-color-scheme: dark) {
+  .wc {
+    --bg: #17140f; --panel: #1e1a14; --panel-2: #241f17; --panel-3: #2c261c;
+    --line: #322b20; --line-2: #3e3527;
+    --text: #f0ebe1; --text-2: #a99f8d; --text-3: #766c5c;
+    --accent: #ef8a4f; --accent-2: #f6a069; --accent-soft: rgba(239,138,79,.15); --accent-tint: #2a2015;
+    --good: #4cba8b; --good-soft: rgba(76,186,139,.15);
+    --normal: #d6a955; --normal-soft: rgba(214,169,85,.15);
+    --weak: #e2746b; --weak-soft: rgba(226,116,107,.15);
+    --shadow: 0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-lg: 0 18px 44px rgba(0,0,0,.55), 0 3px 10px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] .wc {
+  --bg: #17140f; --panel: #1e1a14; --panel-2: #241f17; --panel-3: #2c261c;
+  --line: #322b20; --line-2: #3e3527;
+  --text: #f0ebe1; --text-2: #a99f8d; --text-3: #766c5c;
+  --accent: #ef8a4f; --accent-2: #f6a069; --accent-soft: rgba(239,138,79,.15); --accent-tint: #2a2015;
+  --good: #4cba8b; --good-soft: rgba(76,186,139,.15);
+  --normal: #d6a955; --normal-soft: rgba(214,169,85,.15);
+  --weak: #e2746b; --weak-soft: rgba(226,116,107,.15);
+  --shadow: 0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg: 0 18px 44px rgba(0,0,0,.55), 0 3px 10px rgba(0,0,0,.4);
+}
+:root[data-theme="light"] .wc {
+  --bg: #f6f4f0; --panel: #ffffff; --panel-2: #f2efe8; --panel-3: #ece7dd;
+  --line: #e7e1d7; --line-2: #dbd3c5;
+  --text: #221f19; --text-2: #6a6355; --text-3: #9a9080;
+  --accent: #d9662c; --accent-2: #c2551d; --accent-soft: rgba(217,102,44,.10); --accent-tint: #fbeee3;
+  --good: #2f8f68; --good-soft: rgba(47,143,104,.13);
+  --normal: #b98525; --normal-soft: rgba(185,133,37,.14);
+  --weak: #cd5044; --weak-soft: rgba(205,80,68,.12);
+  --shadow: 0 1px 3px rgba(80,60,30,.06), 0 8px 24px rgba(80,60,30,.07);
+  --shadow-lg: 0 16px 40px rgba(60,40,20,.16), 0 3px 10px rgba(60,40,20,.08);
+}
+
+.wc ::selection { background: var(--accent-soft); }
+.wc :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.wc button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; letter-spacing: inherit; }
+.wc svg, .wc img { display: block; max-width: 100%; }
+.wc .mono { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace; }
+@media (prefers-reduced-motion: reduce) { .wc *, .wc *::before, .wc *::after { transition: none !important; animation: none !important; } }
+
+.wc-app { max-width: 1420px; margin: 0 auto; padding: 0 clamp(12px,2vw,26px) 64px; }
+
+/* ---------- Top bar ---------- */
+.wc-top { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 18px; height: 64px; background: color-mix(in srgb, var(--bg) 84%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.wc-brand { display: flex; align-items: center; gap: 11px; }
+.wc-logo { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(140deg, #f3a06a, var(--accent) 60%, #b34e19); display: grid; place-items: center; box-shadow: var(--shadow); }
+.wc-logo svg { width: 18px; color: #fff; }
+.wc-brand b { font-size: 15px; font-weight: 680; letter-spacing: -.01em; }
+.wc-brand small { display: block; font-size: 11px; color: var(--text-3); }
+
+.wc-nav { display: flex; gap: 3px; margin-left: 8px; }
+.wc-nav button { padding: 9px 15px; border-radius: 10px; font-size: 13.5px; font-weight: 550; color: var(--text-2); transition: all .15s; }
+.wc-nav button:hover { color: var(--text); background: var(--panel-2); }
+.wc-nav button.on { color: var(--accent); background: var(--accent-tint); font-weight: 640; }
+
+.wc-tright { margin-left: auto; display: flex; align-items: center; gap: 11px; }
+.wc-credit { display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 15px; border-radius: 999px; background: var(--accent-tint); border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent); }
+.wc-credit .coin { width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(140deg,#f3b071,var(--accent)); display: grid; place-items: center; }
+.wc-credit .coin::after { content:""; width: 8px; height: 8px; border-radius: 50%; border: 1.6px solid #fff; }
+.wc-credit b { font-size: 13.5px; font-weight: 680; color: var(--accent-2); }
+.wc-credit small { font-size: 11px; color: var(--text-2); }
+
+.wc-ibtn { width: 40px; height: 40px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line-2); color: var(--text-2); display: grid; place-items: center; position: relative; transition: all .15s; box-shadow: var(--shadow); }
+.wc-ibtn:hover { color: var(--text); transform: translateY(-1px); }
+.wc-ndot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); }
+
+.wc-uwrap { position: relative; }
+.wc-user { display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 6px 0 4px; border-radius: 999px; }
+.wc-user:hover { background: var(--panel-2); }
+.wc-ava { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(140deg,#e88a52,#c04f1c); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 12.5px; }
+.wc-user .nm { font-size: 13px; font-weight: 600; }
+.wc-user .nm small { display: block; font-size: 10.5px; color: var(--text-3); font-weight: 400; }
+.wc-user > svg { width: 15px; color: var(--text-3); }
+
+.wc-menu { position: absolute; top: 50px; right: 0; width: 262px; z-index: 50; background: var(--panel); border: 1px solid var(--line-2); border-radius: 16px; box-shadow: var(--shadow-lg); padding: 7px; }
+.wc-menu-head { display: flex; gap: 12px; align-items: center; padding: 11px 11px 13px; }
+.wc-menu-head .wc-ava { width: 44px; height: 44px; font-size: 16px; }
+.wc-menu-head b { font-size: 14px; }
+.wc-menu-head small { display: block; color: var(--text-3); font-size: 11.5px; }
+.wc-plan { margin-top: 6px; display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 650; color: var(--accent-2); background: var(--accent-tint); padding: 3px 9px; border-radius: 999px; }
+.wc-menu-sep { height: 1px; background: var(--line); margin: 5px 3px; }
+.wc-mi { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 10px 11px; border-radius: 11px; font-size: 13.5px; transition: background .12s; }
+.wc-mi:hover { background: var(--panel-2); }
+.wc-mi svg { width: 17px; color: var(--text-3); }
+.wc-mi .r { margin-left: auto; font-size: 11px; color: var(--text-3); }
+.wc-mi.danger { color: var(--weak); } .wc-mi.danger svg { color: var(--weak); }
+
+/* ---------- Guided stepper ---------- */
+.wc-steps { display: flex; align-items: center; gap: 6px; padding: 20px 4px 4px; flex-wrap: wrap; }
+.wc-step { display: flex; align-items: center; gap: 10px; padding: 9px 15px 9px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); }
+.wc-step .n { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--panel-3); color: var(--text-2); }
+.wc-step b { font-size: 13px; font-weight: 600; }
+.wc-step small { display: block; font-size: 11px; color: var(--text-3); font-weight: 400; }
+.wc-step.done .n { background: var(--good-soft); color: var(--good); }
+.wc-step.on { border-color: var(--accent); background: var(--accent-tint); box-shadow: 0 0 0 3px var(--accent-soft); }
+.wc-step.on .n { background: var(--accent); color: #fff; }
+.wc-step.on b { color: var(--accent-2); }
+.wc-step-line { flex: 1; min-width: 12px; height: 2px; background: var(--line-2); border-radius: 2px; }
+
+/* ---------- Studio ---------- */
+.wc-studio { display: grid; grid-template-columns: 300px minmax(0,1fr) 322px; gap: 18px; padding-top: 16px; }
+.wc-card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); }
+.wc-card-hd { display: flex; align-items: center; gap: 9px; padding: 15px 17px 13px; }
+.wc-card-hd .stepdot { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 700; flex: none; }
+.wc-card-hd h3 { font-size: 14px; font-weight: 640; }
+.wc-card-hd .r { margin-left: auto; font-size: 12px; color: var(--accent-2); font-weight: 600; }
+
+.wc-left { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.wc-sec { padding: 0 17px 16px; }
+.wc-sec.bt { padding-top: 15px; border-top: 1px solid var(--line); }
+
+.wc-product { display: flex; gap: 13px; align-items: center; padding: 12px; border-radius: 14px; background: var(--panel-2); }
+.wc-pthumb { width: 60px; height: 72px; border-radius: 11px; background: var(--panel); border: 1px solid var(--line-2); display: grid; place-items: center; flex: none; }
+.wc-pthumb svg { width: 38px; color: var(--text-3); }
+.wc-product b { font-size: 13.5px; }
+.wc-product .sku { font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+.wc-product a { display: inline-block; margin-top: 7px; font-size: 12px; color: var(--accent); font-weight: 600; }
+
+.wc-sec-label { font-size: 12.5px; font-weight: 600; color: var(--text-2); margin: 15px 0 10px; }
+.wc-sectors { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.wc-sector { display: flex; align-items: center; gap: 9px; padding: 11px 12px; border-radius: 13px; border: 1px solid var(--line-2); background: var(--panel); transition: all .14s; text-align: left; }
+.wc-sector:hover { border-color: var(--text-3); }
+.wc-sector .si { width: 30px; height: 30px; border-radius: 9px; background: var(--panel-3); color: var(--text-2); display: grid; place-items: center; flex: none; }
+.wc-sector .si svg { width: 17px; }
+.wc-sector b { font-size: 12.5px; }
+.wc-sector.on { border-color: var(--accent); background: var(--accent-tint); }
+.wc-sector.on .si { background: var(--accent); color: #fff; }
+.wc-sector.on b { color: var(--accent-2); }
+
+.wc-shots { display: flex; flex-direction: column; gap: 6px; }
+.wc-shot { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 13px; border: 1px solid var(--line); background: var(--panel); transition: all .13s; }
+.wc-shot:hover { border-color: var(--line-2); }
+.wc-shot.on { border-color: color-mix(in srgb, var(--accent) 40%, transparent); background: var(--accent-tint); }
+.wc-shot .ck { width: 22px; height: 22px; border-radius: 8px; border: 2px solid var(--line-2); flex: none; display: grid; place-items: center; transition: all .13s; }
+.wc-shot .ck svg { width: 13px; color: #fff; opacity: 0; }
+.wc-shot.on .ck { background: var(--accent); border-color: var(--accent); }
+.wc-shot.on .ck svg { opacity: 1; }
+.wc-shot .t { font-size: 13.5px; }
+.wc-shot .t small { display: block; font-size: 11.5px; color: var(--text-3); }
+.wc-shot .tag { margin-left: auto; font-size: 10px; font-weight: 650; padding: 3px 8px; border-radius: 999px; color: var(--accent-2); background: var(--accent-soft); }
+
+/* center */
+.wc-center { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.wc-canvas { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; }
+.wc-cbar { display: flex; align-items: center; gap: 12px; padding: 16px 18px; }
+.wc-cbar h2 { font-size: 15px; font-weight: 660; }
+.wc-cbar .mut { font-size: 12.5px; color: var(--text-3); }
+.wc-seg { margin-left: auto; display: flex; gap: 3px; padding: 3px; background: var(--panel-2); border-radius: 11px; }
+.wc-seg button { font-size: 12px; padding: 6px 13px; border-radius: 8px; color: var(--text-2); font-weight: 550; }
+.wc-seg button.on { color: var(--text); background: var(--panel); box-shadow: var(--shadow); }
+
+.wc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0 18px 18px; }
+.wc-scard { border-radius: 15px; overflow: hidden; border: 1px solid var(--line); background: var(--panel-2); transition: transform .16s, box-shadow .16s; }
+.wc-scard:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.wc-scard.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.wc-simg { aspect-ratio: 4/5; position: relative; display: grid; place-items: center; }
+.wc-simg figure { width: 58%; color: var(--text-3); opacity: .92; }
+.wc-simg figure.close { width: 90%; }
+.wg1 { background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 9%, var(--panel-2)), var(--panel-2)); }
+.wg2 { background: linear-gradient(165deg, color-mix(in srgb, #4fa3c0 10%, var(--panel-2)), var(--panel-2)); }
+.wg3 { background: linear-gradient(165deg, color-mix(in srgb, #b78ac0 10%, var(--panel-2)), var(--panel-2)); }
+.wg4 { background: linear-gradient(165deg, color-mix(in srgb, #6cbf95 10%, var(--panel-2)), var(--panel-2)); }
+.wc-simg .lbl { position: absolute; top: 9px; left: 10px; font-size: 10.5px; font-weight: 600; color: var(--text-2); background: var(--panel); padding: 3px 9px; border-radius: 999px; box-shadow: var(--shadow); }
+.wc-scard-ft { display: flex; align-items: center; gap: 8px; padding: 11px 12px; }
+.wc-scard-ft b { font-size: 12.5px; }
+.wc-badge { margin-left: auto; font-size: 10.5px; font-weight: 650; padding: 3px 10px; border-radius: 999px; }
+.wb-good { color: var(--good); background: var(--good-soft); } .wb-normal { color: var(--normal); background: var(--normal-soft); } .wb-weak { color: var(--weak); background: var(--weak-soft); }
+
+.wc-action { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-top: 1px solid var(--line); background: linear-gradient(180deg, transparent, var(--accent-soft)); }
+.wc-action .info { font-size: 13px; color: var(--text-2); }
+.wc-action .info b { color: var(--text); }
+.wc-qset { display: inline-flex; gap: 5px; margin-left: 6px; }
+.wc-qset .q { font-size: 12px; padding: 5px 11px; border-radius: 9px; border: 1px solid var(--line-2); color: var(--text-2); }
+.wc-qset .q.on { color: var(--accent-2); border-color: var(--accent); background: var(--accent-tint); font-weight: 640; }
+.wc-gen { margin-left: auto; display: flex; align-items: center; gap: 11px; padding: 13px 24px; border-radius: 14px; color: #fff; font-weight: 680; font-size: 14px; background: linear-gradient(135deg, #ef8148, var(--accent) 55%, #bb4f1a); box-shadow: 0 1px 0 rgba(255,255,255,.28) inset, 0 10px 26px rgba(217,102,44,.32), 0 2px 6px rgba(217,102,44,.3); transition: transform .14s, filter .14s; }
+.wc-gen:hover { transform: translateY(-2px); filter: brightness(1.04); }
+.wc-gen .cost { font-weight: 700; padding-left: 11px; border-left: 1px solid rgba(255,255,255,.32); }
+
+/* right */
+.wc-right { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.wc-field { padding: 0 17px 14px; }
+.wc-field:first-of-type { padding-top: 2px; }
+.wc-field.bt { padding-top: 14px; border-top: 1px solid var(--line); }
+.wc-field label { font-size: 12.5px; color: var(--text-2); font-weight: 550; display: block; margin-bottom: 9px; }
+.wc-orow { display: flex; gap: 6px; }
+.wc-o { flex: 1; text-align: center; font-size: 12.5px; padding: 9px 4px; border-radius: 11px; border: 1px solid var(--line-2); color: var(--text-2); transition: all .13s; }
+.wc-o.on { color: var(--accent-2); border-color: var(--accent); background: var(--accent-tint); font-weight: 640; }
+
+.wc-qa-hd { display: flex; align-items: center; padding: 15px 17px 13px; }
+.wc-qa-hd h3 { font-size: 14px; font-weight: 640; }
+.wc-qa-hd .v { margin-left: auto; font-size: 12px; font-weight: 650; color: var(--good); display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; background: var(--good-soft); }
+.wc-qa-body { padding: 0 17px 14px; }
+.wc-qrow { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.wc-qrow:last-child { border-bottom: none; }
+.wc-qname { width: 50px; font-size: 13px; }
+.wc-qtrack { flex: 1; height: 7px; border-radius: 5px; background: var(--panel-3); overflow: hidden; }
+.wc-qfill { height: 100%; border-radius: 5px; }
+.wf92 { width: 92%; } .wf88 { width: 88%; } .wf64 { width: 64%; } .wf40 { width: 40%; }
+.wc-qfill.good { background: var(--good); } .wc-qfill.normal { background: var(--normal); } .wc-qfill.weak { background: var(--weak); }
+.wc-qtag { width: 46px; text-align: right; font-size: 11px; font-weight: 650; }
+.wc-qtag.good { color: var(--good); } .wc-qtag.normal { color: var(--normal); } .wc-qtag.weak { color: var(--weak); }
+.wc-qnote { margin-top: 12px; font-size: 12.5px; color: var(--text-2); line-height: 1.55; padding: 12px 14px; border-radius: 13px; background: var(--panel-2); }
+.wc-qact { display: flex; gap: 9px; padding: 0 17px 17px; }
+.wc-bghost { flex: 1; text-align: center; font-size: 13px; font-weight: 550; padding: 11px; border-radius: 13px; border: 1px solid var(--line-2); color: var(--text); }
+.wc-bghost:hover { background: var(--panel-2); }
+.wc-bsolid { flex: 1; text-align: center; font-size: 13px; font-weight: 640; padding: 11px; border-radius: 13px; color: #fff; background: linear-gradient(135deg, #ef8148, var(--accent)); }
+
+/* gallery */
+.wc-sec-hd { display: flex; align-items: baseline; gap: 14px; margin: 42px 4px 18px; }
+.wc-sec-hd h2 { font-size: 19px; font-weight: 680; letter-spacing: -.015em; }
+.wc-sec-hd p { font-size: 13px; color: var(--text-3); }
+.wc-sec-hd a { margin-left: auto; font-size: 13px; color: var(--accent); font-weight: 600; }
+.wc-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(184px,1fr)); gap: 16px; }
+.wc-gcard { border-radius: 17px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); transition: transform .16s, box-shadow .16s; }
+.wc-gcard:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.wc-gimg { aspect-ratio: 4/5; position: relative; display: grid; place-items: center; }
+.wc-gimg figure { width: 58%; color: var(--text-3); opacity: .9; }
+.wc-gstatus { position: absolute; top: 10px; right: 10px; font-size: 10.5px; font-weight: 650; padding: 4px 11px; border-radius: 999px; }
+.ws-approved { color: var(--good); background: var(--good-soft); }
+.ws-review { color: var(--accent-2); background: var(--accent-tint); }
+.ws-draft { color: var(--text-2); background: var(--panel-3); }
+.wc-gft { display: flex; align-items: center; gap: 8px; padding: 12px 14px; }
+.wc-gft b { font-size: 12.5px; }
+.wc-gft small { display: block; font-size: 10.5px; color: var(--text-3); }
+.wc-gft .sc { margin-left: auto; font-size: 11.5px; font-weight: 660; color: var(--good); }
+
+@media (max-width: 1120px) {
+  .wc-studio { grid-template-columns: 280px minmax(0,1fr); }
+  .wc-right { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+  .wc-studio { grid-template-columns: 1fr; }
+  .wc-nav { display: none; }
+  .wc-grid { grid-template-columns: repeat(2,1fr); }
+  .wc-user .nm { display: none; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ms-figure" viewBox="0 0 200 340"><circle cx="100" cy="42" r="23"/><path d="M93 66h14v10H93z"/><path d="M74 78 Q100 70 126 78 L133 150 Q118 158 100 158 Q82 158 67 150 Z"/><path d="M69 149 Q100 160 131 149 L151 302 Q100 318 49 302 Z"/><path d="M74 80 Q57 122 61 182 L71 180 Q69 122 84 86 Z"/><path d="M126 80 Q143 122 139 182 L129 180 Q131 122 116 86 Z"/></symbol>
+  <symbol id="ms-garment" viewBox="0 0 200 210"><path d="M70 34 Q100 22 130 34 L164 60 Q170 64 166 72 L149 92 L146 84 L146 188 Q146 194 140 194 L60 194 Q54 194 54 188 L54 84 L51 92 L34 72 Q30 64 36 60 Z"/><path d="M80 34 Q100 54 120 34" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/></symbol>
+  <symbol id="ms-bag" viewBox="0 0 200 200"><path d="M64 84 h72 q10 0 11 10 l7 78 q1 10 -9 10 H55 q-10 0 -9 -10 l7 -78 q1 -10 11 -10 Z"/><path d="M74 84 Q74 48 100 48 Q126 48 126 84" fill="none" stroke="currentColor" stroke-width="7" opacity=".55"/></symbol>
+</svg>
+
+<div class="wc">
+ <div class="wc-app">
+
+  <!-- TOP BAR -->
+  <header class="wc-top">
+    <div class="wc-brand">
+      <span class="wc-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 16.5 9 11l3.5 3.5L19 8"/><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8" cy="8.5" r="1.4" fill="currentColor" stroke="none"/></svg></span>
+      <div><b>Master Studio</b><small>Ürün fotoğraf stüdyosu</small></div>
+    </div>
+    <nav class="wc-nav">
+      <button class="on">Stüdyo</button>
+      <button>Galeri</button>
+      <button>Toplu Üretim</button>
+      <button>Entegrasyonlar</button>
+    </nav>
+    <div class="wc-tright">
+      <div class="wc-credit"><span class="coin"></span><b class="mono">1.240</b><small>işlem birimi</small></div>
+      <button class="wc-ibtn" aria-label="Bildirimler"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="wc-ndot"></span></button>
+      <div class="wc-uwrap">
+        <button class="wc-user"><span class="wc-ava">YG</span><span class="nm">Yeşilmen<small>Pro plan</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="wc-menu" role="menu">
+          <div class="wc-menu-head"><span class="wc-ava">YG</span><div><b>Yeşilmen Ltd.</b><small>info@masterstudio.ai</small><span class="wc-plan">✦ Pro plan</span></div></div>
+          <div class="wc-menu-sep"></div>
+          <button class="wc-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>Profil</button>
+          <button class="wc-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Plan ve Faturalandırma</button>
+          <button class="wc-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M17 6a3.5 3.5 0 0 1 0 7"/></svg>Ekip<span class="r">3 üye</span></button>
+          <button class="wc-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Güvenlik</button>
+          <button class="wc-mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8 2 2 0 1 1-2.7 2.7 1.6 1.6 0 0 0-2.7 1.1 2 2 0 1 1-4 0 1.6 1.6 0 0 0-2.7-1.1 2 2 0 1 1-2.7-2.7A1.6 1.6 0 0 0 4.3 14a2 2 0 1 1 0-4 1.6 1.6 0 0 0 1.4-2.7"/></svg>Tercihler</button>
+          <div class="wc-menu-sep"></div>
+          <button class="wc-mi danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Çıkış yap</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- GUIDED STEPPER -->
+  <div class="wc-steps">
+    <div class="wc-step done"><span class="n">✓</span><div><b>Ürün</b><small>1 yüklendi</small></div></div>
+    <span class="wc-step-line"></span>
+    <div class="wc-step done"><span class="n">✓</span><div><b>Sektör</b><small>Moda &amp; Giyim</small></div></div>
+    <span class="wc-step-line"></span>
+    <div class="wc-step on"><span class="n">3</span><div><b>Çekim türleri</b><small>6 seçili</small></div></div>
+    <span class="wc-step-line"></span>
+    <div class="wc-step"><span class="n">4</span><div><b>Oluştur</b><small>Son adım</small></div></div>
+  </div>
+
+  <!-- STUDIO -->
+  <div class="wc-studio">
+
+    <!-- LEFT -->
+    <aside class="wc-left">
+      <section class="wc-card">
+        <div class="wc-card-hd"><span class="stepdot">1</span><h3>Ürünün</h3><a class="r" href="#">Değiştir</a></div>
+        <div class="wc-sec">
+          <div class="wc-product">
+            <div class="wc-pthumb"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></div>
+            <div><b>Bel Ceketi · Lacivert</b><div class="sku mono">BSGMARS25337</div><a href="#">Başka ürün yükle →</a></div>
+          </div>
+          <div class="wc-sec-label">Hangi sektör?</div>
+          <div class="wc-sectors">
+            <button class="wc-sector on"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3 4 7l3 2v11h10V9l3-2-2-4-4 2a3 3 0 0 1-6 0z"/></svg></span><b>Moda</b></button>
+            <button class="wc-sector"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 16h13l4 3H3zM3 16V9l4-3 4 4 5-2v8"/></svg></span><b>Ayakkabı</b></button>
+            <button class="wc-sector"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg></span><b>Çanta</b></button>
+            <button class="wc-sector"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3 4 5-4 13-4-13z"/><path d="M8 8h8"/></svg></span><b>Takı</b></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="wc-card">
+        <div class="wc-card-hd"><span class="stepdot">3</span><h3>Çekim türleri</h3><span class="r">6 / 8</span></div>
+        <div class="wc-sec">
+          <div class="wc-shots" id="wc-shots">
+            <button class="wc-shot on"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="t">Önden tam boy<small>Manken üzerinde</small></span><span class="tag">Öneri</span></button>
+            <button class="wc-shot on"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="t">Yandan görünüm</span></button>
+            <button class="wc-shot on"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="t">Arkadan görünüm</span></button>
+            <button class="wc-shot on"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="t">Yakın detay<small>Kumaş &amp; dikiş</small></span></button>
+            <button class="wc-shot on"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="t">Bel üstü kadraj</span></button>
+            <button class="wc-shot on"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="t">Düz zemin<small>Mankensiz</small></span></button>
+            <button class="wc-shot"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="t">Askıda görünüm</span></button>
+            <button class="wc-shot"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="t">360° dönüş</span></button>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- CENTER -->
+    <main class="wc-center">
+      <section class="wc-canvas">
+        <div class="wc-cbar">
+          <div><h2>Prova çekimin hazır</h2><span class="mut">6 kare üretildi · 2K · Moda &amp; Giyim</span></div>
+          <div class="wc-seg"><button class="on">Izgara</button><button>Tek kare</button><button>Karşılaştır</button></div>
+        </div>
+        <div class="wc-grid">
+          <article class="wc-scard sel"><div class="wc-simg wg1"><span class="lbl">Önden</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="wc-scard-ft"><b>01 · Önden</b><span class="wc-badge wb-good">İyi</span></div></article>
+          <article class="wc-scard"><div class="wc-simg wg2"><span class="lbl">Yandan</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="wc-scard-ft"><b>02 · Yandan</b><span class="wc-badge wb-good">İyi</span></div></article>
+          <article class="wc-scard"><div class="wc-simg wg3"><span class="lbl">Arkadan</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="wc-scard-ft"><b>03 · Arkadan</b><span class="wc-badge wb-normal">Normal</span></div></article>
+          <article class="wc-scard"><div class="wc-simg wg4"><span class="lbl">Detay</span><figure class="close"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div><div class="wc-scard-ft"><b>04 · Detay</b><span class="wc-badge wb-good">İyi</span></div></article>
+          <article class="wc-scard"><div class="wc-simg wg1"><span class="lbl">Bel üstü</span><figure class="close"><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="wc-scard-ft"><b>05 · Bel üstü</b><span class="wc-badge wb-weak">Zayıf</span></div></article>
+          <article class="wc-scard"><div class="wc-simg wg2"><span class="lbl">Flat-lay</span><figure><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div><div class="wc-scard-ft"><b>06 · Flat-lay</b><span class="wc-badge wb-good">İyi</span></div></article>
+        </div>
+        <div class="wc-action">
+          <span class="info"><b>6 kare</b> üretilecek · Kalite <span class="wc-qset"><span class="q">1K</span><span class="q on">2K</span><span class="q">4K</span></span></span>
+          <button class="wc-gen" id="wc-gen">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 3 4 14h7l-1 7 9-11h-7z"/></svg>
+            Oluştur <span class="cost mono" id="wc-cost">36 işlem birimi</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="wc-right">
+      <section class="wc-card">
+        <div class="wc-card-hd"><h3>Ayarlar</h3></div>
+        <div class="wc-field"><label>En-boy oranı</label><div class="wc-orow"><span class="wc-o">1:1</span><span class="wc-o on">4:5</span><span class="wc-o">3:4</span><span class="wc-o">9:16</span></div></div>
+        <div class="wc-field bt"><label>Arka plan</label><div class="wc-orow"><span class="wc-o on">Stüdyo</span><span class="wc-o">Sade</span><span class="wc-o">Mekân</span></div></div>
+        <div class="wc-field bt"><label>Manken</label><div class="wc-orow"><span class="wc-o on">Otomatik</span><span class="wc-o">Kadın</span><span class="wc-o">Erkek</span></div></div>
+      </section>
+
+      <section class="wc-card">
+        <div class="wc-qa-hd"><h3>QA Karnesi · 01 Önden</h3><span class="v">İyi</span></div>
+        <div class="wc-qa-body">
+          <div class="wc-qrow"><span class="wc-qname">Renk</span><span class="wc-qtrack"><span class="wc-qfill good wf92"></span></span><span class="wc-qtag good">İyi</span></div>
+          <div class="wc-qrow"><span class="wc-qname">Doku</span><span class="wc-qtrack"><span class="wc-qfill good wf88"></span></span><span class="wc-qtag good">İyi</span></div>
+          <div class="wc-qrow"><span class="wc-qname">Logo</span><span class="wc-qtrack"><span class="wc-qfill normal wf64"></span></span><span class="wc-qtag normal">Normal</span></div>
+          <div class="wc-qrow"><span class="wc-qname">Poz</span><span class="wc-qtrack"><span class="wc-qfill good wf92"></span></span><span class="wc-qtag good">İyi</span></div>
+          <p class="wc-qnote">Renk ve dokuyu çok iyi yakaladık. Logonun netliği kadraj kenarında biraz düşük — istersen 04 detay karesini referans alıp yeniden üretebilirsin.</p>
+        </div>
+        <div class="wc-qact"><button class="wc-bghost">Yeniden üret</button><button class="wc-bsolid">Onayla</button></div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="wc-sec-hd"><h2>Galeri</h2><p>Bu çekimden 18 kare</p><a href="#">Tümünü gör →</a></div>
+  <div class="wc-gallery">
+    <article class="wc-gcard"><div class="wc-gimg wg1"><span class="wc-gstatus ws-approved">Onaylı</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="wc-gft"><div><b>Önden tam boy</b><small class="mono">BSGMARS25337</small></div><span class="sc">İyi</span></div></article>
+    <article class="wc-gcard"><div class="wc-gimg wg2"><span class="wc-gstatus ws-review">İncele</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="wc-gft"><div><b>Yandan görünüm</b><small class="mono">BSGMARS25337</small></div><span class="sc">İyi</span></div></article>
+    <article class="wc-gcard"><div class="wc-gimg wg3"><span class="wc-gstatus ws-review">İncele</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="wc-gft"><div><b>Arkadan</b><small class="mono">BSGMARS25337</small></div><span class="sc" style="color:var(--normal)">Normal</span></div></article>
+    <article class="wc-gcard"><div class="wc-gimg wg4"><span class="wc-gstatus ws-approved">Onaylı</span><figure><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div><div class="wc-gft"><div><b>Yakın detay</b><small class="mono">BSGMARS25337</small></div><span class="sc">İyi</span></div></article>
+    <article class="wc-gcard"><div class="wc-gimg wg2"><span class="wc-gstatus ws-draft">Taslak</span><figure><svg viewBox="0 0 200 200"><use href="#ms-bag"/></svg></figure></div><div class="wc-gft"><div><b>Çanta · yandan</b><small class="mono">BSGTOT9021</small></div><span class="sc">İyi</span></div></article>
+    <article class="wc-gcard"><div class="wc-gimg wg1"><span class="wc-gstatus ws-approved">Onaylı</span><figure><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div><div class="wc-gft"><div><b>Flat-lay</b><small class="mono">BSGMARS25337</small></div><span class="sc">İyi</span></div></article>
+  </div>
+
+ </div>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector('.wc'); if (!root) return;
+  var shots = root.querySelector('#wc-shots'), costEl = root.querySelector('#wc-cost');
+  var unit = 6;
+  function recalc(){ var n = shots.querySelectorAll('.wc-shot.on').length; if(costEl) costEl.textContent = (n*unit)+' işlem birimi'; }
+  shots.addEventListener('click', function(e){ var b=e.target.closest('.wc-shot'); if(!b) return; b.classList.toggle('on'); recalc(); });
+  root.querySelectorAll('.wc-qset .q').forEach(function(q){ q.addEventListener('click', function(){ root.querySelectorAll('.wc-qset .q').forEach(function(x){x.classList.remove('on');}); q.classList.add('on'); unit = q.textContent==='1K'?3:q.textContent==='4K'?12:6; recalc(); }); });
+  root.querySelectorAll('.wc-sector').forEach(function(s){ s.addEventListener('click', function(){ root.querySelectorAll('.wc-sector').forEach(function(x){x.classList.remove('on');}); s.classList.add('on'); }); });
+})();
+</script>

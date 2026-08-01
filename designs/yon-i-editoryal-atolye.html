@@ -1,0 +1,601 @@
+<title>Master Studio — Yön I · Editoryal Atölye</title>
+
+<style>
+/* ============================================================
+   YÖN I — "Editoryal Atölye"
+   Bir moda evinin lookbook çalışması: porselen zemin üzerinde
+   büyük LEVHALAR, serif başlıklar, cömert boşluk. Levha düzeni —
+   gazete/broadsheet değil. Moda markalarına satış yapan yüz;
+   onay/QA işleyişi zarifçe içeride (Karne paneli).
+   ÇİFT-TEMA: Açık = porselen #f7f5f2 + mürekkep #17161b.
+              Koyu = is-füme #141317 + fildişi metin.
+   Accent = bordo (#7d2b3a; koyuda açılmış #c96b7c) — yalnız
+   bağlantı, durum ve küçük vurgularda. Semantik iyi/uyarı/zayıf
+   accent'ten ayrı. Display: ui-serif / New York / Georgia.
+   Namespace: .ed — tüm seçiciler bu kök altında, ID'ler "ed-".
+   ============================================================ */
+
+.ed, .ed *, .ed *::before, .ed *::after { box-sizing: border-box; }
+
+.ed {
+  --bg: #f7f5f2; --panel: #fdfcfa; --panel-2: #efece7; --panel-3: #e7e3dd;
+  --line: #e4e0dc; --line-2: #d4cec9;
+  --text: #17161b; --text-2: #5c575c; --text-3: #8f8890;
+  --accent: #7d2b3a; --accent-2: #5f1f2c; --accent-soft: rgba(125,43,58,.08);
+  --on-accent: #f7f5f2;
+  --good: #2b8f5f; --normal: #9c6a15; --weak: #c43f3f;
+  --sel: rgba(125,43,58,.16);
+  --shadow: 0 2px 6px rgba(23,22,27,.05), 0 14px 34px rgba(23,22,27,.08);
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text); background: var(--bg); min-height: 100vh;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-size: 14px; line-height: 1.55; letter-spacing: -0.004em;
+}
+@media (prefers-color-scheme: dark) {
+  .ed {
+    --bg: #141317; --panel: #1a191e; --panel-2: #211f25; --panel-3: #29262e;
+    --line: #29272d; --line-2: #383440;
+    --text: #efeae2; --text-2: #aba49f; --text-3: #7c747b;
+    --accent: #c96b7c; --accent-2: #dd8b9a; --accent-soft: rgba(201,107,124,.13);
+    --on-accent: #17161b;
+    --good: #4cc08a; --normal: #d3a45b; --weak: #ec7a72;
+    --sel: rgba(201,107,124,.32);
+    --shadow: 0 2px 6px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"] .ed {
+  --bg: #141317; --panel: #1a191e; --panel-2: #211f25; --panel-3: #29262e;
+  --line: #29272d; --line-2: #383440;
+  --text: #efeae2; --text-2: #aba49f; --text-3: #7c747b;
+  --accent: #c96b7c; --accent-2: #dd8b9a; --accent-soft: rgba(201,107,124,.13);
+  --on-accent: #17161b;
+  --good: #4cc08a; --normal: #d3a45b; --weak: #ec7a72;
+  --sel: rgba(201,107,124,.32);
+  --shadow: 0 2px 6px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.45);
+}
+:root[data-theme="light"] .ed {
+  --bg: #f7f5f2; --panel: #fdfcfa; --panel-2: #efece7; --panel-3: #e7e3dd;
+  --line: #e4e0dc; --line-2: #d4cec9;
+  --text: #17161b; --text-2: #5c575c; --text-3: #8f8890;
+  --accent: #7d2b3a; --accent-2: #5f1f2c; --accent-soft: rgba(125,43,58,.08);
+  --on-accent: #f7f5f2;
+  --good: #2b8f5f; --normal: #9c6a15; --weak: #c43f3f;
+  --sel: rgba(125,43,58,.16);
+  --shadow: 0 2px 6px rgba(23,22,27,.05), 0 14px 34px rgba(23,22,27,.08);
+}
+
+.ed ::selection { background: var(--sel); }
+.ed :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.ed button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; letter-spacing: inherit; }
+.ed svg { display: block; max-width: 100%; }
+.ed h1, .ed h2, .ed h3, .ed p, .ed figure { margin: 0; }
+.ed .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+.ed .serif { font-family: ui-serif, "New York", Georgia, "Times New Roman", serif; }
+@media (prefers-reduced-motion: reduce) { .ed *, .ed *::before, .ed *::after { transition: none !important; animation: none !important; } }
+
+.ed-app { max-width: 1180px; margin: 0 auto; padding: 18px clamp(16px, 3.4vw, 34px) 64px; }
+
+/* ---------- Masthead: çizgi-arası şerit ---------- */
+.ed-mast {
+  display: flex; align-items: center; gap: 18px; padding: 13px 2px;
+  border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2);
+}
+.ed-wordmark { font-size: 10.5px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; white-space: nowrap; }
+.ed-wordmark span { color: var(--text-3); font-weight: 500; letter-spacing: .18em; }
+.ed-mastnav { margin: 0 auto; display: flex; gap: 4px; }
+.ed-mastnav button {
+  font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--text-3); padding: 6px 10px; transition: color .15s;
+}
+.ed-mastnav button:hover { color: var(--text); }
+.ed-mastnav button.on { color: var(--accent); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+.ed-mastright { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.ed-credit { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.ed-credit b { font-size: 12.5px; font-weight: 650; }
+.ed-credit small { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+.ed-vr { width: 1px; height: 18px; background: var(--line-2); }
+.ed-user { display: flex; align-items: center; gap: 9px; padding: 3px 4px; border-radius: 2px; }
+.ed-user:hover .nm { color: var(--text); }
+.ed-ava {
+  width: 27px; height: 27px; border-radius: 50%; border: 1px solid var(--line-2);
+  background: var(--panel); display: grid; place-items: center; flex: none;
+  font-family: ui-serif, "New York", Georgia, serif; font-size: 11px; font-weight: 600;
+}
+.ed-user .nm { font-size: 12px; color: var(--text-2); transition: color .15s; }
+.ed-user > svg { width: 14px; color: var(--text-3); }
+
+/* ---------- Sezon başlığı + kontroller ---------- */
+.ed-head {
+  display: flex; align-items: flex-end; gap: 26px; flex-wrap: wrap;
+  padding: clamp(30px, 5vw, 54px) 2px clamp(22px, 3vw, 30px);
+  border-bottom: 1px solid var(--line-2); margin-bottom: clamp(28px, 4vw, 42px);
+}
+.ed-eyebrow {
+  display: block; font-size: 10px; font-weight: 650; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+}
+.ed-head h1 {
+  font-family: ui-serif, "New York", Georgia, "Times New Roman", serif;
+  font-size: clamp(46px, 7vw, 78px); font-weight: 560; line-height: 1.0;
+  letter-spacing: -0.01em; text-wrap: balance;
+}
+.ed-sub {
+  margin-top: 14px; font-family: ui-serif, "New York", Georgia, serif;
+  font-style: italic; font-size: clamp(15px, 1.6vw, 17.5px); color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.ed-controls { margin-left: auto; display: flex; align-items: center; gap: 14px; padding-bottom: 6px; }
+.ed-viewlbl { font-size: 9.5px; font-weight: 650; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+.ed-view { display: flex; border: 1px solid var(--line-2); background: var(--panel); border-radius: 2px; overflow: hidden; }
+.ed-view button {
+  padding: 9px 16px; font-size: 10px; font-weight: 650; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--text-3); transition: color .15s, background .15s;
+}
+.ed-view button + button { border-left: 1px solid var(--line-2); }
+.ed-view button:hover { color: var(--text); }
+.ed-view button.on { color: var(--accent); background: var(--accent-soft); }
+.ed-export {
+  display: inline-flex; align-items: center; gap: 9px; padding: 11px 18px;
+  background: var(--text); color: var(--bg); border-radius: 2px;
+  font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+  transition: background .16s, color .16s, transform .12s;
+}
+.ed-export:hover { background: var(--accent); color: var(--on-accent); transform: translateY(-1px); }
+.ed-export svg { width: 15px; }
+
+/* ---------- Levhalar ---------- */
+.ed-plates {
+  display: grid; grid-template-columns: repeat(12, 1fr);
+  column-gap: clamp(18px, 2.6vw, 30px); row-gap: clamp(34px, 4.5vw, 50px);
+}
+.ed-plate { min-width: 0; }
+.ed-plate--hero { grid-column: 1 / -1; }
+.ed-w7 { grid-column: span 7; }
+.ed-w5 { grid-column: span 5; }
+
+.ed-mat {
+  position: relative; border: 1px solid var(--line-2);
+  display: grid; place-items: center; padding: clamp(22px, 3.2vw, 36px) 0;
+  transition: border-color .18s;
+}
+.ed-plate:hover .ed-mat { border-color: color-mix(in srgb, var(--text) 30%, transparent); }
+.ed-mt-navy { background: linear-gradient(168deg, color-mix(in srgb, #1f2a44 9%, var(--panel-2)), var(--panel-2) 74%); }
+.ed-mt-sand { background: linear-gradient(168deg, color-mix(in srgb, #d8c7ae 26%, var(--panel-2)), var(--panel-2) 78%); }
+.ed-mt-taba { background: linear-gradient(168deg, color-mix(in srgb, #a4673a 11%, var(--panel-2)), var(--panel-2) 76%); }
+
+.ed-plnum {
+  position: absolute; top: 14px; left: 19px;
+  font-family: ui-serif, "New York", Georgia, serif; font-style: italic;
+  font-size: clamp(20px, 2.2vw, 27px); color: var(--text-3);
+  font-variant-numeric: tabular-nums; transition: color .18s; line-height: 1;
+}
+.ed-plate:hover .ed-plnum { color: var(--accent); }
+.ed-plate--hero .ed-plnum { font-size: clamp(30px, 3.4vw, 40px); top: 20px; left: 26px; }
+
+.ed-frame {
+  width: 70%; aspect-ratio: 4 / 5; position: relative;
+  border: 1px solid color-mix(in srgb, var(--text) 26%, transparent);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  display: grid; place-items: center;
+}
+.ed-frame::after { content: ""; position: absolute; inset: 7px; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); pointer-events: none; }
+.ed-frame figure { width: 56%; color: var(--text-3); opacity: .92; }
+.ed-frame figure.close { width: 84%; }
+.ed-frame figure.bag { width: 62%; }
+.ed-w7 .ed-frame { width: 50%; }
+.ed-plate--hero .ed-frame { width: min(430px, 76%); }
+.ed-plate--hero .ed-mat { padding: clamp(36px, 6vw, 70px) 0; }
+
+/* Künye — hover'da belirginleşir */
+.ed-cap {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line);
+  opacity: .76; transition: opacity .18s, border-color .18s;
+}
+.ed-plate:hover .ed-cap, .ed-plate:focus-within .ed-cap {
+  opacity: 1; border-top-color: color-mix(in srgb, var(--text) 32%, transparent);
+}
+.ed-cap .t { font-family: ui-serif, "New York", Georgia, serif; font-style: italic; font-size: 15.5px; letter-spacing: 0; }
+.ed-plate--hero .ed-cap .t { font-size: 17.5px; }
+.ed-cap .sku { font-size: 10.5px; color: var(--text-3); }
+.ed-cap .r { margin-left: auto; display: flex; align-items: baseline; gap: 14px; white-space: nowrap; }
+.ed-cap .det { font-size: 10.5px; color: var(--text-3); }
+.ed-meta { width: 100%; font-size: 11.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+
+.ed-status {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase;
+}
+.ed-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex: none; transform: translateY(-.5px); }
+.ed-status--approved { color: var(--accent); }
+.ed-status--approved::before { background: var(--accent); }
+.ed-status--review { color: var(--normal); }
+.ed-status--review::before { background: transparent; border: 1.5px solid currentColor; width: 5px; height: 5px; }
+
+/* Karne bağlantısı + satır-içi panel */
+.ed-karnebtn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase;
+  color: var(--accent); text-decoration: underline dotted; text-underline-offset: 4px;
+  text-decoration-thickness: 1px; transition: color .15s;
+}
+.ed-karnebtn:hover { color: var(--accent-2); }
+.ed-karnebtn svg { width: 13px; transition: transform .2s; }
+.ed-karnebtn.open svg { transform: rotate(180deg); }
+
+.ed-karne {
+  display: none; margin: 16px auto 0; max-width: 580px; width: 100%;
+  border: 1px solid var(--line-2); background: var(--panel); box-shadow: var(--shadow);
+  padding: 16px 20px 18px;
+}
+.ed-karne.open { display: block; animation: ed-slide .22s ease; }
+@keyframes ed-slide { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: none; } }
+.ed-khead { display: flex; align-items: baseline; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.ed-khead .kh { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--text-2); }
+.ed-khead .kv { margin-left: auto; font-size: 9.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--good); }
+.ed-krow { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; }
+.ed-krow .n { font-size: 13px; flex: none; }
+.ed-krow .lead { flex: 1; border-bottom: 1px dotted var(--line-2); transform: translateY(-3px); }
+.ed-krow .s { font-size: 13px; flex: none; }
+.ed-krow .tag { flex: none; width: 62px; text-align: right; font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+.ed-krow .tag.good { color: var(--good); }
+.ed-krow .tag.normal { color: var(--normal); }
+.ed-krow .tag.weak { color: var(--weak); }
+.ed-knote {
+  margin-top: 8px; padding-top: 11px; border-top: 1px solid var(--line);
+  font-family: ui-serif, "New York", Georgia, serif; font-style: italic;
+  font-size: 13.5px; color: var(--text-2); line-height: 1.55;
+}
+
+/* Izgara görünümü: levhalar küçülüp 3 sütuna akar */
+.ed-plates.is-grid { row-gap: clamp(26px, 3vw, 34px); }
+.ed-plates.is-grid .ed-plate,
+.ed-plates.is-grid .ed-plate--hero { grid-column: span 4; }
+.ed-plates.is-grid .ed-mat, .ed-plates.is-grid .ed-plate--hero .ed-mat { padding: 20px 0; }
+.ed-plates.is-grid .ed-frame { width: 74%; }
+.ed-plates.is-grid .ed-plnum { font-size: 19px; top: 11px; left: 14px; }
+.ed-plates.is-grid .ed-cap .t { font-size: 14px; }
+.ed-plates.is-grid .ed-meta { display: none; }
+.ed-plates.is-grid .ed-cap .det { display: none; }
+.ed-plates.is-grid .ed-karne { max-width: none; }
+
+/* ---------- Seçki Künyesi (kolofon) ---------- */
+.ed-colo { margin-top: clamp(52px, 7vw, 80px); border-top: 1px solid var(--line-2); padding-top: clamp(24px, 3vw, 32px); }
+.ed-colo h2 {
+  font-family: ui-serif, "New York", Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 3.2vw, 34px); font-weight: 560; letter-spacing: -0.01em; text-wrap: balance;
+}
+.ed-colosub { margin-top: 7px; font-family: ui-serif, "New York", Georgia, serif; font-style: italic; font-size: 15px; color: var(--text-2); }
+.ed-cologrid { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: clamp(26px, 4vw, 46px); margin-top: 26px; }
+
+.ed-ix { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-bottom: none; }
+.ed-ix .no { flex: none; width: 24px; font-family: ui-serif, "New York", Georgia, serif; font-style: italic; font-size: 14px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.ed-ix .nm { font-size: 13px; min-width: 0; }
+.ed-ix .lead { flex: 1; border-bottom: 1px dotted var(--line-2); transform: translateY(-3px); min-width: 18px; }
+.ed-ix .st { flex: none; font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+.ed-ix .st.ap { color: var(--accent); }
+.ed-ix .st.rv { color: var(--normal); }
+.ed-ix .st.dr { color: var(--text-3); }
+
+.ed-crew { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+.ed-crew .ed-ava { width: 30px; height: 30px; font-size: 11.5px; }
+.ed-crew .cb b { display: block; font-size: 12.5px; font-weight: 650; }
+.ed-crew .cb small { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); }
+.ed-crew .cr { margin-left: auto; font-size: 10.5px; color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.ed-prow { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; }
+.ed-prow .k { flex: none; font-size: 12.5px; color: var(--text-2); }
+.ed-prow .lead { flex: 1; border-bottom: 1px dotted var(--line-2); transform: translateY(-3px); min-width: 18px; }
+.ed-prow .v { flex: none; font-size: 12.5px; }
+.ed-prow .v.em { color: var(--accent); font-weight: 650; }
+
+/* ---------- Marka Kiti ---------- */
+.ed-kit { margin-top: clamp(52px, 7vw, 80px); border-top: 1px solid var(--line-2); padding-top: clamp(24px, 3vw, 32px); }
+.ed-kit h2 {
+  font-family: ui-serif, "New York", Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 3.2vw, 34px); font-weight: 560; letter-spacing: -0.01em; text-wrap: balance;
+}
+.ed-kitsub { margin-top: 7px; font-family: ui-serif, "New York", Georgia, serif; font-style: italic; font-size: 15px; color: var(--text-2); }
+.ed-kitgrid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(26px, 4.5vw, 52px); margin-top: 26px; }
+.ed-kitlbl { font-size: 9.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }
+
+.ed-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.ed-chip .sw { height: 62px; border: 1px solid var(--line-2); border-radius: 2px; }
+.ed-chip .nm { margin-top: 8px; font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.ed-chip .hx { font-size: 10.5px; color: var(--text-3); margin-top: 2px; }
+.ed-chipnote {
+  margin-top: 16px; font-family: ui-serif, "New York", Georgia, serif; font-style: italic;
+  font-size: 13.5px; color: var(--text-2); line-height: 1.55;
+}
+
+.ed-trow { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px dotted var(--line-2); }
+.ed-trow:first-of-type { padding-top: 0; }
+.ed-ttag { flex: none; width: 58px; font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+.ed-tsample { min-width: 0; }
+.ed-tsample.h { font-family: ui-serif, "New York", Georgia, serif; font-size: 22px; font-weight: 560; letter-spacing: -0.01em; }
+.ed-tsample.i { font-family: ui-serif, "New York", Georgia, serif; font-style: italic; font-size: 15.5px; color: var(--text-2); }
+.ed-tsample.b { font-size: 13.5px; color: var(--text-2); }
+.ed-tsample.m { font-size: 13px; color: var(--text-2); }
+
+.ed-rule {
+  display: flex; gap: 16px; align-items: center; margin-top: 20px;
+  border: 1px solid var(--line-2); background: var(--panel); padding: 14px 16px; border-radius: 2px;
+}
+.ed-safe { width: 76px; aspect-ratio: 4 / 5; flex: none; position: relative; background: var(--panel-2); border: 1px solid var(--line-2); }
+.ed-safe::before { content: ""; position: absolute; inset: 6%; border: 1px dashed var(--accent); opacity: .85; }
+.ed-safe i { position: absolute; right: 11%; bottom: 10%; width: 15px; height: 9px; background: var(--accent); opacity: .9; }
+.ed-rule .rb b { display: block; font-size: 9.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 5px; }
+.ed-rule .rb p { font-size: 12.5px; color: var(--text-2); line-height: 1.55; }
+
+/* ---------- Alt bilgi ---------- */
+.ed-foot { margin-top: clamp(52px, 7vw, 78px); display: flex; align-items: center; gap: 20px; }
+.ed-foot::before, .ed-foot::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
+.ed-foot p { font-size: 9.5px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--text-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ---------- Duyarlılık ---------- */
+@media (max-width: 1140px) {
+  .ed-w7, .ed-w5 { grid-column: span 6; }
+  .ed-w7 .ed-frame { width: 62%; }
+  .ed-plates.is-grid .ed-plate, .ed-plates.is-grid .ed-plate--hero { grid-column: span 6; }
+  .ed-head { align-items: flex-start; }
+  .ed-controls { padding-bottom: 0; }
+  .ed-cologrid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 760px) {
+  .ed-app { padding-top: 12px; }
+  .ed-mastnav { display: none; }
+  .ed-user .nm { display: none; }
+  .ed-wordmark span { display: none; }
+  .ed-head { flex-direction: column; align-items: stretch; gap: 18px; }
+  .ed-controls { margin-left: 0; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .ed-viewlbl { display: none; }
+  .ed-plate--hero, .ed-w7, .ed-w5 { grid-column: 1 / -1; }
+  .ed-w7 .ed-frame { width: 70%; }
+  .ed-plates.is-grid .ed-plate, .ed-plates.is-grid .ed-plate--hero { grid-column: span 6; }
+  .ed-plates.is-grid .ed-frame { width: 82%; }
+  .ed-kitgrid { grid-template-columns: 1fr; }
+  .ed-cologrid { grid-template-columns: 1fr; }
+  .ed-chips { grid-template-columns: repeat(2, 1fr); }
+  .ed-cap .r { margin-left: 0; width: 100%; justify-content: flex-start; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ms-figure" viewBox="0 0 200 340"><circle cx="100" cy="42" r="23"/><path d="M93 66h14v10H93z"/><path d="M74 78 Q100 70 126 78 L133 150 Q118 158 100 158 Q82 158 67 150 Z"/><path d="M69 149 Q100 160 131 149 L151 302 Q100 318 49 302 Z"/><path d="M74 80 Q57 122 61 182 L71 180 Q69 122 84 86 Z"/><path d="M126 80 Q143 122 139 182 L129 180 Q131 122 116 86 Z"/></symbol>
+  <symbol id="ms-garment" viewBox="0 0 200 210"><path d="M70 34 Q100 22 130 34 L164 60 Q170 64 166 72 L149 92 L146 84 L146 188 Q146 194 140 194 L60 194 Q54 194 54 188 L54 84 L51 92 L34 72 Q30 64 36 60 Z"/><path d="M80 34 Q100 54 120 34" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/></symbol>
+  <symbol id="ms-bag" viewBox="0 0 200 200"><path d="M64 84 h72 q10 0 11 10 l7 78 q1 10 -9 10 H55 q-10 0 -9 -10 l7 -78 q1 -10 11 -10 Z"/><path d="M74 84 Q74 48 100 48 Q126 48 126 84" fill="none" stroke="currentColor" stroke-width="7" opacity=".55"/></symbol>
+</svg>
+
+<div class="ed">
+ <div class="ed-app">
+
+  <!-- MASTHEAD: ince çizgi-arası şerit -->
+  <header class="ed-mast">
+    <div class="ed-wordmark">Master Studio <span>— Ürün Fotoğraf Stüdyosu</span></div>
+    <nav class="ed-mastnav" aria-label="Ana gezinme">
+      <button>Stüdyo</button>
+      <button class="on">Galeri</button>
+      <button>Toplu Üretim</button>
+      <button>Entegrasyonlar</button>
+    </nav>
+    <div class="ed-mastright">
+      <span class="ed-credit"><b class="mono">1.240</b><small>işlem birimi</small></span>
+      <span class="ed-vr" aria-hidden="true"></span>
+      <button class="ed-user" aria-label="Hesap: Yeşilmen Ltd.">
+        <span class="ed-ava">YG</span><span class="nm">Yeşilmen Ltd.</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- SEZON BAŞLIĞI -->
+  <section class="ed-head">
+    <div>
+      <span class="ed-eyebrow">Galeri — Lookbook Seçkisi</span>
+      <h1>Sonbahar ’26</h1>
+      <p class="ed-sub">Bel Ceketi koleksiyonu · 18 kare · 12 onaylı</p>
+    </div>
+    <div class="ed-controls">
+      <span class="ed-viewlbl">Görünüm</span>
+      <div class="ed-view" id="ed-view" role="group" aria-label="Görünüm seçimi">
+        <button class="on" data-view="plate" aria-pressed="true">Levha</button>
+        <button data-view="grid" aria-pressed="false">Izgara</button>
+      </div>
+      <button class="ed-export" id="ed-export">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Seçkiyi dışa aktar (PDF)
+      </button>
+    </div>
+  </section>
+
+  <!-- LEVHALAR -->
+  <section class="ed-plates" id="ed-plates" aria-label="Lookbook levhaları">
+
+    <!-- HERO LEVHA -->
+    <article class="ed-plate ed-plate--hero">
+      <div class="ed-mat ed-mt-navy">
+        <span class="ed-plnum" aria-hidden="true">01</span>
+        <div class="ed-frame"><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div>
+      </div>
+      <div class="ed-cap">
+        <span class="t">Levha 01 — Önden tam boy</span>
+        <span class="sku mono">BSGMARS25337</span>
+        <span class="r">
+          <span class="ed-status ed-status--approved">Onaylı</span>
+          <button class="ed-karnebtn" id="ed-karne-btn" aria-expanded="false" aria-controls="ed-karne">
+            Karne
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </span>
+        <span class="ed-meta">2K çözünürlük · 4:5 kadraj · Stüdyo fonu · Manken: Otomatik · 28 Temmuz 2026</span>
+      </div>
+      <div class="ed-karne" id="ed-karne" role="region" aria-label="QA karnesi, Levha 01">
+        <div class="ed-khead"><span class="kh">QA Karnesi — Levha 01</span><span class="kv">Genel: İyi</span></div>
+        <div class="ed-krow"><span class="n">Renk</span><span class="lead" aria-hidden="true"></span><span class="s mono">92</span><span class="tag good">İyi</span></div>
+        <div class="ed-krow"><span class="n">Doku</span><span class="lead" aria-hidden="true"></span><span class="s mono">88</span><span class="tag good">İyi</span></div>
+        <div class="ed-krow"><span class="n">Logo</span><span class="lead" aria-hidden="true"></span><span class="s mono">64</span><span class="tag normal">Normal</span></div>
+        <div class="ed-krow"><span class="n">Poz</span><span class="lead" aria-hidden="true"></span><span class="s mono">92</span><span class="tag good">İyi</span></div>
+        <p class="ed-knote">Renk sadakati ΔE 3.1 ile hedefte. Logo netliği kadraj kenarında hafif düşük — 04 numaralı detay levhası referans alınabilir.</p>
+      </div>
+    </article>
+
+    <!-- LEVHA 02 — geniş -->
+    <article class="ed-plate ed-w7">
+      <div class="ed-mat ed-mt-sand">
+        <span class="ed-plnum" aria-hidden="true">02</span>
+        <div class="ed-frame"><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div>
+      </div>
+      <div class="ed-cap">
+        <span class="t">Levha 02 — Yandan görünüm</span>
+        <span class="sku mono">BSGMARS25337</span>
+        <span class="r"><span class="det mono">2K · 4:5</span><span class="ed-status ed-status--approved">Onaylı</span></span>
+      </div>
+    </article>
+
+    <!-- LEVHA 03 — bekleyen -->
+    <article class="ed-plate ed-w5">
+      <div class="ed-mat ed-mt-navy">
+        <span class="ed-plnum" aria-hidden="true">03</span>
+        <div class="ed-frame"><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div>
+      </div>
+      <div class="ed-cap">
+        <span class="t">Levha 03 — Arkadan görünüm</span>
+        <span class="sku mono">BSGMARS25337</span>
+        <span class="r"><span class="det mono">2K · 4:5</span><span class="ed-status ed-status--review">İncele</span></span>
+        <span class="ed-meta">Ayşe K. incelemesinde — poz kontrolü bekliyor</span>
+      </div>
+    </article>
+
+    <!-- LEVHA 04 — detay -->
+    <article class="ed-plate ed-w5">
+      <div class="ed-mat ed-mt-sand">
+        <span class="ed-plnum" aria-hidden="true">04</span>
+        <div class="ed-frame"><figure class="close"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div>
+      </div>
+      <div class="ed-cap">
+        <span class="t">Levha 04 — Yakın detay · Kumaş &amp; dikiş</span>
+        <span class="sku mono">BSGMARS25337</span>
+        <span class="r"><span class="det mono">4K · 4:5</span><span class="ed-status ed-status--approved">Onaylı</span></span>
+      </div>
+    </article>
+
+    <!-- LEVHA 05 — çanta, geniş -->
+    <article class="ed-plate ed-w7">
+      <div class="ed-mat ed-mt-taba">
+        <span class="ed-plnum" aria-hidden="true">05</span>
+        <div class="ed-frame"><figure class="bag"><svg viewBox="0 0 200 200"><use href="#ms-bag"/></svg></figure></div>
+      </div>
+      <div class="ed-cap">
+        <span class="t">Levha 05 — Deri Omuz Çantası · Taba</span>
+        <span class="sku mono">BSGTOT9021</span>
+        <span class="r"><span class="det mono">2K · 4:5</span><span class="ed-status ed-status--approved">Onaylı</span></span>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- SEÇKİ KÜNYESİ -->
+  <section class="ed-colo">
+    <span class="ed-eyebrow">Ek A — Künye</span>
+    <h2>Seçki Künyesi</h2>
+    <p class="ed-colosub">Lookbook sıralaması, ekip ve üretim dökümü</p>
+
+    <div class="ed-cologrid">
+      <div>
+        <div class="ed-kitlbl">Sıralama</div>
+        <div class="ed-ix"><span class="no">01</span><span class="nm">Önden tam boy</span><span class="lead" aria-hidden="true"></span><span class="st ap">Onaylı</span></div>
+        <div class="ed-ix"><span class="no">02</span><span class="nm">Yandan görünüm</span><span class="lead" aria-hidden="true"></span><span class="st ap">Onaylı</span></div>
+        <div class="ed-ix"><span class="no">03</span><span class="nm">Arkadan görünüm</span><span class="lead" aria-hidden="true"></span><span class="st rv">İncele</span></div>
+        <div class="ed-ix"><span class="no">04</span><span class="nm">Yakın detay · Kumaş &amp; dikiş</span><span class="lead" aria-hidden="true"></span><span class="st ap">Onaylı</span></div>
+        <div class="ed-ix"><span class="no">05</span><span class="nm">Deri Omuz Çantası · Taba</span><span class="lead" aria-hidden="true"></span><span class="st ap">Onaylı</span></div>
+        <div class="ed-ix"><span class="no">06</span><span class="nm">Düz zemin · flat-lay</span><span class="lead" aria-hidden="true"></span><span class="st dr">Taslak</span></div>
+        <div class="ed-ix"><span class="no">07</span><span class="nm">Askıda görünüm</span><span class="lead" aria-hidden="true"></span><span class="st dr">Taslak</span></div>
+      </div>
+      <div>
+        <div class="ed-kitlbl">Ekip</div>
+        <div class="ed-crew"><span class="ed-ava">YG</span><span class="cb"><b>Yeşilmen</b><small>Sanat yönetimi</small></span><span class="cr mono">12 onay</span></div>
+        <div class="ed-crew"><span class="ed-ava">AK</span><span class="cb"><b>Ayşe K.</b><small>Kalite incelemesi</small></span><span class="cr mono">4 incelemede</span></div>
+        <div class="ed-crew"><span class="ed-ava">DT</span><span class="cb"><b>Deniz T.</b><small>Retüş &amp; dışa aktarım</small></span><span class="cr mono">2 taslak</span></div>
+      </div>
+      <div>
+        <div class="ed-kitlbl">Üretim</div>
+        <div class="ed-prow"><span class="k">Toplam kare</span><span class="lead" aria-hidden="true"></span><span class="v mono">18</span></div>
+        <div class="ed-prow"><span class="k">Kalite</span><span class="lead" aria-hidden="true"></span><span class="v mono">16 × 2K · 2 × 4K</span></div>
+        <div class="ed-prow"><span class="k">Harcanan</span><span class="lead" aria-hidden="true"></span><span class="v mono">120 işlem birimi</span></div>
+        <div class="ed-prow"><span class="k">Kalan bakiye</span><span class="lead" aria-hidden="true"></span><span class="v mono">1.240 işlem birimi</span></div>
+        <div class="ed-prow"><span class="k">Dışa aktarım</span><span class="lead" aria-hidden="true"></span><span class="v">PDF · 4:5 · 300 dpi</span></div>
+        <div class="ed-prow"><span class="k">Hedef pazaryerleri</span><span class="lead" aria-hidden="true"></span><span class="v">Trendyol · Shopify</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARKA KİTİ -->
+  <section class="ed-kit">
+    <span class="ed-eyebrow">Ek B — Kimlik</span>
+    <h2>Marka Kiti</h2>
+    <p class="ed-kitsub">Yeşilmen Ltd. için Sonbahar ’26 görsel dili</p>
+
+    <div class="ed-kitgrid">
+      <div>
+        <div class="ed-kitlbl">Renk Paleti</div>
+        <div class="ed-chips">
+          <div class="ed-chip"><div class="sw" style="background:#1f2a44"></div><div class="nm">Lacivert</div><div class="hx mono">#1F2A44</div></div>
+          <div class="ed-chip"><div class="sw" style="background:#a4673a"></div><div class="nm">Taba</div><div class="hx mono">#A4673A</div></div>
+          <div class="ed-chip"><div class="sw" style="background:#d8c7ae"></div><div class="nm">Kum</div><div class="hx mono">#D8C7AE</div></div>
+          <div class="ed-chip"><div class="sw" style="background:#f7f5f2"></div><div class="nm">Porselen</div><div class="hx mono">#F7F5F2</div></div>
+        </div>
+        <p class="ed-chipnote">Kadraj fonu Kum, ürün Lacivert, sap ve aksesuar Taba; boşluklar Porselen kalır.</p>
+      </div>
+      <div>
+        <div class="ed-kitlbl">Tipografi</div>
+        <div class="ed-trow"><span class="ed-ttag">Başlık</span><span class="ed-tsample h serif">Sonbahar ’26 Seçkisi</span></div>
+        <div class="ed-trow"><span class="ed-ttag">Vurgu</span><span class="ed-tsample i">Koleksiyon notları italik dizilir</span></div>
+        <div class="ed-trow"><span class="ed-ttag">Gövde</span><span class="ed-tsample b">Künye ve etiketler sistem sans ile yazılır.</span></div>
+        <div class="ed-trow"><span class="ed-ttag">Rakam</span><span class="ed-tsample m mono">0123456789 · ΔE 3.1 · %6</span></div>
+        <div class="ed-rule">
+          <span class="ed-safe" aria-hidden="true"><i></i></span>
+          <div class="rb">
+            <b>Logo güvenli alan</b>
+            <p>Logo, kadraj kenarından en az yüzde 6 içeride kalır. Yerleşim: sağ alt köşe, tek renk mürekkep baskı.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALT BİLGİ -->
+  <footer class="ed-foot">
+    <p>Master Studio ile hazırlandı · Sonbahar ’26 seçkisi</p>
+  </footer>
+
+ </div>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector('.ed'); if (!root) return;
+
+  /* Levha | Izgara görünüm anahtarı */
+  var plates = root.querySelector('#ed-plates');
+  var viewBtns = root.querySelectorAll('#ed-view button');
+  viewBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      viewBtns.forEach(function (x) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
+      b.classList.add('on'); b.setAttribute('aria-pressed', 'true');
+      if (plates) plates.classList.toggle('is-grid', b.dataset.view === 'grid');
+    });
+  });
+
+  /* Karne: hero levha altında satır-içi QA paneli */
+  var kBtn = root.querySelector('#ed-karne-btn');
+  var kPanel = root.querySelector('#ed-karne');
+  if (kBtn && kPanel) {
+    kBtn.addEventListener('click', function () {
+      var open = kPanel.classList.toggle('open');
+      kBtn.classList.toggle('open', open);
+      kBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+})();
+</script>

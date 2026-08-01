@@ -1,0 +1,563 @@
+<style>
+/* ============================================================
+   YÖN A — "Stüdyo / Sinematik"
+   Koyu, görsel-öncelikli profesyonel foto aracı.
+   BİLİNÇLİ TEK-TEMA: Koyu. Renk-derecelendirme masası hissi.
+   Accent = sıcak stüdyo ışığı altını (#E9B872).
+   Namespace: .sa
+   ============================================================ */
+
+.sa, .sa *, .sa *::before, .sa *::after { box-sizing: border-box; }
+
+.sa {
+  /* Sabit koyu palet — viewer teması ne olursa olsun koyu kalır (karar) */
+  --bg:      #0b0b0f;
+  --bg-2:    #0f0f14;
+  --surface: #15151b;
+  --surface-2:#1b1b23;
+  --raise:   #21212b;
+  --line:    #26262f;
+  --line-2:  #34343f;
+  --text:    #ececf1;
+  --text-2:  #9c9caa;
+  --text-3:  #6a6a78;
+  --gold:    #e9b872;
+  --gold-2:  #f4d29a;
+  --gold-dim:rgba(233,184,114,.14);
+  --gold-ink:#241b0d;
+  --good:    #62c78a;
+  --normal:  #d6a94a;
+  --weak:    #db6b60;
+  --info:    #6ea8d8;
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.006em;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.sa ::selection { background: rgba(233,184,114,.28); color: #fff; }
+.sa :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+.sa button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; letter-spacing: inherit; }
+.sa img, .sa svg { display: block; max-width: 100%; }
+.sa-mono { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sa *, .sa *::before, .sa *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------- App frame ---------- */
+.sa-app { max-width: 1440px; margin: 0 auto; padding: 0 clamp(12px, 2vw, 28px) 60px; }
+
+/* ---------- Top bar ---------- */
+.sa-top {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: 20px;
+  height: 60px;
+  padding: 0 4px;
+  background: linear-gradient(180deg, rgba(11,11,15,.94), rgba(11,11,15,.74));
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.sa-brand { display: flex; align-items: center; gap: 11px; padding-right: 6px; }
+.sa-mark {
+  width: 30px; height: 30px; border-radius: 9px;
+  background: radial-gradient(120% 120% at 30% 20%, #f4d29a, #e9b872 45%, #b5822f);
+  box-shadow: 0 0 0 1px rgba(233,184,114,.35), 0 4px 14px rgba(233,184,114,.22);
+  position: relative;
+}
+.sa-mark::after { content:""; position:absolute; inset: 8px; border-radius: 3px; background: var(--gold-ink); clip-path: polygon(0 100%, 45% 0, 55% 0, 100% 100%); }
+.sa-word { font-weight: 700; font-size: 13.5px; letter-spacing: .14em; }
+.sa-word span { color: var(--text-3); }
+
+.sa-tabs { display: flex; align-items: center; gap: 2px; }
+.sa-tab {
+  padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 550;
+  color: var(--text-2); transition: color .16s, background .16s; white-space: nowrap;
+}
+.sa-tab:hover { color: var(--text); background: var(--surface); }
+.sa-tab.on { color: var(--gold-2); background: linear-gradient(180deg, var(--gold-dim), transparent); box-shadow: inset 0 0 0 1px rgba(233,184,114,.18); }
+
+.sa-top-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.sa-search {
+  display: flex; align-items: center; gap: 8px;
+  height: 34px; padding: 0 12px; min-width: 200px;
+  border-radius: 9px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--text-3); font-size: 12.5px;
+}
+.sa-search kbd { margin-left: auto; font-size: 10.5px; padding: 2px 6px; border-radius: 5px; background: var(--raise); border: 1px solid var(--line-2); color: var(--text-2); }
+
+.sa-credit {
+  display: flex; align-items: baseline; gap: 6px; height: 34px; padding: 0 13px;
+  border-radius: 9px; border: 1px solid rgba(233,184,114,.28);
+  background: linear-gradient(180deg, rgba(233,184,114,.10), rgba(233,184,114,.03));
+}
+.sa-credit b { font-size: 13px; font-weight: 700; color: var(--gold-2); }
+.sa-credit small { font-size: 10.5px; color: var(--text-3); letter-spacing: .02em; }
+
+.sa-icon-btn {
+  width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--text-2); display: grid; place-items: center;
+  position: relative; transition: color .16s, border-color .16s;
+}
+.sa-icon-btn:hover { color: var(--text); border-color: var(--line-2); }
+.sa-dot { position: absolute; top: 7px; right: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 2px var(--surface); }
+
+.sa-avatar-wrap { position: relative; }
+.sa-avatar {
+  display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 6px 0 4px;
+  border-radius: 9px; border: 1px solid var(--line); background: var(--surface);
+}
+.sa-ava { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #3a3a46, #23232c); display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--gold-2); }
+.sa-avatar-name { font-size: 12.5px; font-weight: 550; }
+.sa-avatar-name small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; }
+
+/* User menu (açık gösterilir) */
+.sa-menu {
+  position: absolute; top: 44px; right: 0; width: 258px; z-index: 50;
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 13px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.4);
+  padding: 6px; overflow: hidden;
+}
+.sa-menu-head { display: flex; gap: 11px; align-items: center; padding: 11px 10px 12px; }
+.sa-menu-head .sa-ava { width: 38px; height: 38px; border-radius: 10px; font-size: 14px; }
+.sa-menu-head b { font-size: 13px; }
+.sa-menu-head small { display: block; color: var(--text-3); font-size: 11.5px; }
+.sa-plan-pill { margin-top: 5px; display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 650; color: var(--gold-ink); background: linear-gradient(135deg, var(--gold-2), var(--gold)); padding: 2px 8px; border-radius: 20px; }
+.sa-menu-sep { height: 1px; background: var(--line); margin: 4px 0; }
+.sa-menu-item { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; padding: 9px 10px; border-radius: 9px; font-size: 13px; color: var(--text); transition: background .12s; }
+.sa-menu-item:hover { background: var(--surface-2); }
+.sa-menu-item svg { color: var(--text-3); width: 16px; height: 16px; }
+.sa-menu-item .k { margin-left: auto; font-size: 11px; color: var(--text-3); }
+.sa-menu-item.danger { color: var(--weak); }
+.sa-menu-item.danger svg { color: var(--weak); }
+
+/* ---------- Studio layout ---------- */
+.sa-eyebrow { display: block; font-size: 10.5px; font-weight: 650; letter-spacing: .16em; text-transform: uppercase; color: var(--text-3); }
+.sa-studio {
+  display: grid;
+  grid-template-columns: 296px minmax(0,1fr) 336px;
+  gap: 16px;
+  padding-top: 18px;
+}
+.sa-panel {
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
+  border: 1px solid var(--line); border-radius: 16px;
+}
+.sa-panel-pad { padding: 16px; }
+.sa-panel-hd { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.sa-panel-hd h3 { font-size: 12.5px; font-weight: 650; letter-spacing: .01em; }
+.sa-count { font-size: 11px; color: var(--text-3); }
+
+/* Left column sections */
+.sa-left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sa-sec { padding: 14px 16px; }
+.sa-sec + .sa-sec { border-top: 1px solid var(--line); }
+
+/* Upload / selected product */
+.sa-product { display: flex; gap: 12px; align-items: center; }
+.sa-thumb {
+  width: 66px; height: 78px; border-radius: 10px; overflow: hidden; flex: none;
+  background: linear-gradient(160deg, #2a2a33, #17171d);
+  border: 1px solid var(--line-2); display: grid; place-items: center;
+}
+.sa-thumb svg { width: 42px; color: var(--text-2); }
+.sa-product-meta b { font-size: 13px; }
+.sa-product-meta .sku { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.sa-swap { margin-top: 8px; font-size: 11.5px; color: var(--gold-2); font-weight: 550; }
+
+/* Sector chips */
+.sa-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+.sa-chip {
+  font-size: 12px; padding: 6px 11px; border-radius: 20px;
+  border: 1px solid var(--line-2); color: var(--text-2); background: var(--surface);
+  transition: all .14s;
+}
+.sa-chip:hover { color: var(--text); border-color: var(--text-3); }
+.sa-chip.on { color: var(--gold-ink); background: linear-gradient(135deg, var(--gold-2), var(--gold)); border-color: transparent; font-weight: 600; }
+
+/* Shot checklist */
+.sa-shots { margin-top: 11px; display: flex; flex-direction: column; gap: 3px; }
+.sa-shot { display: flex; align-items: center; gap: 11px; padding: 9px 10px; border-radius: 10px; transition: background .13s; }
+.sa-shot:hover { background: var(--surface-2); }
+.sa-ck { width: 19px; height: 19px; border-radius: 6px; border: 1.5px solid var(--line-2); flex: none; display: grid; place-items: center; transition: all .14s; }
+.sa-ck svg { width: 12px; opacity: 0; color: var(--gold-ink); }
+.sa-shot.on .sa-ck { background: linear-gradient(135deg, var(--gold-2), var(--gold)); border-color: transparent; }
+.sa-shot.on .sa-ck svg { opacity: 1; }
+.sa-shot-label { font-size: 13px; }
+.sa-shot-label small { display: block; font-size: 11px; color: var(--text-3); }
+.sa-shot .tag { margin-left: auto; font-size: 9.5px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; padding: 2px 6px; border-radius: 5px; color: var(--gold-2); background: var(--gold-dim); }
+
+/* Center canvas */
+.sa-center { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sa-canvas {
+  border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(233,184,114,.06), transparent 60%),
+    linear-gradient(180deg, var(--surface), var(--bg-2));
+}
+.sa-canvas-bar { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+.sa-canvas-bar h2 { font-size: 13.5px; font-weight: 650; }
+.sa-canvas-bar .muted { font-size: 12px; color: var(--text-3); }
+.sa-seg { margin-left: auto; display: flex; padding: 3px; gap: 2px; background: var(--bg); border: 1px solid var(--line); border-radius: 9px; }
+.sa-seg button { font-size: 11.5px; padding: 5px 11px; border-radius: 6px; color: var(--text-3); }
+.sa-seg button.on { color: var(--text); background: var(--raise); }
+
+.sa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
+.sa-shotcard { border-radius: 13px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); transition: border-color .16s, transform .16s; }
+.sa-shotcard:hover { border-color: var(--line-2); transform: translateY(-2px); }
+.sa-shotcard.sel { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 12px 30px rgba(233,184,114,.14); }
+.sa-img { aspect-ratio: 4/5; position: relative; display: grid; place-items: center; }
+.sa-img.g1 { background: linear-gradient(165deg, #2b2733, #16151d); }
+.sa-img.g2 { background: linear-gradient(165deg, #223037, #14181d); }
+.sa-img.g3 { background: linear-gradient(165deg, #322a2a, #1a1616); }
+.sa-img.g4 { background: linear-gradient(165deg, #2c2f24, #171913); }
+.sa-img figure { width: 60%; opacity: .82; color: rgba(255,255,255,.9); }
+.sa-img figure.close { width: 92%; }
+.sa-img .ang { position: absolute; top: 9px; left: 10px; font-size: 10px; font-weight: 600; letter-spacing: .03em; color: var(--text-2); background: rgba(0,0,0,.5); backdrop-filter: blur(4px); padding: 3px 8px; border-radius: 6px; }
+.sa-img .qa-mini { position: absolute; bottom: 9px; left: 10px; display: flex; gap: 4px; }
+.sa-qbar { width: 22px; height: 4px; border-radius: 3px; background: var(--line-2); }
+.sa-qbar.g { background: var(--good); } .sa-qbar.n { background: var(--normal); } .sa-qbar.w { background: var(--weak); }
+.sa-shotcard-ft { display: flex; align-items: center; gap: 8px; padding: 9px 11px; }
+.sa-shotcard-ft b { font-size: 12px; }
+.sa-shotcard-ft .badge { margin-left: auto; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.badge-good { color: var(--good); background: rgba(98,199,138,.12); }
+.badge-normal { color: var(--normal); background: rgba(214,169,74,.13); }
+.badge-weak { color: var(--weak); background: rgba(219,107,96,.13); }
+
+/* Action bar */
+.sa-actionbar {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+  border-top: 1px solid var(--line);
+  background: linear-gradient(180deg, transparent, rgba(233,184,114,.03));
+}
+.sa-ab-info { font-size: 12px; color: var(--text-2); }
+.sa-ab-info b { color: var(--text); }
+.sa-ab-set { display: flex; gap: 7px; margin-left: 4px; }
+.sa-pill { font-size: 11.5px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line-2); color: var(--text-2); }
+.sa-pill.on { color: var(--gold-2); border-color: rgba(233,184,114,.4); background: var(--gold-dim); }
+.sa-generate {
+  margin-left: auto; display: flex; align-items: center; gap: 10px;
+  padding: 12px 22px; border-radius: 12px; color: var(--gold-ink); font-weight: 700; font-size: 13.5px;
+  background: linear-gradient(135deg, #f6d69f, #e9b872 55%, #d09a44);
+  box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 8px 24px rgba(233,184,114,.28), 0 2px 6px rgba(233,184,114,.3);
+  transition: transform .14s, filter .14s;
+}
+.sa-generate:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.sa-generate .cost { font-weight: 700; padding-left: 10px; margin-left: 2px; border-left: 1px solid rgba(36,27,13,.28); }
+
+/* Right column — settings + QA */
+.sa-right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sa-field { padding: 13px 16px; border-bottom: 1px solid var(--line); }
+.sa-field:last-child { border-bottom: none; }
+.sa-field label { font-size: 12px; color: var(--text-2); display: block; margin-bottom: 8px; }
+.sa-optrow { display: flex; gap: 6px; }
+.sa-opt { flex: 1; text-align: center; font-size: 12px; padding: 8px 4px; border-radius: 9px; border: 1px solid var(--line-2); color: var(--text-2); transition: all .14s; }
+.sa-opt.on { color: var(--gold-2); border-color: rgba(233,184,114,.4); background: var(--gold-dim); font-weight: 600; }
+
+/* QA scorecard */
+.sa-qa { }
+.sa-qa-hd { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.sa-qa-hd h3 { font-size: 12.5px; font-weight: 650; }
+.sa-qa-verdict { font-size: 11px; font-weight: 650; color: var(--good); display: flex; align-items: center; gap: 6px; }
+.sa-qa-verdict::before { content:""; width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px rgba(98,199,138,.2); }
+.sa-qa-body { padding: 8px 16px 16px; }
+.sa-qa-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.sa-qa-row:last-child { border-bottom: none; }
+.sa-qa-name { font-size: 13px; width: 52px; }
+.sa-qa-track { flex: 1; height: 6px; border-radius: 4px; background: var(--raise); overflow: hidden; }
+.sa-qa-fill { height: 100%; border-radius: 4px; }
+.sa-qa-fill.good { width: 92%; background: linear-gradient(90deg, #4a9c6b, var(--good)); }
+.sa-qa-fill.good2 { width: 88%; background: linear-gradient(90deg, #4a9c6b, var(--good)); }
+.sa-qa-fill.normal { width: 64%; background: linear-gradient(90deg, #a8863a, var(--normal)); }
+.sa-qa-fill.weak { width: 38%; background: linear-gradient(90deg, #a8463d, var(--weak)); }
+.sa-qa-tag { font-size: 10.5px; font-weight: 650; width: 46px; text-align: right; }
+.sa-qa-tag.good { color: var(--good); } .sa-qa-tag.normal { color: var(--normal); } .sa-qa-tag.weak { color: var(--weak); }
+.sa-qa-note { margin-top: 12px; font-size: 11.5px; color: var(--text-3); line-height: 1.5; padding: 10px 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); }
+.sa-qa-actions { display: flex; gap: 8px; padding: 0 16px 16px; }
+.sa-btn-ghost { flex: 1; text-align: center; font-size: 12.5px; padding: 9px; border-radius: 10px; border: 1px solid var(--line-2); color: var(--text); transition: background .13s; }
+.sa-btn-ghost:hover { background: var(--surface-2); }
+.sa-btn-solid { flex: 1; text-align: center; font-size: 12.5px; font-weight: 600; padding: 9px; border-radius: 10px; color: var(--gold-ink); background: linear-gradient(135deg, var(--gold-2), var(--gold)); }
+
+/* ---------- Gallery ---------- */
+.sa-section-hd { display: flex; align-items: baseline; gap: 14px; margin: 40px 2px 16px; }
+.sa-section-hd h2 { font-size: 17px; font-weight: 650; letter-spacing: -.01em; }
+.sa-section-hd p { font-size: 12.5px; color: var(--text-3); }
+.sa-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.sa-gcard { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); transition: transform .16s, border-color .16s; }
+.sa-gcard:hover { transform: translateY(-3px); border-color: var(--line-2); }
+.sa-gimg { aspect-ratio: 4/5; position: relative; display: grid; place-items: center; }
+.sa-gimg figure { width: 58%; opacity: .8; color: rgba(255,255,255,.9); }
+.sa-status { position: absolute; top: 9px; right: 9px; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; backdrop-filter: blur(6px); }
+.st-approved { color: #0c1f14; background: linear-gradient(135deg,#7fe0a8,#4fbf80); }
+.st-review { color: var(--gold-ink); background: linear-gradient(135deg,var(--gold-2),var(--gold)); }
+.st-draft { color: var(--text); background: rgba(255,255,255,.12); }
+.sa-gcard-ft { padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+.sa-gcard-ft b { font-size: 12px; }
+.sa-gcard-ft small { display: block; font-size: 10.5px; color: var(--text-3); }
+.sa-gcard-ft .sc { margin-left: auto; font-size: 11px; font-weight: 650; color: var(--good); }
+
+@media (max-width: 1120px) {
+  .sa-studio { grid-template-columns: 260px minmax(0,1fr); }
+  .sa-right { grid-column: 1 / -1; }
+  .sa-search, .sa-avatar-name { display: none; }
+}
+@media (max-width: 720px) {
+  .sa-studio { grid-template-columns: 1fr; }
+  .sa-left { grid-row: 2; }
+  .sa-grid { grid-template-columns: repeat(2, 1fr); }
+  .sa-tabs { overflow-x: auto; }
+}
+</style>
+
+<!-- Reusable SVG placeholders (hiçbir harici görsel yok) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ms-figure" viewBox="0 0 200 340">
+    <circle cx="100" cy="42" r="23"/>
+    <path d="M93 66h14v10H93z"/>
+    <path d="M74 78 Q100 70 126 78 L133 150 Q118 158 100 158 Q82 158 67 150 Z"/>
+    <path d="M69 149 Q100 160 131 149 L151 302 Q100 318 49 302 Z"/>
+    <path d="M74 80 Q57 122 61 182 L71 180 Q69 122 84 86 Z"/>
+    <path d="M126 80 Q143 122 139 182 L129 180 Q131 122 116 86 Z"/>
+  </symbol>
+  <symbol id="ms-garment" viewBox="0 0 200 210">
+    <path d="M70 34 Q100 22 130 34 L164 60 Q170 64 166 72 L149 92 L146 84 L146 188 Q146 194 140 194 L60 194 Q54 194 54 188 L54 84 L51 92 L34 72 Q30 64 36 60 Z"/>
+    <path d="M80 34 Q100 54 120 34" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
+  </symbol>
+  <symbol id="ms-bag" viewBox="0 0 200 200">
+    <path d="M64 84 h72 q10 0 11 10 l7 78 q1 10 -9 10 H55 q-10 0 -9 -10 l7 -78 q1 -10 11 -10 Z"/>
+    <path d="M74 84 Q74 48 100 48 Q126 48 126 84" fill="none" stroke="currentColor" stroke-width="7" opacity=".55"/>
+  </symbol>
+</svg>
+
+<div class="sa">
+ <div class="sa-app">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="sa-top">
+    <div class="sa-brand">
+      <div class="sa-mark"></div>
+      <div class="sa-word">MASTER <span>STUDIO</span></div>
+    </div>
+    <nav class="sa-tabs">
+      <button class="sa-tab on">Stüdyo</button>
+      <button class="sa-tab">Galeri</button>
+      <button class="sa-tab">Toplu Üretim</button>
+      <button class="sa-tab">Entegrasyonlar</button>
+    </nav>
+    <div class="sa-top-right">
+      <div class="sa-search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Ürün, çekim ya da komut ara</span><kbd class="sa-mono">⌘K</kbd></div>
+      <div class="sa-credit"><b class="sa-mono">1.240</b><small>işlem birimi</small></div>
+      <button class="sa-icon-btn" aria-label="Bildirimler"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="sa-dot"></span></button>
+      <div class="sa-avatar-wrap">
+        <button class="sa-avatar">
+          <span class="sa-ava">YG</span>
+          <span class="sa-avatar-name">Yeşilmen<small>Stüdyo Pro</small></span>
+        </button>
+        <!-- açık dropdown -->
+        <div class="sa-menu" role="menu">
+          <div class="sa-menu-head">
+            <span class="sa-ava" style="width:38px;height:38px;border-radius:10px;font-size:14px">YG</span>
+            <div>
+              <b>Yeşilmen Ltd.</b>
+              <small>info@masterstudio.ai</small>
+              <span class="sa-plan-pill">◆ Stüdyo Pro</span>
+            </div>
+          </div>
+          <div class="sa-menu-sep"></div>
+          <button class="sa-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>Profil</button>
+          <button class="sa-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Plan ve Faturalandırma</button>
+          <button class="sa-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M17 6a3.5 3.5 0 0 1 0 7"/></svg>Ekip<span class="k">3 üye</span></button>
+          <button class="sa-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Güvenlik</button>
+          <button class="sa-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Tercihler</button>
+          <div class="sa-menu-sep"></div>
+          <button class="sa-menu-item danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Çıkış yap</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== STUDIO ===== -->
+  <div class="sa-studio">
+
+    <!-- LEFT: ürün + sektör + çekim -->
+    <aside class="sa-panel sa-left">
+      <div class="sa-sec">
+        <span class="sa-eyebrow">Ürün</span>
+        <div class="sa-product" style="margin-top:11px">
+          <div class="sa-thumb"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></div>
+          <div class="sa-product-meta">
+            <b>Bel Ceketi · Lacivert</b>
+            <div class="sku sa-mono">BSGMARS25337</div>
+            <button class="sa-swap">Ürünü değiştir →</button>
+          </div>
+        </div>
+      </div>
+      <div class="sa-sec">
+        <span class="sa-eyebrow">Sektör</span>
+        <div class="sa-chips">
+          <button class="sa-chip on">Moda &amp; Giyim</button>
+          <button class="sa-chip">Ayakkabı</button>
+          <button class="sa-chip">Çanta</button>
+          <button class="sa-chip">Takı</button>
+          <button class="sa-chip">Kozmetik</button>
+        </div>
+      </div>
+      <div class="sa-sec">
+        <span class="sa-eyebrow">Çekim türleri <span style="color:var(--gold-2)">· 6 seçili</span></span>
+        <div class="sa-shots" id="sa-shots">
+          <button class="sa-shot on"><span class="sa-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="sa-shot-label">Önden tam boy<small>Manken üzerinde</small></span><span class="tag">Varsayılan</span></button>
+          <button class="sa-shot on"><span class="sa-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="sa-shot-label">Yandan görünüm</span></button>
+          <button class="sa-shot on"><span class="sa-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="sa-shot-label">Arkadan görünüm</span></button>
+          <button class="sa-shot on"><span class="sa-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="sa-shot-label">Yakın detay<small>Kumaş &amp; dikiş</small></span></button>
+          <button class="sa-shot on"><span class="sa-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="sa-shot-label">Bel üstü kadraj</span></button>
+          <button class="sa-shot on"><span class="sa-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="sa-shot-label">Düz zemin<small>Mankensiz</small></span></button>
+          <button class="sa-shot"><span class="sa-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="sa-shot-label">Askıda görünüm</span></button>
+          <button class="sa-shot"><span class="sa-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m5 12 5 5L20 6"/></svg></span><span class="sa-shot-label">360° dönüş</span></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: tuval -->
+    <main class="sa-center">
+      <section class="sa-canvas">
+        <div class="sa-canvas-bar">
+          <h2>Prova çekimi</h2>
+          <span class="muted">6 kare · 2K · Moda &amp; Giyim</span>
+          <div class="sa-seg">
+            <button class="on">Izgara</button>
+            <button>Tek kare</button>
+            <button>Karşılaştır</button>
+          </div>
+        </div>
+        <div class="sa-grid">
+          <article class="sa-shotcard sel">
+            <div class="sa-img g1"><span class="ang">Önden tam boy</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure><div class="qa-mini"><span class="sa-qbar g"></span><span class="sa-qbar g"></span><span class="sa-qbar n"></span><span class="sa-qbar g"></span></div></div>
+            <div class="sa-shotcard-ft"><b>01 · Önden</b><span class="badge badge-good">İyi</span></div>
+          </article>
+          <article class="sa-shotcard">
+            <div class="sa-img g2"><span class="ang">Yandan</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure><div class="qa-mini"><span class="sa-qbar g"></span><span class="sa-qbar g"></span><span class="sa-qbar g"></span><span class="sa-qbar g"></span></div></div>
+            <div class="sa-shotcard-ft"><b>02 · Yandan</b><span class="badge badge-good">İyi</span></div>
+          </article>
+          <article class="sa-shotcard">
+            <div class="sa-img g3"><span class="ang">Arkadan</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure><div class="qa-mini"><span class="sa-qbar g"></span><span class="sa-qbar n"></span><span class="sa-qbar n"></span><span class="sa-qbar g"></span></div></div>
+            <div class="sa-shotcard-ft"><b>03 · Arkadan</b><span class="badge badge-normal">Normal</span></div>
+          </article>
+          <article class="sa-shotcard">
+            <div class="sa-img g4"><span class="ang">Yakın detay</span><figure class="close"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure><div class="qa-mini"><span class="sa-qbar g"></span><span class="sa-qbar g"></span><span class="sa-qbar g"></span><span class="sa-qbar g"></span></div></div>
+            <div class="sa-shotcard-ft"><b>04 · Detay</b><span class="badge badge-good">İyi</span></div>
+          </article>
+          <article class="sa-shotcard">
+            <div class="sa-img g1"><span class="ang">Bel üstü</span><figure class="close"><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure><div class="qa-mini"><span class="sa-qbar g"></span><span class="sa-qbar g"></span><span class="sa-qbar w"></span><span class="sa-qbar g"></span></div></div>
+            <div class="sa-shotcard-ft"><b>05 · Bel üstü</b><span class="badge badge-weak">Zayıf · logo</span></div>
+          </article>
+          <article class="sa-shotcard">
+            <div class="sa-img g2"><span class="ang">Düz zemin</span><figure><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure><div class="qa-mini"><span class="sa-qbar g"></span><span class="sa-qbar g"></span><span class="sa-qbar g"></span><span class="sa-qbar n"></span></div></div>
+            <div class="sa-shotcard-ft"><b>06 · Flat-lay</b><span class="badge badge-good">İyi</span></div>
+          </article>
+        </div>
+        <div class="sa-actionbar">
+          <div class="sa-ab-info"><b>6 kare</b> üretilecek · Kalite
+            <span class="sa-ab-set">
+              <span class="sa-pill">1K</span><span class="sa-pill on">2K</span><span class="sa-pill">4K</span>
+            </span>
+          </div>
+          <button class="sa-generate" id="sa-gen">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.5 6.5L22 12l-6.5 2.5L13 21l-2.5-6.5L4 12l6.5-2.5z"/></svg>
+            Oluştur <span class="cost sa-mono" id="sa-cost">36 işlem birimi</span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- RIGHT: ayarlar + QA karnesi -->
+    <aside class="sa-right">
+      <section class="sa-panel">
+        <div class="sa-panel-hd"><h3>Sahne ayarları</h3></div>
+        <div class="sa-field">
+          <label>En-boy oranı</label>
+          <div class="sa-optrow"><span class="sa-opt">1:1</span><span class="sa-opt on">4:5</span><span class="sa-opt">3:4</span><span class="sa-opt">9:16</span></div>
+        </div>
+        <div class="sa-field">
+          <label>Arka plan</label>
+          <div class="sa-optrow"><span class="sa-opt on">Stüdyo</span><span class="sa-opt">Sade</span><span class="sa-opt">Mekân</span></div>
+        </div>
+        <div class="sa-field">
+          <label>Işık karakteri</label>
+          <div class="sa-optrow"><span class="sa-opt">Yumuşak</span><span class="sa-opt on">Sinematik</span><span class="sa-opt">Yüksek</span></div>
+        </div>
+      </section>
+
+      <section class="sa-panel sa-qa">
+        <div class="sa-qa-hd">
+          <h3>QA Karnesi · 01 Önden</h3>
+          <span class="sa-qa-verdict">İyi</span>
+        </div>
+        <div class="sa-qa-body">
+          <div class="sa-qa-row"><span class="sa-qa-name">Renk</span><span class="sa-qa-track"><span class="sa-qa-fill good"></span></span><span class="sa-qa-tag good">İyi</span></div>
+          <div class="sa-qa-row"><span class="sa-qa-name">Doku</span><span class="sa-qa-track"><span class="sa-qa-fill good2"></span></span><span class="sa-qa-tag good">İyi</span></div>
+          <div class="sa-qa-row"><span class="sa-qa-name">Logo</span><span class="sa-qa-track"><span class="sa-qa-fill normal"></span></span><span class="sa-qa-tag normal">Normal</span></div>
+          <div class="sa-qa-row"><span class="sa-qa-name">Poz</span><span class="sa-qa-track"><span class="sa-qa-fill good"></span></span><span class="sa-qa-tag good">İyi</span></div>
+          <p class="sa-qa-note">Logo netliği kadraj kenarında hafif düşük. Yakın detay karesi (04) referans olarak kullanılabilir; renk sadakati ΔE 3.1 ile hedefte.</p>
+        </div>
+        <div class="sa-qa-actions">
+          <button class="sa-btn-ghost">Yeniden üret</button>
+          <button class="sa-btn-solid">Onayla</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- ===== GALLERY ===== -->
+  <div class="sa-section-hd">
+    <h2>Galeri</h2>
+    <p>Bu çekimden onaya hazır 18 kare</p>
+  </div>
+  <div class="sa-gallery">
+    <article class="sa-gcard"><div class="sa-gimg g1"><span class="sa-status st-approved">Onaylı</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="sa-gcard-ft"><div><b>Önden tam boy</b><small class="sa-mono">BSGMARS25337</small></div><span class="sc">İyi</span></div></article>
+    <article class="sa-gcard"><div class="sa-gimg g2"><span class="sa-status st-review">İncele</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="sa-gcard-ft"><div><b>Yandan görünüm</b><small class="sa-mono">BSGMARS25337</small></div><span class="sc">İyi</span></div></article>
+    <article class="sa-gcard"><div class="sa-gimg g3"><span class="sa-status st-review">İncele</span><figure><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div><div class="sa-gcard-ft"><div><b>Arkadan</b><small class="sa-mono">BSGMARS25337</small></div><span class="sc" style="color:var(--normal)">Normal</span></div></article>
+    <article class="sa-gcard"><div class="sa-gimg g4"><span class="sa-status st-approved">Onaylı</span><figure><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div><div class="sa-gcard-ft"><div><b>Yakın detay</b><small class="sa-mono">BSGMARS25337</small></div><span class="sc">İyi</span></div></article>
+    <article class="sa-gcard"><div class="sa-gimg g2"><span class="sa-status st-draft">Taslak</span><figure><svg viewBox="0 0 200 200"><use href="#ms-bag"/></svg></figure></div><div class="sa-gcard-ft"><div><b>Çanta · yandan</b><small class="sa-mono">BSGTOT9021</small></div><span class="sc">İyi</span></div></article>
+    <article class="sa-gcard"><div class="sa-gimg g1"><span class="sa-status st-approved">Onaylı</span><figure><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div><div class="sa-gcard-ft"><div><b>Flat-lay</b><small class="sa-mono">BSGMARS25337</small></div><span class="sc">İyi</span></div></article>
+  </div>
+
+ </div>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector('.sa');
+  if (!root) return;
+  var shots = root.querySelector('#sa-shots');
+  var costEl = root.querySelector('#sa-cost');
+  var unit = 6; // 2K = kare başına 6 işlem birimi
+  function recalc() {
+    var n = shots.querySelectorAll('.sa-shot.on').length;
+    if (costEl) costEl.textContent = (n * unit) + ' işlem birimi';
+  }
+  shots.addEventListener('click', function (e) {
+    var b = e.target.closest('.sa-shot'); if (!b) return;
+    b.classList.toggle('on'); recalc();
+  });
+  root.querySelectorAll('.sa-ab-set .sa-pill').forEach(function (p) {
+    p.addEventListener('click', function () {
+      root.querySelectorAll('.sa-ab-set .sa-pill').forEach(function (x){x.classList.remove('on');});
+      p.classList.add('on');
+      unit = p.textContent === '1K' ? 3 : p.textContent === '4K' ? 12 : 6;
+      recalc();
+    });
+  });
+  root.querySelectorAll('.sa-chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      root.querySelectorAll('.sa-chip').forEach(function (x){x.classList.remove('on');});
+      c.classList.add('on');
+    });
+  });
+})();
+</script>

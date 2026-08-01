@@ -1,0 +1,667 @@
+<title>Master Studio — Yön J · Akış Kurucu</title>
+
+<style>
+/* ============================================================
+   YÖN J — "Akış Kurucu"
+   Entegrasyonlar bölümünün düğüm tabanlı otomasyon kurucusu:
+   Zapier/n8n sınıfı görsel akış, ama daha rafine. İnsan dokunuşu
+   gerektirmeyen işler tamamen otomatiğe bağlanır.
+   TEMA: ÇİFT — serin açık nötr + nokta-ızgara tuval; koyu temada
+   mürekkep-petrol. Accent = petrol/teal (#0f766e → koyuda #2dd4bf).
+   Düğüm tipi renk kodu (kısık, jetonlarla): tetikleyici=petrol,
+   eylem=çelik gri-mavi, koşul=kehribar, çıkış=yeşil.
+   Namespace: .fb — tüm seçiciler bu kökün altında, ID önekleri fb-.
+   ============================================================ */
+
+.fb, .fb *, .fb *::before, .fb *::after { box-sizing: border-box; }
+
+.fb {
+  --bg: #f1f4f4; --panel: #ffffff; --panel-2: #f4f7f7; --panel-3: #e9efef;
+  --line: #e3eaea; --line-2: #d3dedd;
+  --text: #14201f; --text-2: #5c6c6a; --text-3: #8da09d;
+  --accent: #0f766e; --accent-2: #0b5f58; --accent-soft: rgba(15,118,110,.10);
+  --on-accent: #ffffff;
+  --good: #2f9e69; --good-soft: rgba(47,158,105,.12);
+  --normal: #b0791f; --normal-soft: rgba(176,121,31,.13);
+  --weak: #d64545; --weak-soft: rgba(214,69,69,.12);
+  --t-act: #5b7086; --t-act-soft: rgba(91,112,134,.12);
+  --t-cond: #ac741d; --t-cond-soft: rgba(172,116,29,.13);
+  --t-out: #2f9e69; --t-out-soft: rgba(47,158,105,.12);
+  --edge: #b4c4c2; --dot: #d2dedc; --canvas: #f7fafa;
+  --shadow: 0 1px 2px rgba(16,32,30,.05), 0 4px 14px rgba(16,32,30,.05);
+  --shadow-lg: 0 12px 32px rgba(12,30,28,.14), 0 2px 8px rgba(12,30,28,.08);
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text); background: var(--bg); min-height: 100vh;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-size: 13px; line-height: 1.5; letter-spacing: -0.008em;
+}
+@media (prefers-color-scheme: dark) {
+  .fb {
+    --bg: #0a1113; --panel: #101a1c; --panel-2: #152123; --panel-3: #1b2a2c;
+    --line: #1e2c2e; --line-2: #2b3d40;
+    --text: #e7efee; --text-2: #99acaa; --text-3: #647a78;
+    --accent: #2dd4bf; --accent-2: #5eead4; --accent-soft: rgba(45,212,191,.13);
+    --on-accent: #052723;
+    --good: #43c088; --good-soft: rgba(67,192,136,.15);
+    --normal: #d3a24d; --normal-soft: rgba(211,162,77,.15);
+    --weak: #ee6a6a; --weak-soft: rgba(238,106,106,.15);
+    --t-act: #90a6bd; --t-act-soft: rgba(144,166,189,.14);
+    --t-cond: #d3a24d; --t-cond-soft: rgba(211,162,77,.14);
+    --t-out: #43c088; --t-out-soft: rgba(67,192,136,.14);
+    --edge: #35494c; --dot: #1c2b2e; --canvas: #0d1719;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.36);
+    --shadow-lg: 0 16px 40px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] .fb {
+  --bg: #0a1113; --panel: #101a1c; --panel-2: #152123; --panel-3: #1b2a2c;
+  --line: #1e2c2e; --line-2: #2b3d40;
+  --text: #e7efee; --text-2: #99acaa; --text-3: #647a78;
+  --accent: #2dd4bf; --accent-2: #5eead4; --accent-soft: rgba(45,212,191,.13);
+  --on-accent: #052723;
+  --good: #43c088; --good-soft: rgba(67,192,136,.15);
+  --normal: #d3a24d; --normal-soft: rgba(211,162,77,.15);
+  --weak: #ee6a6a; --weak-soft: rgba(238,106,106,.15);
+  --t-act: #90a6bd; --t-act-soft: rgba(144,166,189,.14);
+  --t-cond: #d3a24d; --t-cond-soft: rgba(211,162,77,.14);
+  --t-out: #43c088; --t-out-soft: rgba(67,192,136,.14);
+  --edge: #35494c; --dot: #1c2b2e; --canvas: #0d1719;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.36);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.4);
+}
+:root[data-theme="light"] .fb {
+  --bg: #f1f4f4; --panel: #ffffff; --panel-2: #f4f7f7; --panel-3: #e9efef;
+  --line: #e3eaea; --line-2: #d3dedd;
+  --text: #14201f; --text-2: #5c6c6a; --text-3: #8da09d;
+  --accent: #0f766e; --accent-2: #0b5f58; --accent-soft: rgba(15,118,110,.10);
+  --on-accent: #ffffff;
+  --good: #2f9e69; --good-soft: rgba(47,158,105,.12);
+  --normal: #b0791f; --normal-soft: rgba(176,121,31,.13);
+  --weak: #d64545; --weak-soft: rgba(214,69,69,.12);
+  --t-act: #5b7086; --t-act-soft: rgba(91,112,134,.12);
+  --t-cond: #ac741d; --t-cond-soft: rgba(172,116,29,.13);
+  --t-out: #2f9e69; --t-out-soft: rgba(47,158,105,.12);
+  --edge: #b4c4c2; --dot: #d2dedc; --canvas: #f7fafa;
+  --shadow: 0 1px 2px rgba(16,32,30,.05), 0 4px 14px rgba(16,32,30,.05);
+  --shadow-lg: 0 12px 32px rgba(12,30,28,.14), 0 2px 8px rgba(12,30,28,.08);
+}
+
+.fb ::selection { background: var(--accent-soft); }
+.fb :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.fb button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; letter-spacing: inherit; }
+.fb svg, .fb img { display: block; max-width: 100%; }
+.fb .mono { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .fb *, .fb *::before, .fb *::after { transition: none !important; animation: none !important; } }
+
+.fb-app { max-width: 1500px; margin: 0 auto; padding: 0 clamp(10px,1.8vw,22px) 56px; }
+
+/* ---------- Üst bar ---------- */
+.fb-top { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 14px; height: 56px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 84%, transparent); backdrop-filter: blur(12px); }
+.fb-brand { display: flex; align-items: center; gap: 9px; }
+.fb-logo { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(140deg, #14b8a6, var(--accent) 60%, #0b4f4a); display: grid; place-items: center; box-shadow: var(--shadow); color: #fff; }
+.fb-logo svg { width: 16px; }
+.fb-brand b { font-size: 13.5px; font-weight: 660; letter-spacing: -.01em; }
+.fb-brand small { display: block; font-size: 10.5px; color: var(--text-3); }
+.fb-nav { display: flex; gap: 2px; margin-left: 8px; }
+.fb-nav button { padding: 7px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 550; color: var(--text-2); transition: color .14s, background .14s; }
+.fb-nav button:hover { color: var(--text); background: var(--panel-2); }
+.fb-nav button.on { color: var(--accent); background: var(--accent-soft); font-weight: 640; }
+.fb-tright { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.fb-credit { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--panel); }
+.fb-credit b { font-size: 12.5px; font-weight: 650; }
+.fb-credit small { font-size: 10.5px; color: var(--text-3); }
+.fb-ibtn { width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--panel); color: var(--text-2); display: grid; place-items: center; position: relative; transition: color .14s, border-color .14s; }
+.fb-ibtn:hover { color: var(--text); }
+.fb-ndot { position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--panel); }
+.fb-user { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 6px 0 3px; border-radius: 999px; }
+.fb-user:hover { background: var(--panel-2); }
+.fb-ava { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(140deg, #2aa79a, #0b564f); color: #fff; display: grid; place-items: center; font-size: 10.5px; font-weight: 700; flex: none; }
+.fb-user .nm { font-size: 12px; font-weight: 600; }
+.fb-user .nm small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; }
+.fb-user > svg { width: 14px; color: var(--text-3); }
+
+/* ---------- Akış başlık şeridi ---------- */
+.fb-fhd { margin-top: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; box-shadow: var(--shadow); }
+.fb-fico { width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex: none; }
+.fb-fico svg { width: 19px; }
+.fb-fname { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.fb-fname h1 { font-size: 15px; font-weight: 660; letter-spacing: -.012em; text-wrap: balance; }
+.fb-fsub { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+.fb-badge { display: inline-block; font-size: 10px; font-weight: 650; padding: 2px 8px; border-radius: 6px; }
+.fb .b-good { color: var(--good); background: var(--good-soft); }
+.fb .b-normal { color: var(--normal); background: var(--normal-soft); }
+.fb .b-weak { color: var(--weak); background: var(--weak-soft); }
+.fb-stats { margin-left: auto; font-size: 11.5px; color: var(--text-2); white-space: nowrap; }
+.fb-stats b { color: var(--text); font-weight: 650; }
+.fb-swrap { display: flex; align-items: center; gap: 8px; }
+.fb-swrap .sl { font-size: 10px; font-weight: 680; letter-spacing: .09em; color: var(--text-3); }
+.fb-switch { width: 40px; height: 22px; border-radius: 999px; background: var(--panel-3); border: 1px solid var(--line-2); position: relative; transition: background .16s, border-color .16s; flex: none; }
+.fb-switch .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: left .16s; }
+.fb-switch.on { background: var(--accent); border-color: var(--accent); }
+.fb-switch.on .knob { left: 20px; }
+.fb-run { display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 9px; background: var(--accent); color: var(--on-accent); font-weight: 640; font-size: 12.5px; box-shadow: var(--shadow); transition: background .14s, transform .12s, opacity .14s; }
+.fb-run svg { width: 14px; }
+.fb-run:hover:not(:disabled) { background: var(--accent-2); transform: translateY(-1px); }
+.fb-run:disabled { opacity: .45; cursor: not-allowed; }
+.fb-run.busy { cursor: progress; opacity: .75; }
+
+/* ---------- Çalışma ızgarası ---------- */
+.fb-work { display: grid; grid-template-columns: 248px minmax(0,1fr) 304px; grid-template-areas: "blocks canvas config"; gap: 12px; margin-top: 12px; align-items: start; }
+.fb-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.fb-bhd { display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-bottom: 1px solid var(--line); }
+.fb-bhd h3 { font-size: 12px; font-weight: 640; }
+.fb-bhd .mut { font-size: 11px; color: var(--text-3); }
+.fb-bhd .r { margin-left: auto; font-size: 11.5px; color: var(--accent); font-weight: 600; text-decoration: none; }
+.fb-eyebrow { display: block; font-size: 10px; font-weight: 680; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+
+/* ---------- Sol panel: Bloklar ---------- */
+.fb-blocks { grid-area: blocks; min-width: 0; }
+.fb-bgroup { padding: 11px 8px 4px; }
+.fb-bgroup .fb-eyebrow { padding: 0 6px 6px; }
+.fb-bgroup + .fb-bgroup { border-top: 1px solid var(--line); margin-top: 6px; }
+.fb-blk { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 7px 8px; border-radius: 9px; border: 1px solid transparent; cursor: grab; transition: background .12s, border-color .12s; }
+.fb-blk:hover { background: var(--panel-2); border-color: var(--line); }
+.fb-blk:active { cursor: grabbing; }
+.fb-blk .bi { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; flex: none; }
+.fb-blk .bi svg { width: 15px; }
+.fb .bi-trig { background: var(--accent-soft); color: var(--accent); }
+.fb .bi-act { background: var(--t-act-soft); color: var(--t-act); }
+.fb .bi-cond { background: var(--t-cond-soft); color: var(--t-cond); }
+.fb .bi-out { background: var(--t-out-soft); color: var(--t-out); }
+.fb-blk .bt { font-size: 12px; font-weight: 560; min-width: 0; }
+.fb-blk .bt small { display: block; font-size: 10.5px; color: var(--text-3); font-weight: 400; }
+.fb-blk .grip { margin-left: auto; width: 14px; color: var(--text-3); opacity: .35; transition: opacity .12s; flex: none; }
+.fb-blk:hover .grip { opacity: 1; }
+.fb-bhint { margin: 10px 14px 13px; padding: 9px 11px; border: 1px dashed var(--line-2); border-radius: 9px; font-size: 11px; color: var(--text-3); line-height: 1.45; }
+.fb-bhint b { color: var(--text-2); font-weight: 600; }
+
+/* ---------- Orta tuval ---------- */
+.fb-cwrap { grid-area: canvas; min-width: 0; overflow: hidden; }
+.fb-cbar { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--line); }
+.fb-cbar .info { font-size: 11px; color: var(--text-3); }
+.fb-ztools { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.fb-zb { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--line-2); background: var(--panel); color: var(--text-2); display: grid; place-items: center; transition: color .12s, border-color .12s; }
+.fb-zb:hover { color: var(--text); }
+.fb-zb svg { width: 13px; }
+.fb-zoom { font-size: 11px; color: var(--text-2); padding: 0 5px; }
+.fb-canvas { overflow-x: auto; }
+.fb-flow { position: relative; min-width: 1296px; height: 472px; background-color: var(--canvas); background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.15px); background-size: 18px 18px; }
+.fb-wires { position: absolute; left: 0; top: 0; pointer-events: none; }
+.fb-edge { fill: none; stroke: var(--edge); stroke-width: 1.7; }
+.fb-edge.yes { stroke: var(--good); }
+.fb-edge.no { stroke: var(--t-cond); }
+.fb-edge.live { stroke-dasharray: 5 7; animation: fb-dash 1.5s linear infinite; }
+@keyframes fb-dash { to { stroke-dashoffset: -12; } }
+.fb #fb-arr path { fill: var(--edge); }
+.fb #fb-arr-yes path { fill: var(--good); }
+.fb #fb-arr-no path { fill: var(--t-cond); }
+.fb-port { fill: var(--panel); stroke: var(--edge); stroke-width: 1.5; }
+.fb-port.yes { stroke: var(--good); }
+.fb-port.no { stroke: var(--t-cond); }
+.fb-cwrap.paused .fb-edge.live { animation: none; opacity: .55; }
+.fb-cwrap.paused .fb-node { opacity: .72; }
+
+.fb-node { position: absolute; width: 208px; min-height: 92px; text-align: left; background: var(--panel); border: 1px solid var(--line-2); border-radius: 10px; padding: 10px 12px 11px 15px; box-shadow: var(--shadow); transition: border-color .13s, box-shadow .13s, transform .13s, opacity .2s; --nc: var(--text-3); --nc-soft: var(--panel-3); }
+.fb-node::before { content: ""; position: absolute; left: -1px; top: 9px; bottom: 9px; width: 3px; border-radius: 0 3px 3px 0; background: var(--nc); }
+.fb-node:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.fb-node.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow); }
+.fb-node .tp { display: flex; align-items: center; gap: 6px; font-size: 9.5px; font-weight: 680; letter-spacing: .08em; text-transform: uppercase; color: var(--nc); }
+.fb-node .tp svg { width: 13px; }
+.fb-node b { display: block; font-size: 12.5px; font-weight: 640; margin-top: 5px; letter-spacing: -.008em; }
+.fb-node .sum { display: block; font-size: 11px; color: var(--text-2); margin-top: 3px; }
+.fb-node .st { position: absolute; top: 10px; right: 10px; width: 7px; height: 7px; border-radius: 50%; }
+.fb-node .st.ok { background: var(--good); }
+.fb-node .st.warn { background: var(--normal); }
+.fb .t-trig { --nc: var(--accent); --nc-soft: var(--accent-soft); }
+.fb .t-act { --nc: var(--t-act); --nc-soft: var(--t-act-soft); }
+.fb .t-cond { --nc: var(--t-cond); --nc-soft: var(--t-cond-soft); }
+.fb .t-out { --nc: var(--t-out); --nc-soft: var(--t-out-soft); }
+.fb-node.n1 { left: 24px; top: 200px; }
+.fb-node.n2 { left: 284px; top: 200px; }
+.fb-node.n3 { left: 544px; top: 200px; }
+.fb-node.n4 { left: 804px; top: 52px; }
+.fb-node.n5 { left: 1064px; top: 52px; }
+.fb-node.n6 { left: 804px; top: 350px; }
+.fb-elabel { position: absolute; z-index: 2; font-size: 10px; font-weight: 680; padding: 2px 9px; border-radius: 999px; background: var(--panel); border: 1px solid; }
+.fb-elabel.yes { color: var(--good); border-color: color-mix(in srgb, var(--good) 42%, transparent); left: 756px; top: 151px; }
+.fb-elabel.no { color: var(--t-cond); border-color: color-mix(in srgb, var(--t-cond) 42%, transparent); left: 753px; top: 322px; }
+
+/* ---------- Sağ panel: düğüm yapılandırması ---------- */
+.fb-config { grid-area: config; min-width: 0; }
+.fb-phd { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.fb-phd h4 { font-size: 12.5px; font-weight: 650; }
+.fb-ntag { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; }
+.fb .nt-trig { color: var(--accent); background: var(--accent-soft); }
+.fb .nt-act { color: var(--t-act); background: var(--t-act-soft); }
+.fb .nt-cond { color: var(--t-cond); background: var(--t-cond-soft); }
+.fb .nt-out { color: var(--t-out); background: var(--t-out-soft); }
+.fb-field { padding: 11px 14px; border-bottom: 1px solid var(--line); }
+.fb-field:last-of-type { border-bottom: none; }
+.fb-field > label { display: block; font-size: 11.5px; color: var(--text-2); margin-bottom: 7px; }
+.fb-orow { display: flex; gap: 5px; }
+.fb-o { flex: 1; text-align: center; font-size: 11.5px; padding: 7px 4px; border-radius: 8px; border: 1px solid var(--line-2); color: var(--text-2); transition: color .12s, border-color .12s, background .12s; }
+.fb-o:hover { border-color: var(--text-3); color: var(--text); }
+.fb-o.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); font-weight: 650; }
+.fb-select { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 8px 11px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); font-size: 12px; color: var(--text); transition: border-color .12s; }
+.fb-select:hover { border-color: var(--text-3); }
+.fb-select svg { width: 14px; color: var(--text-3); margin-left: auto; flex: none; }
+.fb-conn { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border: 1px solid var(--line-2); border-radius: 9px; background: var(--panel-2); }
+.fb-conn .ci { width: 28px; height: 28px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex: none; }
+.fb-conn .ci svg { width: 15px; }
+.fb-conn b { font-size: 12px; display: block; }
+.fb-conn small { font-size: 10.5px; color: var(--text-3); }
+.fb-conn .cs { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 650; color: var(--good); }
+.fb-conn .cs::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+.fb-tagrow { display: flex; flex-wrap: wrap; gap: 5px; }
+.fb-tag { font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); color: var(--text-2); }
+.fb-tag.on { color: var(--accent); background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.fb-kv { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; padding: 5px 0; }
+.fb-kv .k { color: var(--text-2); }
+.fb-kv .v { font-weight: 600; text-align: right; }
+.fb-note { margin-top: 9px; font-size: 11px; color: var(--text-2); line-height: 1.5; padding: 9px 11px; border-radius: 9px; background: var(--panel-2); }
+.fb-step { display: flex; align-items: center; border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; }
+.fb-step button { width: 30px; height: 30px; display: grid; place-items: center; color: var(--text-2); transition: background .12s; }
+.fb-step button:hover { background: var(--panel-2); }
+.fb-step button svg { width: 13px; }
+.fb-step .val { flex: 1; text-align: center; font-size: 12.5px; font-weight: 650; border-left: 1px solid var(--line); border-right: 1px solid var(--line); align-self: stretch; display: grid; place-items: center; }
+.fb-person { display: flex; align-items: center; gap: 9px; padding: 8px 11px; border: 1px solid var(--line-2); border-radius: 9px; }
+.fb-person .fb-ava { width: 28px; height: 28px; font-size: 11px; background: linear-gradient(140deg, #7a8fa6, #4d6076); }
+.fb-person b { font-size: 12px; display: block; }
+.fb-person small { font-size: 10.5px; color: var(--text-3); }
+.fb-person svg { width: 14px; color: var(--text-3); margin-left: auto; }
+.fb-cfg-ft { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+.fb-bghost { flex: 1; text-align: center; font-size: 12px; font-weight: 550; padding: 8px; border-radius: 8px; border: 1px solid var(--line-2); color: var(--text); transition: background .12s; }
+.fb-bghost:hover { background: var(--panel-2); }
+.fb-bsolid { flex: 1; text-align: center; font-size: 12px; font-weight: 640; padding: 8px; border-radius: 8px; background: var(--accent); color: var(--on-accent); transition: background .12s; }
+.fb-bsolid:hover { background: var(--accent-2); }
+
+/* ---------- Alt şerit: koşum geçmişi ---------- */
+.fb-history { margin-top: 12px; overflow: hidden; }
+.fb-twrap { overflow-x: auto; }
+.fb-table { width: 100%; border-collapse: collapse; min-width: 700px; font-size: 12px; }
+.fb-table th { text-align: left; font-size: 10px; font-weight: 680; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); padding: 9px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.fb-table td { padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.fb-table tbody tr:last-child td { border-bottom: none; }
+.fb-table tbody tr { transition: background .12s; }
+.fb-table tbody tr:hover { background: var(--panel-2); }
+.fb-table .t { color: var(--text-2); white-space: nowrap; width: 96px; }
+.fb-table .num, .fb-table th.num { text-align: right; white-space: nowrap; width: 104px; }
+.fb-table .note { color: var(--text-2); font-size: 11.5px; }
+.fb-prod { display: flex; align-items: center; gap: 9px; }
+.fb-prod .th { width: 26px; height: 30px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); display: grid; place-items: center; color: var(--text-3); flex: none; }
+.fb-prod .th svg { width: 15px; }
+.fb-prod b { display: block; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.fb-prod small { font-size: 10px; color: var(--text-3); }
+.fb-table tr.new { animation: fb-rownew 1.8s ease-out; }
+@keyframes fb-rownew { 0% { background: var(--accent-soft); } 100% { background: transparent; } }
+
+/* ---------- Duyarlılık ---------- */
+@media (max-width: 1140px) {
+  .fb-work { grid-template-columns: minmax(0,1fr) 300px; grid-template-areas: "canvas config" "blocks blocks"; }
+  .fb-blocks-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
+  .fb-bgroup + .fb-bgroup { border-top: none; margin-top: 0; border-left: 1px solid var(--line); }
+  .fb-stats { margin-left: 0; }
+}
+@media (max-width: 760px) {
+  .fb-work { grid-template-columns: 1fr; grid-template-areas: "canvas" "config" "blocks"; }
+  .fb-blocks-body { grid-template-columns: 1fr; }
+  .fb-bgroup + .fb-bgroup { border-left: none; border-top: 1px solid var(--line); margin-top: 6px; }
+  .fb-nav { display: none; }
+  .fb-user .nm { display: none; }
+  .fb-credit small { display: none; }
+  .fb-fhd { align-items: flex-start; }
+  .fb-stats { width: 100%; white-space: normal; }
+  .fb-run { margin-left: auto; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ms-garment" viewBox="0 0 200 210"><path d="M70 34 Q100 22 130 34 L164 60 Q170 64 166 72 L149 92 L146 84 L146 188 Q146 194 140 194 L60 194 Q54 194 54 188 L54 84 L51 92 L34 72 Q30 64 36 60 Z"/><path d="M80 34 Q100 54 120 34" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/></symbol>
+  <symbol id="ms-bag" viewBox="0 0 200 200"><path d="M64 84 h72 q10 0 11 10 l7 78 q1 10 -9 10 H55 q-10 0 -9 -10 l7 -78 q1 -10 11 -10 Z"/><path d="M74 84 Q74 48 100 48 Q126 48 126 84" fill="none" stroke="currentColor" stroke-width="7" opacity=".55"/></symbol>
+</svg>
+
+<div class="fb">
+ <div class="fb-app">
+
+  <!-- ÜST BAR -->
+  <header class="fb-top">
+    <div class="fb-brand">
+      <span class="fb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="12" r="2.2"/><circle cx="18.5" cy="5.5" r="2.2"/><circle cx="18.5" cy="18.5" r="2.2"/><path d="M7.6 11 16.4 6.6M7.6 13l8.8 4.4"/></svg></span>
+      <div><b>Master Studio</b><small>Ürün fotoğraf stüdyosu</small></div>
+    </div>
+    <nav class="fb-nav">
+      <button>Stüdyo</button>
+      <button>Galeri</button>
+      <button>Toplu Üretim</button>
+      <button class="on">Entegrasyonlar</button>
+    </nav>
+    <div class="fb-tright">
+      <div class="fb-credit"><b class="mono">1.240</b><small>işlem birimi</small></div>
+      <button class="fb-ibtn" aria-label="Bildirimler"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="fb-ndot"></span></button>
+      <button class="fb-user"><span class="fb-ava">YG</span><span class="nm">Yeşilmen<small>Stüdyo Pro</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+    </div>
+  </header>
+
+  <!-- AKIŞ BAŞLIK ŞERİDİ -->
+  <section class="fb-fhd">
+    <span class="fb-fico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="5.5" r="2.3"/><circle cx="18.5" cy="5.5" r="2.3"/><circle cx="12" cy="18.5" r="2.3"/><path d="M5.5 8v1a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3V8"/><path d="M12 12v4"/></svg></span>
+    <div>
+      <div class="fb-fname"><h1>Yeni ürün → Otomatik çekim</h1><span class="fb-badge b-good" id="fb-state">Çalışıyor</span></div>
+      <p class="fb-fsub">Entegrasyonlar · Trendyol · Yeşilmen Ltd. mağazası</p>
+    </div>
+    <div class="fb-stats mono">Son 7 gün: <b id="fb-runs-n">32</b> koşum · <b id="fb-ok-n">29</b> başarılı · ort. <b>3 dk 41 sn</b></div>
+    <div class="fb-swrap"><span class="sl">AKTİF</span><button class="fb-switch on" id="fb-switch" role="switch" aria-checked="true" aria-label="Akışı aç veya duraklat"><span class="knob"></span></button></div>
+    <button class="fb-run" id="fb-run"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5v14l11-7z"/></svg><span id="fb-run-lbl">Test koşumu</span></button>
+  </section>
+
+  <!-- ÇALIŞMA ALANI -->
+  <div class="fb-work">
+
+    <!-- SOL: BLOKLAR -->
+    <aside class="fb-card fb-blocks">
+      <div class="fb-bhd"><h3>Bloklar</h3><span class="mut mono" style="margin-left:auto">8</span></div>
+      <div class="fb-blocks-body">
+        <div class="fb-bgroup">
+          <span class="fb-eyebrow">Tetikleyiciler</span>
+          <button class="fb-blk"><span class="bi bi-trig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16l1 5H3z"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg></span><span class="bt">Trendyol'dan yeni ürün<small>Ürün onaylandığında başlar</small></span><svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></button>
+          <button class="fb-blk"><span class="bi bi-trig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="bt">Zamanlama<small>Belirli aralıklarla çalışır</small></span><svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></button>
+          <button class="fb-blk"><span class="bi bi-trig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 3 4 14h7l-1 7 9-11h-7z"/></svg></span><span class="bt">Webhook<small>Dış sistemden çağrı alır</small></span><svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></button>
+        </div>
+        <div class="fb-bgroup">
+          <span class="fb-eyebrow">Eylemler</span>
+          <button class="fb-blk"><span class="bi bi-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h3.5L9 4.5h6L16.5 7H20a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg></span><span class="bt">Çekim üret<small>Kare sayısı ve kalite seçilir</small></span><svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></button>
+          <button class="fb-blk"><span class="bi bi-cond"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="5.5" r="2.3"/><circle cx="18.5" cy="5.5" r="2.3"/><circle cx="12" cy="18.5" r="2.3"/><path d="M5.5 8v1a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3V8"/><path d="M12 12v4"/></svg></span><span class="bt">QA eşiği<small>Karne skoruna göre dallanır</small></span><svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></button>
+          <button class="fb-blk"><span class="bi bi-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="m15.5 10.5 2 2 4-4"/></svg></span><span class="bt">Onaya gönder<small>Ekip üyesine atar</small></span><svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></button>
+          <button class="fb-blk"><span class="bi bi-out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V4"/><path d="m7 8.5 5-5 5 5"/><path d="M4 20h16"/></svg></span><span class="bt">Pazaryerine yayınla<small>Görselleri mağazaya aktarır</small></span><svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></button>
+          <button class="fb-blk"><span class="bi bi-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 8 9 6 9-6"/></svg></span><span class="bt">E-posta bildir<small>Özet e-postası gönderir</small></span><svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></button>
+        </div>
+      </div>
+      <p class="fb-bhint"><b>İpucu:</b> Bir bloğu tuvale sürükleyip bırakarak akışa ekle; bağlantı çizgisi en yakın çıkışa kendiliğinden bağlanır.</p>
+    </aside>
+
+    <!-- ORTA: TUVAL -->
+    <section class="fb-card fb-cwrap" id="fb-flowsec">
+      <div class="fb-cbar">
+        <span class="info mono">6 blok · 5 bağlantı</span>
+        <div class="fb-ztools">
+          <button class="fb-zb" aria-label="Uzaklaştır"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></button>
+          <span class="fb-zoom mono">%100</span>
+          <button class="fb-zb" aria-label="Yakınlaştır"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="fb-zb" aria-label="Akışı tuvale sığdır"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/></svg></button>
+        </div>
+      </div>
+      <div class="fb-canvas">
+        <div class="fb-flow">
+          <svg class="fb-wires" width="1296" height="472" viewBox="0 0 1296 472" aria-hidden="true">
+            <defs>
+              <marker id="fb-arr" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 10 5 0 10z"/></marker>
+              <marker id="fb-arr-yes" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 10 5 0 10z"/></marker>
+              <marker id="fb-arr-no" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0 10 5 0 10z"/></marker>
+            </defs>
+            <path class="fb-edge live" marker-end="url(#fb-arr)" d="M236 246 C256 246 260 246 280 246"/>
+            <path class="fb-edge live" marker-end="url(#fb-arr)" d="M496 246 C516 246 520 246 540 246"/>
+            <path class="fb-edge yes live" marker-end="url(#fb-arr-yes)" d="M756 226 C790 226 766 98 800 98"/>
+            <path class="fb-edge live" marker-end="url(#fb-arr)" d="M1016 98 C1036 98 1040 98 1060 98"/>
+            <path class="fb-edge no live" marker-end="url(#fb-arr-no)" d="M756 266 C790 266 766 396 800 396"/>
+            <circle class="fb-port" cx="232" cy="246" r="3.4"/>
+            <circle class="fb-port" cx="492" cy="246" r="3.4"/>
+            <circle class="fb-port yes" cx="752" cy="226" r="3.4"/>
+            <circle class="fb-port no" cx="752" cy="266" r="3.4"/>
+            <circle class="fb-port" cx="1012" cy="98" r="3.4"/>
+          </svg>
+
+          <button class="fb-node n1 t-trig" data-node="n1" aria-pressed="false">
+            <span class="tp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16l1 5H3z"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg>Tetikleyici</span>
+            <b>Trendyol'dan yeni ürün</b>
+            <span class="sum">Yeşilmen Ltd. · anında tetiklenir</span>
+            <span class="st ok" title="Son koşum başarılı"></span>
+          </button>
+
+          <button class="fb-node n2 t-act" data-node="n2" aria-pressed="false">
+            <span class="tp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h3.5L9 4.5h6L16.5 7H20a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>Eylem</span>
+            <b>Çekim üret</b>
+            <span class="sum">6 kare · 2K · 36 işlem birimi/ürün</span>
+            <span class="st ok" title="Son koşum başarılı"></span>
+          </button>
+
+          <button class="fb-node n3 t-cond sel" data-node="n3" aria-pressed="true">
+            <span class="tp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="5.5" r="2.3"/><circle cx="18.5" cy="5.5" r="2.3"/><circle cx="12" cy="18.5" r="2.3"/><path d="M5.5 8v1a3 3 0 0 0 3 3h7a3 3 0 0 0 3-3V8"/><path d="M12 12v4"/></svg>Koşul</span>
+            <b>QA eşiği</b>
+            <span class="sum" id="fb-n3-sum">En az: İyi · altı incelemeye</span>
+            <span class="st ok" title="Son koşum başarılı"></span>
+          </button>
+
+          <button class="fb-node n4 t-act" data-node="n4" aria-pressed="false">
+            <span class="tp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5.5"/></svg>Eylem</span>
+            <b>Otomatik onayla</b>
+            <span class="sum">Eşiği geçen kareler · anında</span>
+            <span class="st ok" title="Son koşum başarılı"></span>
+          </button>
+
+          <button class="fb-node n5 t-out" data-node="n5" aria-pressed="false">
+            <span class="tp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V4"/><path d="m7 8.5 5-5 5 5"/><path d="M4 20h16"/></svg>Çıkış</span>
+            <b>Trendyol'a yayınla</b>
+            <span class="sum">Mevcut görselleri değiştirir</span>
+            <span class="st ok" title="Son koşum başarılı"></span>
+          </button>
+
+          <button class="fb-node n6 t-act" data-node="n6" aria-pressed="false">
+            <span class="tp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="m15.5 10.5 2 2 4-4"/></svg>Eylem</span>
+            <b>Ekibe incelemeye gönder</b>
+            <span class="sum">Ayşe K. · SLA 24 saat</span>
+            <span class="st warn" title="1 bekleyen inceleme"></span>
+          </button>
+
+          <span class="fb-elabel yes">Evet</span>
+          <span class="fb-elabel no">Hayır</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAĞ: DÜĞÜM YAPILANDIRMASI -->
+    <aside class="fb-card fb-config">
+      <div class="fb-bhd"><h3>Düğüm yapılandırması</h3></div>
+
+      <div class="fb-cfg-panel" data-panel="n1" hidden>
+        <div class="fb-phd"><span class="fb-ntag nt-trig">Tetikleyici</span><h4>Trendyol'dan yeni ürün</h4></div>
+        <div class="fb-field"><label>Bağlantı</label>
+          <div class="fb-conn"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16l1 5H3z"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg></span><div><b>Trendyol</b><small>Yeşilmen Ltd. mağazası</small></div><span class="cs">Bağlı</span></div>
+        </div>
+        <div class="fb-field"><label>İzlenen olay</label>
+          <button class="fb-select">Yeni ürün onaylandığında<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+        <div class="fb-field"><label>Kategori filtresi</label>
+          <div class="fb-tagrow"><span class="fb-tag on">Giyim</span><span class="fb-tag on">Çanta</span><span class="fb-tag on">Ayakkabı</span><span class="fb-tag">Takı</span></div>
+          <p class="fb-note">Son tetiklenme: bugün 09:38 · <span class="mono">BSGMARS25337</span></p>
+        </div>
+      </div>
+
+      <div class="fb-cfg-panel" data-panel="n2" hidden>
+        <div class="fb-phd"><span class="fb-ntag nt-act">Eylem</span><h4>Çekim üret</h4></div>
+        <div class="fb-field"><label>Kare sayısı</label>
+          <div class="fb-step"><button aria-label="Kare sayısını azalt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></button><span class="val mono">6</span><button aria-label="Kare sayısını artır"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button></div>
+        </div>
+        <div class="fb-field"><label>Kalite</label>
+          <div class="fb-orow"><span class="fb-o">1K</span><span class="fb-o on">2K</span><span class="fb-o">4K</span></div>
+          <p class="fb-note mono">6 kare × 2K = <b>36 işlem birimi/ürün</b></p>
+        </div>
+        <div class="fb-field"><label>Çekim ayarları</label>
+          <div class="fb-kv"><span class="k">En-boy oranı</span><span class="v">4:5</span></div>
+          <div class="fb-kv"><span class="k">Arka plan</span><span class="v">Stüdyo</span></div>
+          <div class="fb-kv"><span class="k">Manken</span><span class="v">Otomatik</span></div>
+        </div>
+      </div>
+
+      <div class="fb-cfg-panel" data-panel="n3">
+        <div class="fb-phd"><span class="fb-ntag nt-cond">Koşul</span><h4>QA eşiği</h4></div>
+        <div class="fb-field"><label>En düşük kabul edilen karne</label>
+          <div class="fb-orow" id="fb-thr"><button class="fb-o">Zayıf</button><button class="fb-o">Normal</button><button class="fb-o on">İyi</button></div>
+          <p class="fb-note">İyi eşiği: Renk, Doku, Logo ve Poz skorlarının tümü 80 ve üzeri olmalı.</p>
+        </div>
+        <div class="fb-field"><label>Değerlendirilen boyutlar</label>
+          <div class="fb-tagrow"><span class="fb-tag on">Renk</span><span class="fb-tag on">Doku</span><span class="fb-tag on">Logo</span><span class="fb-tag on">Poz</span></div>
+        </div>
+        <div class="fb-field"><label>Eşiğin altındaki kareler</label>
+          <button class="fb-select">İncelemeye gönder<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="fb-cfg-panel" data-panel="n4" hidden>
+        <div class="fb-phd"><span class="fb-ntag nt-act">Eylem</span><h4>Otomatik onayla</h4></div>
+        <div class="fb-field"><label>Kapsam</label>
+          <button class="fb-select">Eşiği geçen tüm kareler<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+        <div class="fb-field"><label>Onay kaydı</label>
+          <div class="fb-kv"><span class="k">Onaylayan</span><span class="v">Sistem (otomatik)</span></div>
+          <div class="fb-kv"><span class="k">Galeri durumu</span><span class="v">Onaylı</span></div>
+          <p class="fb-note">Otomatik onaylanan kareler galeriye Onaylı olarak düşer; geçmişten her zaman geri alınabilir.</p>
+        </div>
+      </div>
+
+      <div class="fb-cfg-panel" data-panel="n5" hidden>
+        <div class="fb-phd"><span class="fb-ntag nt-out">Çıkış</span><h4>Trendyol'a yayınla</h4></div>
+        <div class="fb-field"><label>Hedef mağaza</label>
+          <div class="fb-conn"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16l1 5H3z"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/></svg></span><div><b>Trendyol</b><small>Yeşilmen Ltd. mağazası</small></div><span class="cs">Bağlı</span></div>
+        </div>
+        <div class="fb-field"><label>Yayın modu</label>
+          <button class="fb-select">Mevcut görselleri değiştir<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+        <div class="fb-field"><label>Görsel sırası</label>
+          <div class="fb-kv"><span class="k">Kapak</span><span class="v">Önden tam boy</span></div>
+          <div class="fb-kv"><span class="k">Sonrası</span><span class="v">QA skoruna göre</span></div>
+        </div>
+      </div>
+
+      <div class="fb-cfg-panel" data-panel="n6" hidden>
+        <div class="fb-phd"><span class="fb-ntag nt-act">Eylem</span><h4>Ekibe incelemeye gönder</h4></div>
+        <div class="fb-field"><label>Atanan kişi</label>
+          <div class="fb-person"><span class="fb-ava">AK</span><div><b>Ayşe K.</b><small>İçerik editörü</small></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+        </div>
+        <div class="fb-field"><label>Yanıt süresi (SLA)</label>
+          <button class="fb-select">24 saat içinde<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+        <div class="fb-field"><label>Bildirim kanalları</label>
+          <div class="fb-tagrow"><span class="fb-tag on">E-posta</span><span class="fb-tag on">Uygulama içi</span></div>
+          <p class="fb-note">Bekleyen 1 inceleme var — dün 22:05 koşumundan <span class="mono">BSGAYK4412</span>.</p>
+        </div>
+      </div>
+
+      <div class="fb-cfg-ft"><button class="fb-bghost">Varsayılana dön</button><button class="fb-bsolid">Kaydet</button></div>
+    </aside>
+  </div>
+
+  <!-- ALT ŞERİT: KOŞUM GEÇMİŞİ -->
+  <section class="fb-card fb-history">
+    <div class="fb-bhd"><h3>Koşum geçmişi</h3><span class="mut">Son 7 gün · <b class="mono" id="fb-hist-n">32</b> koşum</span><a class="r" href="#">Tümünü gör →</a></div>
+    <div class="fb-twrap">
+      <table class="fb-table">
+        <thead><tr><th>Zaman</th><th>Ürün</th><th>Sonuç</th><th class="num">Süre</th><th>Ayrıntı</th></tr></thead>
+        <tbody id="fb-runs">
+          <tr>
+            <td class="mono t">09:41</td>
+            <td><div class="fb-prod"><span class="th"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></span><div><b>Bel Ceketi · Lacivert</b><small class="mono">BSGMARS25337</small></div></div></td>
+            <td><span class="fb-badge b-good">Başarılı</span></td>
+            <td class="mono num">3 dk 12 sn</td>
+            <td class="note">6 kare üretildi · QA: İyi · otomatik yayınlandı</td>
+          </tr>
+          <tr>
+            <td class="mono t">08:17</td>
+            <td><div class="fb-prod"><span class="th"><svg viewBox="0 0 200 200"><use href="#ms-bag"/></svg></span><div><b>Deri Omuz Çantası · Taba</b><small class="mono">BSGTOT9021</small></div></div></td>
+            <td><span class="fb-badge b-good">Başarılı</span></td>
+            <td class="mono num">4 dk 02 sn</td>
+            <td class="note">36 işlem birimi harcandı · 6 kare yayında</td>
+          </tr>
+          <tr>
+            <td class="mono t">Dün 22:05</td>
+            <td><div class="fb-prod"><span class="th"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h5v8l6 2.5a3 3 0 0 1 2 2.8V19H6z"/><path d="M6 13.5h5"/></svg></span><div><b>Süet Bot · Kum</b><small class="mono">BSGAYK4412</small></div></div></td>
+            <td><span class="fb-badge b-normal">İncelemede</span></td>
+            <td class="mono num">3 dk 47 sn</td>
+            <td class="note">Logo skoru 64 · eşik altı · Ayşe K. inceliyor</td>
+          </tr>
+          <tr>
+            <td class="mono t">Dün 18:33</td>
+            <td><div class="fb-prod"><span class="th"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></span><div><b>Bel Ceketi · Lacivert</b><small class="mono">BSGMARS25337</small></div></div></td>
+            <td><span class="fb-badge b-good">Başarılı</span></td>
+            <td class="mono num">3 dk 28 sn</td>
+            <td class="note">2 kare yeniden üretildi · yayınlandı</td>
+          </tr>
+          <tr>
+            <td class="mono t">Dün 14:09</td>
+            <td><div class="fb-prod"><span class="th"><svg viewBox="0 0 200 200"><use href="#ms-bag"/></svg></span><div><b>Deri Omuz Çantası · Taba</b><small class="mono">BSGTOT9021</small></div></div></td>
+            <td><span class="fb-badge b-weak">Hata</span></td>
+            <td class="mono num">0 dk 44 sn</td>
+            <td class="note">Trendyol API zaman aşımı · 3 deneme başarısız</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+ </div>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector('.fb'); if (!root) return;
+  function $(s) { return root.querySelector(s); }
+
+  /* 1) Düğüm seçimi → sağ panel değişir */
+  var nodes = root.querySelectorAll('.fb-node');
+  var panels = root.querySelectorAll('.fb-cfg-panel');
+  nodes.forEach(function (n) {
+    n.addEventListener('click', function () {
+      nodes.forEach(function (x) { x.classList.remove('sel'); x.setAttribute('aria-pressed', 'false'); });
+      n.classList.add('sel'); n.setAttribute('aria-pressed', 'true');
+      var id = n.getAttribute('data-node');
+      panels.forEach(function (p) { p.hidden = p.getAttribute('data-panel') !== id; });
+    });
+  });
+
+  /* 2) AKTİF anahtarı → rozet + tuval durumu + test düğmesi */
+  var sw = $('#fb-switch'), badge = $('#fb-state'), flowsec = $('#fb-flowsec'), runBtn = $('#fb-run');
+  if (sw) sw.addEventListener('click', function () {
+    var on = sw.classList.toggle('on');
+    sw.setAttribute('aria-checked', on ? 'true' : 'false');
+    if (badge) { badge.textContent = on ? 'Çalışıyor' : 'Duraklatıldı'; badge.className = 'fb-badge ' + (on ? 'b-good' : 'b-normal'); }
+    if (flowsec) flowsec.classList.toggle('paused', !on);
+    if (runBtn && !runBtn.classList.contains('busy')) runBtn.disabled = !on;
+  });
+
+  /* 3) Test koşumu → geçmişe yeni satır + sayaçlar */
+  var tbody = $('#fb-runs'), runsN = $('#fb-runs-n'), okN = $('#fb-ok-n'), histN = $('#fb-hist-n'), runLbl = $('#fb-run-lbl');
+  var runs = 32, oks = 29;
+  if (runBtn && tbody) runBtn.addEventListener('click', function () {
+    if (runBtn.disabled || runBtn.classList.contains('busy')) return;
+    runBtn.classList.add('busy'); runBtn.disabled = true;
+    if (runLbl) runLbl.textContent = 'Koşum sürüyor…';
+    window.setTimeout(function () {
+      var tr = document.createElement('tr');
+      tr.className = 'new';
+      tr.innerHTML =
+        '<td class="mono t">şimdi</td>' +
+        '<td><div class="fb-prod"><span class="th"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></span><div><b>Bel Ceketi · Lacivert</b><small class="mono">BSGMARS25337</small></div></div></td>' +
+        '<td><span class="fb-badge b-good">Başarılı</span></td>' +
+        '<td class="mono num">3 dk 12 sn</td>' +
+        '<td class="note">Test koşumu · 6 kare üretildi · yayın atlandı</td>';
+      tbody.insertBefore(tr, tbody.firstChild);
+      runs += 1; oks += 1;
+      if (runsN) runsN.textContent = runs;
+      if (okN) okN.textContent = oks;
+      if (histN) histN.textContent = runs;
+      if (runLbl) runLbl.textContent = 'Test koşumu';
+      runBtn.classList.remove('busy');
+      runBtn.disabled = sw ? !sw.classList.contains('on') : false;
+    }, 1100);
+  });
+
+  /* 4) QA eşik seçici → düğüm özeti güncellenir */
+  var thr = $('#fb-thr'), n3sum = $('#fb-n3-sum');
+  if (thr) thr.addEventListener('click', function (e) {
+    var b = e.target.closest('.fb-o'); if (!b || !thr.contains(b)) return;
+    thr.querySelectorAll('.fb-o').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    if (n3sum) n3sum.textContent = 'En az: ' + b.textContent.trim() + ' · altı incelemeye';
+  });
+})();
+</script>

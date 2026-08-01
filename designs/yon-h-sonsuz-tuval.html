@@ -1,0 +1,665 @@
+<title>Master Studio — Yön H · Sonsuz Tuval</title>
+
+<style>
+/* ============================================================
+   YÖN H — "Sonsuz Tuval"
+   Figma-vari uzamsal çalışma alanı: çekimin kareleri serbest
+   tuvalde çerçeveler halinde durur; ekip aynı anda içinde gezer,
+   yorum iğneler, onay verir. Çok-oyunculu (multiplayer) SaaS.
+   TEMA: ÇİFT — soğuk nötr griler (araç yüzeyleri), nokta-ızgara
+   tuval; koyu temada grafit. ACCENT: çelik mavisi (#3f7bb6).
+   İmleç kimlikleri: Ayşe = mercan, Deniz = yaprak yeşili
+   (semantik iyi/uyarı/zayıf ailesinden bilinçli olarak ayrı).
+   UI yazısı kompakt (12–12.5px). Namespace: .cv
+   ============================================================ */
+
+.cv, .cv *, .cv *::before, .cv *::after { box-sizing: border-box; }
+
+.cv {
+  --bg: #e8ebee; --canvas: #f0f2f5; --dot: #c6cdd5;
+  --panel: #ffffff; --panel-2: #f2f4f7; --panel-3: #e7ebef;
+  --glass: rgba(255,255,255,.86);
+  --line: #dfe4e9; --line-2: #ccd4dc;
+  --text: #1a2027; --text-2: #59646f; --text-3: #8b96a2;
+  --accent: #3f7bb6; --accent-2: #316399; --accent-soft: rgba(63,123,182,.12);
+  --good: #2f9e69; --good-soft: rgba(47,158,105,.13);
+  --normal: #b0791f; --normal-soft: rgba(176,121,31,.14);
+  --weak: #d64545; --weak-soft: rgba(214,69,69,.12);
+  --cur-a: #e06a4e;  /* Ayşe · mercan (zayıf kırmızısından daha turuncu) */
+  --cur-d: #5f9d33;  /* Deniz · yaprak yeşili (iyi zümrütünden daha sarı) */
+  --on-accent: #ffffff;  /* accent / imleç / semantik dolgular üzerindeki metin */
+  --shadow: 0 1px 2px rgba(18,26,38,.06), 0 6px 20px rgba(18,26,38,.08);
+  --shadow-lg: 0 14px 36px rgba(14,22,34,.16), 0 3px 9px rgba(14,22,34,.09);
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text); background: var(--bg); min-height: 100vh;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-size: 12.5px; line-height: 1.5; letter-spacing: -0.006em;
+}
+@media (prefers-color-scheme: dark) {
+  .cv {
+    --bg: #101215; --canvas: #16181c; --dot: #2b3038;
+    --panel: #1c1f24; --panel-2: #22262c; --panel-3: #2a2f36;
+    --glass: rgba(28,31,36,.88);
+    --line: #2a2e35; --line-2: #3a414a;
+    --text: #e7eaee; --text-2: #99a3ad; --text-3: #6a747f;
+    --accent: #6ea7d8; --accent-2: #8dbce4; --accent-soft: rgba(110,167,216,.16);
+    --good: #43c088; --good-soft: rgba(67,192,136,.15);
+    --normal: #d3a24d; --normal-soft: rgba(211,162,77,.15);
+    --weak: #ee6a6a; --weak-soft: rgba(238,106,106,.15);
+    --cur-a: #f0876a; --cur-d: #8cc45c;
+    --on-accent: #0f1419;  /* koyu temada dolgular açıldığı için üzeri koyu metin */
+    --shadow: 0 1px 2px rgba(0,0,0,.42), 0 6px 20px rgba(0,0,0,.38);
+    --shadow-lg: 0 16px 40px rgba(0,0,0,.58), 0 3px 9px rgba(0,0,0,.42);
+  }
+}
+:root[data-theme="dark"] .cv {
+  --bg: #101215; --canvas: #16181c; --dot: #2b3038;
+  --panel: #1c1f24; --panel-2: #22262c; --panel-3: #2a2f36;
+  --glass: rgba(28,31,36,.88);
+  --line: #2a2e35; --line-2: #3a414a;
+  --text: #e7eaee; --text-2: #99a3ad; --text-3: #6a747f;
+  --accent: #6ea7d8; --accent-2: #8dbce4; --accent-soft: rgba(110,167,216,.16);
+  --good: #43c088; --good-soft: rgba(67,192,136,.15);
+  --normal: #d3a24d; --normal-soft: rgba(211,162,77,.15);
+  --weak: #ee6a6a; --weak-soft: rgba(238,106,106,.15);
+  --cur-a: #f0876a; --cur-d: #8cc45c;
+  --on-accent: #0f1419;
+  --shadow: 0 1px 2px rgba(0,0,0,.42), 0 6px 20px rgba(0,0,0,.38);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,.58), 0 3px 9px rgba(0,0,0,.42);
+}
+:root[data-theme="light"] .cv {
+  --bg: #e8ebee; --canvas: #f0f2f5; --dot: #c6cdd5;
+  --panel: #ffffff; --panel-2: #f2f4f7; --panel-3: #e7ebef;
+  --glass: rgba(255,255,255,.86);
+  --line: #dfe4e9; --line-2: #ccd4dc;
+  --text: #1a2027; --text-2: #59646f; --text-3: #8b96a2;
+  --accent: #3f7bb6; --accent-2: #316399; --accent-soft: rgba(63,123,182,.12);
+  --good: #2f9e69; --good-soft: rgba(47,158,105,.13);
+  --normal: #b0791f; --normal-soft: rgba(176,121,31,.14);
+  --weak: #d64545; --weak-soft: rgba(214,69,69,.12);
+  --cur-a: #e06a4e; --cur-d: #5f9d33;
+  --on-accent: #ffffff;
+  --shadow: 0 1px 2px rgba(18,26,38,.06), 0 6px 20px rgba(18,26,38,.08);
+  --shadow-lg: 0 14px 36px rgba(14,22,34,.16), 0 3px 9px rgba(14,22,34,.09);
+}
+
+.cv ::selection { background: var(--accent-soft); }
+.cv :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 6px; }
+.cv button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; letter-spacing: inherit; padding: 0; }
+.cv input { font: inherit; color: inherit; letter-spacing: inherit; }
+.cv svg { display: block; max-width: 100%; }
+.cv .mono { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .cv *, .cv *::before, .cv *::after { transition: none !important; animation: none !important; } }
+
+.cv-app { max-width: 1500px; margin: 0 auto; padding: 0 clamp(10px,1.4vw,18px) 42px; }
+
+/* ---------------- Üst bar ---------------- */
+.cv-top { display: flex; align-items: center; gap: 12px; height: 52px; }
+.cv-brand { display: flex; align-items: center; gap: 9px; font-weight: 650; font-size: 13px; }
+.cv-logo { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; box-shadow: var(--shadow); flex: none; }
+.cv-logo svg { width: 14px; color: var(--on-accent); }
+.cv-brand small { display: block; font-size: 10px; font-weight: 450; color: var(--text-3); line-height: 1.25; }
+.cv-tsep-v { width: 1px; height: 22px; background: var(--line-2); flex: none; }
+.cv-file { display: flex; align-items: center; gap: 7px; padding: 5px 9px; border-radius: 8px; transition: background .13s; }
+.cv-file:hover { background: var(--panel-2); }
+.cv-file b { font-size: 12.5px; font-weight: 600; }
+.cv-file .st { font-size: 10.5px; color: var(--text-3); }
+.cv-file svg { width: 13px; color: var(--text-3); }
+
+.cv-nav { display: flex; align-items: center; gap: 2px; }
+.cv-nav a { text-decoration: none; color: var(--text-2); font-size: 11.5px; font-weight: 570; padding: 5px 9px; border-radius: 7px; white-space: nowrap; transition: background .13s, color .13s; }
+.cv-nav a:hover { background: var(--panel-2); color: var(--text); }
+.cv-nav a.on { color: var(--accent); background: var(--accent-soft); font-weight: 650; }
+
+.cv-tr { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.cv-credit { display: flex; align-items: baseline; gap: 5px; height: 30px; padding: 0 10px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); }
+.cv-credit b { font-size: 12px; font-weight: 650; }
+.cv-credit small { font-size: 10px; color: var(--text-3); }
+.cv-avas { display: flex; align-items: center; }
+.cv-ava { width: 27px; height: 27px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: var(--on-accent); border: 2px solid var(--bg); margin-left: -7px; }
+.cv-ava:first-child { margin-left: 0; }
+.cv-ava.yg { background: linear-gradient(140deg, var(--accent), var(--accent-2)); box-shadow: 0 0 0 1.5px var(--accent); z-index: 3; }
+.cv-ava.ak { background: var(--cur-a); box-shadow: 0 0 0 1.5px var(--cur-a); z-index: 2; }
+.cv-ava.dt { background: var(--cur-d); box-shadow: 0 0 0 1.5px var(--cur-d); z-index: 1; }
+.cv-share { display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 13px; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-size: 12px; font-weight: 620; box-shadow: var(--shadow); transition: background .14s, transform .12s; }
+.cv-share:hover { background: var(--accent-2); transform: translateY(-1px); }
+.cv-share svg { width: 13px; }
+
+/* ---------------- Sahne + tuval ---------------- */
+.cv-stage { position: relative; }
+.cv-canvas {
+  position: relative; height: 640px; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 14px;
+  background-color: var(--canvas);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.3px);
+  background-size: 22px 22px; background-position: 11px 11px;
+}
+.cv-canvas[data-tool="hand"] { cursor: grab; }
+.cv-canvas[data-tool="frame"], .cv-canvas[data-tool="comment"] { cursor: crosshair; }
+
+.cv-world { position: absolute; inset: 0; transform-origin: 50% 44%; transition: transform .18s ease; }
+
+/* ---- Çerçeveler ---- */
+.cv-frame { position: absolute; width: 132px; }
+.cv-frame.lg { width: 168px; }
+.cv-frame.sq { width: 150px; }
+.cv-fhead { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; padding: 0 1px; }
+.cv-fhead .nm { font-size: 10.5px; font-weight: 570; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-frame.sel .cv-fhead .nm { color: var(--accent); font-weight: 640; }
+.cv-fbadge { flex: none; margin-left: auto; font-size: 9px; font-weight: 680; padding: 1px 6px; border-radius: 5px; }
+.cvb-good { color: var(--good); background: var(--good-soft); }
+.cvb-normal { color: var(--normal); background: var(--normal-soft); }
+.cvb-weak { color: var(--weak); background: var(--weak-soft); }
+.cv-fbody { position: relative; border-radius: 4px; border: 1px solid var(--line-2); background: var(--panel-2); box-shadow: var(--shadow); display: grid; place-items: center; aspect-ratio: 4/5; transition: box-shadow .14s, border-color .14s; }
+.cv-frame.sq .cv-fbody { aspect-ratio: 1/1; }
+.cv-frame:hover .cv-fbody { border-color: color-mix(in srgb, var(--accent) 45%, var(--line-2)); }
+.cv-frame.sel .cv-fbody { border-color: transparent; box-shadow: 0 0 0 1.5px var(--accent), var(--shadow); }
+.cv-fbody figure { margin: 0; width: 54%; color: var(--text-3); opacity: .92; }
+.cv-fbody figure.close { width: 82%; }
+.cvg1 { background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 9%, var(--panel-2)), var(--panel-2)); }
+.cvg2 { background: linear-gradient(165deg, color-mix(in srgb, #4aa3a0 10%, var(--panel-2)), var(--panel-2)); }
+.cvg3 { background: linear-gradient(165deg, color-mix(in srgb, #a583b8 10%, var(--panel-2)), var(--panel-2)); }
+.cvg4 { background: linear-gradient(165deg, color-mix(in srgb, #c9a06a 11%, var(--panel-2)), var(--panel-2)); }
+
+.cv-h { position: absolute; width: 8px; height: 8px; border-radius: 2px; background: var(--panel); border: 1.5px solid var(--accent); display: none; z-index: 3; }
+.cv-frame.sel .cv-h { display: block; }
+.cv-h.nw { left: -4.5px; top: -4.5px; } .cv-h.n { left: 50%; margin-left: -4px; top: -4.5px; } .cv-h.ne { right: -4.5px; top: -4.5px; }
+.cv-h.e { right: -4.5px; top: 50%; margin-top: -4px; } .cv-h.se { right: -4.5px; bottom: -4.5px; } .cv-h.s { left: 50%; margin-left: -4px; bottom: -4.5px; }
+.cv-h.sw { left: -4.5px; bottom: -4.5px; } .cv-h.w { left: -4.5px; top: 50%; margin-top: -4px; }
+.cv-size { position: absolute; left: 50%; transform: translateX(-50%); bottom: -25px; background: var(--accent); color: var(--on-accent); font-size: 9.5px; font-weight: 620; padding: 2px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 3; }
+.cv-frame.sel .cv-size { display: block; }
+
+/* ---- Çok-oyunculu imleçler ---- */
+.cv-cursor { position: absolute; z-index: 6; pointer-events: none; transition: transform .18s ease; transform-origin: top left; }
+.cv-cursor .mv { animation: cv-drift-a 8s ease-in-out infinite; }
+.cv-cursor.d .mv { animation: cv-drift-d 10s ease-in-out infinite; }
+@keyframes cv-drift-a { 0%,100% { transform: translate(0,0); } 45% { transform: translate(12px,-9px); } 70% { transform: translate(4px,3px); } }
+@keyframes cv-drift-d { 0%,100% { transform: translate(0,0); } 40% { transform: translate(-10px,6px); } 75% { transform: translate(6px,-5px); } }
+.cv-cursor svg { width: 17px; height: 17px; }
+.cv-cursor .tag { display: inline-block; margin: 1px 0 0 11px; font-size: 10px; font-weight: 650; color: var(--on-accent); padding: 2px 8px; border-radius: 3px 9px 9px 9px; white-space: nowrap; }
+.cv-cursor.a .tag { background: var(--cur-a); }
+.cv-cursor.d .tag { background: var(--cur-d); }
+.cv-cursor.a svg { color: var(--cur-a); }
+.cv-cursor.d svg { color: var(--cur-d); }
+
+/* ---- Yorum iğnesi + iplik ---- */
+.cv-pinwrap { position: absolute; z-index: 7; transition: transform .18s ease; transform-origin: top left; }
+.cv-pin { width: 30px; height: 30px; border-radius: 15px 15px 15px 3px; background: var(--cur-d); color: var(--on-accent); font-size: 10px; font-weight: 700; display: grid; place-items: center; box-shadow: var(--shadow-lg); border: 2px solid var(--panel); transition: transform .13s; }
+.cv-pin:hover { transform: scale(1.08); }
+.cv-pin .chk { display: none; width: 14px; }
+.cv-pin.res { background: var(--good); }
+.cv-pin.res .ini { display: none; }
+.cv-pin.res .chk { display: block; }
+.cv-thread { position: absolute; left: 38px; top: -4px; width: 248px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 11px 12px 12px; display: none; }
+.cv-thread.open { display: block; }
+.cv-thread .hd { display: flex; align-items: center; gap: 8px; }
+.cv-cava { width: 24px; height: 24px; border-radius: 50%; background: var(--cur-d); color: var(--on-accent); display: grid; place-items: center; font-size: 9.5px; font-weight: 700; flex: none; }
+.cv-thread .hd b { font-size: 11.5px; font-weight: 640; display: block; line-height: 1.2; }
+.cv-thread .hd small { font-size: 10px; color: var(--text-3); }
+.cv-topen { margin-left: auto; font-size: 9px; font-weight: 700; color: var(--normal); background: var(--normal-soft); padding: 2px 7px; border-radius: 5px; }
+.cv-thread p { margin: 8px 0 10px; font-size: 12px; line-height: 1.5; color: var(--text); }
+.cv-thread .ft { display: flex; gap: 6px; }
+.cv-reply { flex: 1; min-width: 0; height: 28px; padding: 0 9px; font-size: 11.5px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel-2); }
+.cv-reply::placeholder { color: var(--text-3); }
+.cv-resolve { height: 28px; padding: 0 11px; border-radius: 8px; background: var(--good); color: var(--on-accent); font-size: 11.5px; font-weight: 640; transition: filter .13s; }
+.cv-resolve:hover { filter: brightness(1.08); }
+
+/* ---- Yüzen araç çubuğu ---- */
+.cv-toolbar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; align-items: center; gap: 3px; padding: 4px; background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 11px; box-shadow: var(--shadow); }
+.cv-tool { position: relative; width: 34px; height: 34px; border-radius: 8px; color: var(--text-2); display: grid; place-items: center; transition: background .13s, color .13s; }
+.cv-tool:hover { background: var(--panel-2); color: var(--text); }
+.cv-tool.on { background: var(--accent); color: var(--on-accent); }
+.cv-tool svg { width: 16px; }
+.cv-tool .k { position: absolute; right: 3px; bottom: 2px; font-size: 7.5px; font-weight: 700; color: var(--text-3); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.cv-tool.on .k { color: var(--on-accent); opacity: .75; }
+.cv-tsep { width: 1px; height: 20px; background: var(--line-2); margin: 0 4px; }
+.cv-zbtn { width: 26px; height: 26px; border-radius: 7px; color: var(--text-2); display: grid; place-items: center; transition: background .13s, color .13s; }
+.cv-zbtn:hover { background: var(--panel-2); color: var(--text); }
+.cv-zbtn svg { width: 13px; }
+.cv-zval { min-width: 38px; text-align: center; font-size: 11px; font-weight: 620; color: var(--text-2); }
+
+/* ---- Sol panel · Kareler ---- */
+.cv-panel { position: absolute; z-index: 9; background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.cv-frames { left: 14px; top: 14px; width: 202px; }
+.cv-phd { display: flex; align-items: baseline; gap: 7px; padding: 11px 12px 8px; }
+.cv-phd h3 { margin: 0; font-size: 11.5px; font-weight: 650; }
+.cv-phd .r { margin-left: auto; font-size: 10px; color: var(--text-3); }
+.cv-list { padding: 0 6px 6px; display: flex; flex-direction: column; gap: 1px; }
+.cv-lrow { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 6px 7px; border-radius: 8px; transition: background .12s; }
+.cv-lrow:hover { background: var(--panel-2); }
+.cv-lrow.on { background: var(--accent-soft); }
+.cv-lrow .num { font-size: 10px; color: var(--text-3); width: 16px; flex: none; }
+.cv-lrow.on .num { color: var(--accent); font-weight: 650; }
+.cv-lrow .t { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-lrow.on .t { font-weight: 620; color: var(--accent); }
+.cv-lrow .cm { flex: none; margin-left: auto; width: 12px; color: var(--text-3); }
+.cv-ldot { flex: none; width: 7px; height: 7px; border-radius: 50%; }
+.cv-ldot:last-child { margin-left: auto; }
+.cv-lrow .cm ~ .cv-ldot { margin-left: 4px; }
+.cvd-good { background: var(--good); } .cvd-normal { background: var(--normal); } .cvd-weak { background: var(--weak); }
+.cv-pft { border-top: 1px solid var(--line); padding: 8px 12px; font-size: 10.5px; color: var(--text-3); }
+.cv-pft b { color: var(--text-2); font-weight: 620; }
+
+/* ---- Zoom denetimi (sol alt) ---- */
+.cv-zoom { position: absolute; left: 14px; bottom: 14px; z-index: 9; display: flex; align-items: center; gap: 2px; padding: 4px; background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+.cv-zoom .cv-tsep { margin: 0 3px; }
+.cv-zfit { height: 26px; padding: 0 9px; border-radius: 7px; font-size: 11px; font-weight: 600; color: var(--text-2); transition: background .13s, color .13s; }
+.cv-zfit:hover { background: var(--panel-2); color: var(--text); }
+
+/* ---- Sağ panel · Seçim özellikleri ---- */
+.cv-props { right: 14px; top: 14px; width: 256px; max-height: calc(100% - 148px); overflow-y: auto; }
+.cv-eyebrow { font-size: 9.5px; font-weight: 680; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+.cv-props-hd { padding: 11px 13px 9px; border-bottom: 1px solid var(--line); }
+.cv-props-hd .row { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+.cv-props-hd h3 { margin: 0; font-size: 12.5px; font-weight: 650; letter-spacing: -.01em; }
+.cv-props-hd .cv-fbadge { font-size: 9.5px; padding: 2px 8px; }
+.cv-kv { display: flex; align-items: center; gap: 8px; padding: 7px 13px; border-bottom: 1px solid var(--line); }
+.cv-kv .k { width: 74px; flex: none; font-size: 11px; color: var(--text-2); }
+.cv-kv .v { font-size: 11.5px; font-weight: 570; }
+.cv-qa { padding: 9px 13px 4px; }
+.cv-qa h4 { margin: 0 0 4px; font-size: 10.5px; font-weight: 650; color: var(--text-2); }
+.cv-qrow { display: flex; align-items: center; gap: 9px; padding: 6px 0; }
+.cv-qrow .qn { width: 34px; flex: none; font-size: 11px; }
+.cv-qtrack { flex: 1; height: 4px; border-radius: 3px; background: var(--panel-3); overflow: hidden; }
+.cv-qfill { height: 100%; border-radius: 3px; transition: width .25s ease; }
+.cv-qfill.good { background: var(--good); } .cv-qfill.normal { background: var(--normal); } .cv-qfill.weak { background: var(--weak); }
+.cv-qval { width: 22px; flex: none; text-align: right; font-size: 10.5px; font-weight: 650; }
+.cv-qval.good { color: var(--good); } .cv-qval.normal { color: var(--normal); } .cv-qval.weak { color: var(--weak); }
+.cv-note { margin: 4px 13px 10px; padding: 8px 10px; border-radius: 9px; background: var(--panel-2); font-size: 11px; line-height: 1.5; color: var(--text-2); }
+.cv-pact { display: flex; gap: 7px; padding: 0 13px 12px; }
+.cv-bghost { flex: 1; text-align: center; font-size: 11.5px; font-weight: 570; padding: 8px 4px; border-radius: 8px; border: 1px solid var(--line-2); color: var(--text); transition: background .13s; }
+.cv-bghost:hover { background: var(--panel-2); }
+.cv-bsolid { flex: 1; text-align: center; font-size: 11.5px; font-weight: 650; padding: 8px 4px; border-radius: 8px; background: var(--accent); color: var(--on-accent); transition: background .13s; }
+.cv-bsolid:hover { background: var(--accent-2); }
+.cv-cost { padding: 0 13px 12px; font-size: 10px; color: var(--text-3); text-align: center; }
+
+/* ---- Mini-harita (sağ alt) ---- */
+.cv-mini { position: absolute; right: 14px; bottom: 14px; z-index: 9; width: 150px; height: 94px; background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.cv-mini-f { position: absolute; border-radius: 2px; background: var(--line-2); }
+.cv-mini-f.on { background: var(--accent); }
+.cv-mini-view { position: absolute; border: 1.5px solid var(--accent); border-radius: 4px; background: var(--accent-soft); transition: all .18s ease; }
+
+/* ---------------- Duyarlılık ---------------- */
+@media (max-width: 1140px) {
+  .cv-frames { width: 178px; }
+  .cv-props { width: 236px; }
+  .cv-mini { width: 118px; height: 74px; }
+  .cv-credit small { display: none; }
+}
+@media (max-width: 760px) {
+  .cv-top { height: auto; min-height: 52px; flex-wrap: wrap; padding: 8px 0; row-gap: 2px; }
+  .cv-tsep-v { display: none; }
+  .cv-nav { order: 5; width: 100%; overflow-x: auto; }
+  .cv-file { min-width: 0; }
+  .cv-file b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cv-canvas { height: 430px; border-radius: 12px; }
+  .cv-toolbar { top: 10px; }
+  .cv-tool .k { display: none; }
+  .cv-panel { position: static; width: auto; margin-top: 12px; backdrop-filter: none; background: var(--panel); max-height: none; overflow: visible; }
+  .cv-mini { display: none; }
+  .cv-brand small, .cv-file .st, .cv-credit { display: none; }
+  .cv-pinwrap .cv-thread { left: auto; right: 36px; top: 34px; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ms-figure" viewBox="0 0 200 340"><circle cx="100" cy="42" r="23"/><path d="M93 66h14v10H93z"/><path d="M74 78 Q100 70 126 78 L133 150 Q118 158 100 158 Q82 158 67 150 Z"/><path d="M69 149 Q100 160 131 149 L151 302 Q100 318 49 302 Z"/><path d="M74 80 Q57 122 61 182 L71 180 Q69 122 84 86 Z"/><path d="M126 80 Q143 122 139 182 L129 180 Q131 122 116 86 Z"/></symbol>
+  <symbol id="ms-garment" viewBox="0 0 200 210"><path d="M70 34 Q100 22 130 34 L164 60 Q170 64 166 72 L149 92 L146 84 L146 188 Q146 194 140 194 L60 194 Q54 194 54 188 L54 84 L51 92 L34 72 Q30 64 36 60 Z"/><path d="M80 34 Q100 54 120 34" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/></symbol>
+</svg>
+
+<div class="cv">
+ <div class="cv-app">
+
+  <!-- ÜST BAR -->
+  <header class="cv-top">
+    <div class="cv-brand">
+      <span class="cv-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 16.5 9 11l3.5 3.5L19 8"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg></span>
+      <div>Master Studio<small>Ürün fotoğraf stüdyosu</small></div>
+    </div>
+    <span class="cv-tsep-v"></span>
+    <nav class="cv-nav" aria-label="Ana gezinme">
+      <a href="#" class="on" aria-current="page">Stüdyo</a>
+      <a href="#">Galeri</a>
+      <a href="#">Toplu Üretim</a>
+      <a href="#">Entegrasyonlar</a>
+    </nav>
+    <span class="cv-tsep-v"></span>
+    <button class="cv-file">
+      <b>Bel Ceketi · Prova çekimi</b>
+      <span class="st">Otomatik kaydedildi</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="cv-tr">
+      <div class="cv-credit"><b class="mono">1.240</b><small>işlem birimi</small></div>
+      <div class="cv-avas" title="Şu an tuvalde: Yeşilmen, Ayşe K., Deniz T.">
+        <span class="cv-ava yg">YG</span><span class="cv-ava ak">AK</span><span class="cv-ava dt">DT</span>
+      </div>
+      <button class="cv-share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M19 8v6M22 11h-6"/></svg>Paylaş</button>
+    </div>
+  </header>
+
+  <!-- SAHNE -->
+  <div class="cv-stage">
+    <div class="cv-canvas" id="cv-canvas" data-tool="move">
+
+      <!-- DÜNYA (zoom ile ölçeklenir) -->
+      <div class="cv-world" id="cv-world">
+
+        <!-- Kare 01 -->
+        <div class="cv-frame" data-frame="1" style="left:20%;top:92px" tabindex="0" role="button" aria-label="Kare 01 · Önden tam boy seç">
+          <div class="cv-fhead"><span class="nm">01 · Önden tam boy</span><span class="cv-fbadge cvb-good">İyi</span></div>
+          <div class="cv-fbody cvg1">
+            <figure><svg viewBox="0 0 200 340" fill="currentColor"><use href="#ms-figure"/></svg></figure>
+            <span class="cv-h nw"></span><span class="cv-h n"></span><span class="cv-h ne"></span><span class="cv-h e"></span><span class="cv-h se"></span><span class="cv-h s"></span><span class="cv-h sw"></span><span class="cv-h w"></span>
+            <span class="cv-size mono">1600 × 2000</span>
+          </div>
+        </div>
+
+        <!-- Kare 02 -->
+        <div class="cv-frame" data-frame="2" style="left:33.5%;top:60px" tabindex="0" role="button" aria-label="Kare 02 · Yandan görünüm seç">
+          <div class="cv-fhead"><span class="nm">02 · Yandan görünüm</span><span class="cv-fbadge cvb-good">İyi</span></div>
+          <div class="cv-fbody cvg2">
+            <figure><svg viewBox="0 0 200 340" fill="currentColor"><use href="#ms-figure"/></svg></figure>
+            <span class="cv-h nw"></span><span class="cv-h n"></span><span class="cv-h ne"></span><span class="cv-h e"></span><span class="cv-h se"></span><span class="cv-h s"></span><span class="cv-h sw"></span><span class="cv-h w"></span>
+            <span class="cv-size mono">1600 × 2000</span>
+          </div>
+        </div>
+
+        <!-- Kare 03 -->
+        <div class="cv-frame" data-frame="3" style="left:46.5%;top:98px" tabindex="0" role="button" aria-label="Kare 03 · Arkadan görünüm seç">
+          <div class="cv-fhead"><span class="nm">03 · Arkadan görünüm</span><span class="cv-fbadge cvb-normal">Normal</span></div>
+          <div class="cv-fbody cvg3">
+            <figure><svg viewBox="0 0 200 340" fill="currentColor"><use href="#ms-figure"/></svg></figure>
+            <span class="cv-h nw"></span><span class="cv-h n"></span><span class="cv-h ne"></span><span class="cv-h e"></span><span class="cv-h se"></span><span class="cv-h s"></span><span class="cv-h sw"></span><span class="cv-h w"></span>
+            <span class="cv-size mono">1600 × 2000</span>
+          </div>
+        </div>
+
+        <!-- Kare 04 · seçili -->
+        <div class="cv-frame lg sel" data-frame="4" style="left:60%;top:150px" tabindex="0" role="button" aria-label="Kare 04 · Yakın detay seçili">
+          <div class="cv-fhead"><span class="nm">04 · Yakın detay</span><span class="cv-fbadge cvb-good">İyi</span></div>
+          <div class="cv-fbody cvg1">
+            <figure class="close"><svg viewBox="0 0 200 210" fill="currentColor"><use href="#ms-garment"/></svg></figure>
+            <span class="cv-h nw"></span><span class="cv-h n"></span><span class="cv-h ne"></span><span class="cv-h e"></span><span class="cv-h se"></span><span class="cv-h s"></span><span class="cv-h sw"></span><span class="cv-h w"></span>
+            <span class="cv-size mono">1600 × 2000</span>
+          </div>
+        </div>
+
+        <!-- Kare 05 -->
+        <div class="cv-frame" data-frame="5" style="left:26%;top:340px" tabindex="0" role="button" aria-label="Kare 05 · Bel üstü kadraj seç">
+          <div class="cv-fhead"><span class="nm">05 · Bel üstü kadraj</span><span class="cv-fbadge cvb-weak">Zayıf</span></div>
+          <div class="cv-fbody cvg4">
+            <figure class="close"><svg viewBox="0 0 200 340" fill="currentColor"><use href="#ms-figure"/></svg></figure>
+            <span class="cv-h nw"></span><span class="cv-h n"></span><span class="cv-h ne"></span><span class="cv-h e"></span><span class="cv-h se"></span><span class="cv-h s"></span><span class="cv-h sw"></span><span class="cv-h w"></span>
+            <span class="cv-size mono">1600 × 2000</span>
+          </div>
+        </div>
+
+        <!-- Kare 06 -->
+        <div class="cv-frame sq" data-frame="6" style="left:41.5%;top:352px" tabindex="0" role="button" aria-label="Kare 06 · Flat-lay seç">
+          <div class="cv-fhead"><span class="nm">06 · Flat-lay</span><span class="cv-fbadge cvb-good">İyi</span></div>
+          <div class="cv-fbody cvg2">
+            <figure><svg viewBox="0 0 200 210" fill="currentColor"><use href="#ms-garment"/></svg></figure>
+            <span class="cv-h nw"></span><span class="cv-h n"></span><span class="cv-h ne"></span><span class="cv-h e"></span><span class="cv-h se"></span><span class="cv-h s"></span><span class="cv-h sw"></span><span class="cv-h w"></span>
+            <span class="cv-size mono">1800 × 1800</span>
+          </div>
+        </div>
+
+        <!-- İmleç · Ayşe (mercan) -->
+        <div class="cv-cursor a cv-fix" style="left:38.5%;top:208px" aria-hidden="true">
+          <div class="mv">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--panel)" stroke-width="1.4" stroke-linejoin="round"><path d="m4 3.5 7.1 17 2.4-7.3 7.2-2.3z"/></svg>
+            <span class="tag">Ayşe</span>
+          </div>
+        </div>
+
+        <!-- İmleç · Deniz (yeşil) -->
+        <div class="cv-cursor d cv-fix" style="left:31%;top:498px" aria-hidden="true">
+          <div class="mv">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="var(--panel)" stroke-width="1.4" stroke-linejoin="round"><path d="m4 3.5 7.1 17 2.4-7.3 7.2-2.3z"/></svg>
+            <span class="tag">Deniz</span>
+          </div>
+        </div>
+
+        <!-- Yorum iğnesi + iplik (kare 05 kenarı) -->
+        <div class="cv-pinwrap cv-fix" style="left:calc(26% + 140px);top:366px">
+          <button class="cv-pin" id="cv-pin1" aria-label="Yorum ipliğini aç veya kapat" aria-expanded="true">
+            <span class="ini">DT</span>
+            <svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 6"/></svg>
+          </button>
+          <div class="cv-thread open" id="cv-thread1">
+            <div class="hd">
+              <span class="cv-cava">DT</span>
+              <div><b>Deniz T.</b><small>12 dk önce · Kare 05</small></div>
+              <span class="cv-topen">Açık</span>
+            </div>
+            <p>Logo kenarda kırpılıyor — yeniden üretelim mi?</p>
+            <div class="ft">
+              <input class="cv-reply" type="text" placeholder="Yanıtla…" aria-label="Yoruma yanıt yaz">
+              <button class="cv-resolve" id="cv-resolve">Çöz</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /world -->
+
+      <!-- ARAÇ ÇUBUĞU -->
+      <div class="cv-toolbar" role="toolbar" aria-label="Tuval araçları">
+        <button class="cv-tool on" data-tool="move" aria-label="Taşı aracı (V)" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m4 3.5 7.1 17 2.4-7.3 7.2-2.3z"/></svg><span class="k">V</span></button>
+        <button class="cv-tool" data-tool="frame" aria-label="Kadraj aracı (F)" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v20M18 2v20M2 6h20M2 18h20"/></svg><span class="k">F</span></button>
+        <button class="cv-tool" data-tool="comment" aria-label="Yorum aracı (C)" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2.5-2.9A8 8 0 1 1 21 12z"/></svg><span class="k">C</span></button>
+        <button class="cv-tool" data-tool="hand" aria-label="El aracı (H)" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V7.5a1.5 1.5 0 0 0-3 0V11m0-1V4.5a1.5 1.5 0 0 0-3 0V10m0 0V5.5a1.5 1.5 0 0 0-3 0V12m9-1.5a1.5 1.5 0 0 1 3 0V15a7 7 0 0 1-7 7 7 7 0 0 1-5.6-2.8L4 14.5a1.7 1.7 0 0 1 2.7-2L9 15"/></svg><span class="k">H</span></button>
+        <span class="cv-tsep"></span>
+        <button class="cv-zbtn" id="cv-zout" aria-label="Uzaklaştır"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/></svg></button>
+        <span class="cv-zval mono" id="cv-zoomval">%84</span>
+        <button class="cv-zbtn" id="cv-zin" aria-label="Yakınlaştır"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+
+      <!-- ZOOM DENETİMİ (sol alt) -->
+      <div class="cv-zoom">
+        <button class="cv-zbtn" id="cv-zout2" aria-label="Uzaklaştır"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/></svg></button>
+        <span class="cv-zval mono" id="cv-zoomval2">%84</span>
+        <button class="cv-zbtn" id="cv-zin2" aria-label="Yakınlaştır"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></button>
+        <span class="cv-tsep"></span>
+        <button class="cv-zfit" id="cv-zfit">Sığdır</button>
+      </div>
+
+      <!-- MİNİ-HARİTA (sağ alt) -->
+      <div class="cv-mini" aria-hidden="true">
+        <span class="cv-mini-f" data-mini="1" style="left:20%;top:14%;width:10%;height:26%"></span>
+        <span class="cv-mini-f" data-mini="2" style="left:33.5%;top:9%;width:10%;height:26%"></span>
+        <span class="cv-mini-f" data-mini="3" style="left:46.5%;top:15%;width:10%;height:26%"></span>
+        <span class="cv-mini-f on" data-mini="4" style="left:60%;top:23%;width:12.5%;height:33%"></span>
+        <span class="cv-mini-f" data-mini="5" style="left:26%;top:53%;width:10%;height:26%"></span>
+        <span class="cv-mini-f" data-mini="6" style="left:41.5%;top:55%;width:11%;height:23%"></span>
+        <span class="cv-mini-view" id="cv-miniview"></span>
+      </div>
+
+    </div><!-- /canvas -->
+
+    <!-- SOL PANEL · KARELER -->
+    <aside class="cv-panel cv-frames" aria-label="Kare listesi">
+      <div class="cv-phd"><h3>Kareler</h3><span class="r">6 / 6 üretildi</span></div>
+      <div class="cv-list" id="cv-list">
+        <button class="cv-lrow" data-frame="1"><span class="num mono">01</span><span class="t">Önden tam boy</span><span class="cv-ldot cvd-good"></span></button>
+        <button class="cv-lrow" data-frame="2"><span class="num mono">02</span><span class="t">Yandan görünüm</span><span class="cv-ldot cvd-good"></span></button>
+        <button class="cv-lrow" data-frame="3"><span class="num mono">03</span><span class="t">Arkadan görünüm</span><span class="cv-ldot cvd-normal"></span></button>
+        <button class="cv-lrow on" data-frame="4"><span class="num mono">04</span><span class="t">Yakın detay</span><span class="cv-ldot cvd-good"></span></button>
+        <button class="cv-lrow" data-frame="5"><span class="num mono">05</span><span class="t">Bel üstü kadraj</span><svg class="cm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-8 8H4l2.5-2.9A8 8 0 1 1 21 12z"/></svg><span class="cv-ldot cvd-weak"></span></button>
+        <button class="cv-lrow" data-frame="6"><span class="num mono">06</span><span class="t">Flat-lay</span><span class="cv-ldot cvd-good"></span></button>
+      </div>
+      <div class="cv-pft"><b>2K</b> kalite · <b class="mono">36</b> işlem birimi</div>
+    </aside>
+
+    <!-- SAĞ PANEL · SEÇİM ÖZELLİKLERİ -->
+    <aside class="cv-panel cv-props" aria-label="Seçim özellikleri">
+      <div class="cv-props-hd">
+        <span class="cv-eyebrow">Seçim</span>
+        <div class="row"><h3 id="cv-ptitle">Kare 04 · Yakın detay</h3><span class="cv-fbadge cvb-good" id="cv-pbadge">İyi</span></div>
+      </div>
+      <div class="cv-kv"><span class="k">Ürün</span><span class="v">Bel Ceketi · Lacivert</span></div>
+      <div class="cv-kv"><span class="k">SKU</span><span class="v mono">BSGMARS25337</span></div>
+      <div class="cv-kv"><span class="k">Boyut</span><span class="v mono" id="cv-psize">1600 × 2000 px</span></div>
+      <div class="cv-kv"><span class="k">Oran</span><span class="v mono" id="cv-pratio">4:5</span></div>
+      <div class="cv-kv"><span class="k">Arka plan</span><span class="v" id="cv-pbg">Stüdyo</span></div>
+      <div class="cv-kv"><span class="k">Kalite</span><span class="v" id="cv-pq">2K · 6 birim</span></div>
+      <div class="cv-qa">
+        <h4>QA karnesi</h4>
+        <div class="cv-qrow"><span class="qn">Renk</span><span class="cv-qtrack"><span class="cv-qfill good" data-qa="0" style="width:95%"></span></span><span class="cv-qval mono good" data-qv="0">95</span></div>
+        <div class="cv-qrow"><span class="qn">Doku</span><span class="cv-qtrack"><span class="cv-qfill good" data-qa="1" style="width:93%"></span></span><span class="cv-qval mono good" data-qv="1">93</span></div>
+        <div class="cv-qrow"><span class="qn">Logo</span><span class="cv-qtrack"><span class="cv-qfill good" data-qa="2" style="width:88%"></span></span><span class="cv-qval mono good" data-qv="2">88</span></div>
+        <div class="cv-qrow"><span class="qn">Poz</span><span class="cv-qtrack"><span class="cv-qfill good" data-qa="3" style="width:90%"></span></span><span class="cv-qval mono good" data-qv="3">90</span></div>
+      </div>
+      <p class="cv-note" id="cv-pnote">Kumaş dokusu ve dikiş netliği çok iyi; renk sapması ΔE 1.8 ile hedefin altında.</p>
+      <div class="cv-pact">
+        <button class="cv-bghost">Yeniden üret</button>
+        <button class="cv-bsolid">Onayla</button>
+      </div>
+      <div class="cv-cost">Yeniden üretim <b class="mono">6</b> işlem birimi düşer</div>
+    </aside>
+  </div><!-- /stage -->
+
+ </div>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector('.cv'); if (!root) return;
+  var canvas = root.querySelector('#cv-canvas');
+  var world = root.querySelector('#cv-world');
+  if (!canvas || !world) return;
+
+  /* ---- Kare verileri ---- */
+  var DATA = {
+    1: { title: 'Kare 01 · Önden tam boy', size: '1600 × 2000 px', ratio: '4:5', bg: 'Stüdyo', q: '2K · 6 birim',
+         badge: ['İyi','good'], qa: [92,88,64,92],
+         note: 'Renk sadakati ΔE 3.1 ile hedefte. Logo netliği kadraj kenarında hafif düşük.' },
+    2: { title: 'Kare 02 · Yandan görünüm', size: '1600 × 2000 px', ratio: '4:5', bg: 'Stüdyo', q: '2K · 6 birim',
+         badge: ['İyi','good'], qa: [90,86,71,89],
+         note: 'Profil pozu dengeli; kol hattı doğal düşüyor. Yayına hazır.' },
+    3: { title: 'Kare 03 · Arkadan görünüm', size: '1600 × 2000 px', ratio: '4:5', bg: 'Stüdyo', q: '2K · 6 birim',
+         badge: ['Normal','normal'], qa: [88,76,68,74],
+         note: 'Sırt dikişi hizasında hafif doku kaybı var — yeniden üretim önerilir.' },
+    4: { title: 'Kare 04 · Yakın detay', size: '1600 × 2000 px', ratio: '4:5', bg: 'Stüdyo', q: '2K · 6 birim',
+         badge: ['İyi','good'], qa: [95,93,88,90],
+         note: 'Kumaş dokusu ve dikiş netliği çok iyi; renk sapması ΔE 1.8 ile hedefin altında.' },
+    5: { title: 'Kare 05 · Bel üstü kadraj', size: '1600 × 2000 px', ratio: '4:5', bg: 'Stüdyo', q: '2K · 6 birim',
+         badge: ['Zayıf','weak'], qa: [78,72,41,66],
+         note: 'Logo kadraj kenarında kırpılıyor — Deniz’in açık yorumuna bakın.' },
+    6: { title: 'Kare 06 · Flat-lay', size: '1800 × 1800 px', ratio: '1:1', bg: 'Sade', q: '2K · 6 birim',
+         badge: ['İyi','good'], qa: [91,87,81,85],
+         note: 'Düz zemin gölgesi dengeli; ürün formu korunuyor.' }
+  };
+
+  function band(v) { return v >= 80 ? 'good' : v >= 55 ? 'normal' : 'weak'; }
+
+  /* ---- Seçim ---- */
+  var pTitle = root.querySelector('#cv-ptitle'), pBadge = root.querySelector('#cv-pbadge');
+  var pSize = root.querySelector('#cv-psize'), pRatio = root.querySelector('#cv-pratio');
+  var pBg = root.querySelector('#cv-pbg'), pQ = root.querySelector('#cv-pq'), pNote = root.querySelector('#cv-pnote');
+
+  function select(id) {
+    var d = DATA[id]; if (!d) return;
+    root.querySelectorAll('.cv-frame').forEach(function (f) { f.classList.toggle('sel', f.dataset.frame === String(id)); });
+    root.querySelectorAll('.cv-lrow').forEach(function (r) { r.classList.toggle('on', r.dataset.frame === String(id)); });
+    root.querySelectorAll('.cv-mini-f').forEach(function (m) { m.classList.toggle('on', m.dataset.mini === String(id)); });
+    if (pTitle) pTitle.textContent = d.title;
+    if (pBadge) { pBadge.textContent = d.badge[0]; pBadge.className = 'cv-fbadge cvb-' + d.badge[1]; }
+    if (pSize) pSize.textContent = d.size;
+    if (pRatio) pRatio.textContent = d.ratio;
+    if (pBg) pBg.textContent = d.bg;
+    if (pQ) pQ.textContent = d.q;
+    if (pNote) pNote.textContent = d.note;
+    d.qa.forEach(function (v, i) {
+      var fill = root.querySelector('[data-qa="' + i + '"]'), val = root.querySelector('[data-qv="' + i + '"]');
+      var b = band(v);
+      if (fill) { fill.style.width = v + '%'; fill.className = 'cv-qfill ' + b; }
+      if (val) { val.textContent = v; val.className = 'cv-qval mono ' + b; }
+    });
+  }
+
+  world.addEventListener('click', function (e) {
+    var f = e.target.closest('.cv-frame'); if (!f) return;
+    select(f.dataset.frame);
+  });
+  world.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var f = e.target.closest('.cv-frame'); if (!f) return;
+    e.preventDefault(); select(f.dataset.frame);
+  });
+  var list = root.querySelector('#cv-list');
+  if (list) list.addEventListener('click', function (e) {
+    var r = e.target.closest('.cv-lrow'); if (!r) return;
+    select(r.dataset.frame);
+  });
+
+  /* ---- Araçlar ---- */
+  var tools = root.querySelectorAll('.cv-tool');
+  function setTool(name) {
+    tools.forEach(function (t) {
+      var on = t.dataset.tool === name;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    canvas.dataset.tool = name;
+  }
+  tools.forEach(function (t) { t.addEventListener('click', function () { setTool(t.dataset.tool); }); });
+  document.addEventListener('keydown', function (e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    var map = { v: 'move', f: 'frame', c: 'comment', h: 'hand' };
+    var k = (e.key || '').toLowerCase();
+    if (map[k]) setTool(map[k]);
+    if (k === 'escape') closeThread();
+  });
+
+  /* ---- Zoom ---- */
+  var pct = 84, MIN = 70, MAX = 110, STEP = 8;
+  var vals = [root.querySelector('#cv-zoomval'), root.querySelector('#cv-zoomval2')];
+  var fixes = root.querySelectorAll('.cv-fix');
+  var miniView = root.querySelector('#cv-miniview');
+
+  function applyZoom() {
+    var s = pct / 100;
+    world.style.transform = 'scale(' + s + ')';
+    fixes.forEach(function (el) { el.style.transform = 'scale(' + (1 / s).toFixed(4) + ')'; });
+    canvas.style.backgroundSize = (22 * s).toFixed(2) + 'px ' + (22 * s).toFixed(2) + 'px';
+    vals.forEach(function (v) { if (v) v.textContent = '%' + pct; });
+    if (miniView) {
+      var w = Math.min(96, Math.max(40, (84 / pct) * 74));
+      var h = Math.min(94, Math.max(38, (84 / pct) * 66));
+      miniView.style.width = w + '%'; miniView.style.height = h + '%';
+      miniView.style.left = (50 - w / 2) + '%'; miniView.style.top = (45 - h / 2) + '%';
+    }
+  }
+  function zoom(delta) { pct = Math.max(MIN, Math.min(MAX, pct + delta)); applyZoom(); }
+  [['#cv-zin', STEP], ['#cv-zin2', STEP], ['#cv-zout', -STEP], ['#cv-zout2', -STEP]].forEach(function (pair) {
+    var b = root.querySelector(pair[0]);
+    if (b) b.addEventListener('click', function () { zoom(pair[1]); });
+  });
+  var fit = root.querySelector('#cv-zfit');
+  if (fit) fit.addEventListener('click', function () { pct = 84; applyZoom(); });
+  applyZoom();
+
+  /* ---- Yorum ipliği ---- */
+  var pin = root.querySelector('#cv-pin1'), thread = root.querySelector('#cv-thread1');
+  function closeThread() {
+    if (thread) thread.classList.remove('open');
+    if (pin) pin.setAttribute('aria-expanded', 'false');
+  }
+  if (pin && thread) {
+    pin.addEventListener('click', function () {
+      var open = thread.classList.toggle('open');
+      pin.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+  var resolve = root.querySelector('#cv-resolve');
+  if (resolve && pin) {
+    resolve.addEventListener('click', function () {
+      pin.classList.add('res');
+      pin.setAttribute('aria-label', 'Çözüldü olarak işaretlendi');
+      closeThread();
+    });
+  }
+})();
+</script>

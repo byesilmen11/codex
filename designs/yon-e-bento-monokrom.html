@@ -1,0 +1,521 @@
+<title>Master Studio — Yön E · Bento Monokrom</title>
+<style>
+/* ============================================================
+   YÖN E — "Bento Monokrom"
+   Genel Bakış panosu; bento ızgara. Vercel/Geist disiplini:
+   neredeyse monokrom, ince çizgiler, büyük tabular rakamlar.
+   Gradyan YOK, gölge yok denecek kadar az; hiyerarşi tamamen
+   tipografi + hairline ile kurulur.
+   TEK sinyal rengi: kobalt (#155ff0 / koyu temada #7aa2ff) —
+   YALNIZ birincil CTA ("Yeni çekim") ve veri vurgularında
+   (sparkline, ilerleme, bugünkü sütun). Semantik iyi/uyarı/zayıf
+   ayrı ailelerde ve kısık tutulur.
+   ÇİFT TEMA: açık = #fcfcfb sıcak grafit zemin, beyaz kartlar,
+   #eceae6 çizgiler; koyu = is-siyahı #0e0e0f + koyu grafit kartlar.
+   Namespace: .bt — tüm seçiciler bu kökün altında, ID öneki "bt-".
+   ============================================================ */
+
+.bt, .bt *, .bt *::before, .bt *::after { box-sizing: border-box; }
+
+.bt {
+  --bg: #fcfcfb; --panel: #ffffff; --panel-2: #f6f5f2; --panel-3: #efede9;
+  --line: #eceae6; --line-2: #e1ded8; --line-3: #c6c2b9;
+  --text: #191817; --text-2: #6b6862; --text-3: #9c978d;
+  --accent: #155ff0; --accent-2: #0d4cc9; --accent-ink: #ffffff;
+  --accent-soft: rgba(21,95,240,.08); --accent-line: rgba(21,95,240,.28);
+  --good: #2f9e69; --good-soft: rgba(47,158,105,.11);
+  --normal: #b0791f; --normal-soft: rgba(176,121,31,.12);
+  --weak: #d64545; --weak-soft: rgba(214,69,69,.11);
+  --bar: #dcd9d2;
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text); background: var(--bg); min-height: 100vh;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-size: 13.5px; line-height: 1.5; letter-spacing: -0.008em;
+}
+@media (prefers-color-scheme: dark) {
+  .bt {
+    --bg: #0e0e0f; --panel: #151517; --panel-2: #1b1b1e; --panel-3: #232327;
+    --line: #232326; --line-2: #2d2d31; --line-3: #4a4a51;
+    --text: #f2f1ef; --text-2: #a5a29c; --text-3: #6f6c66;
+    --accent: #7aa2ff; --accent-2: #9dbcff; --accent-ink: #0b1630;
+    --accent-soft: rgba(122,162,255,.11); --accent-line: rgba(122,162,255,.38);
+    --good: #45b183; --good-soft: rgba(69,177,131,.13);
+    --normal: #cf9c43; --normal-soft: rgba(207,156,67,.13);
+    --weak: #e06c6c; --weak-soft: rgba(224,108,108,.13);
+    --bar: #303034;
+  }
+}
+:root[data-theme="dark"] .bt {
+  --bg: #0e0e0f; --panel: #151517; --panel-2: #1b1b1e; --panel-3: #232327;
+  --line: #232326; --line-2: #2d2d31; --line-3: #4a4a51;
+  --text: #f2f1ef; --text-2: #a5a29c; --text-3: #6f6c66;
+  --accent: #7aa2ff; --accent-2: #9dbcff; --accent-ink: #0b1630;
+  --accent-soft: rgba(122,162,255,.11); --accent-line: rgba(122,162,255,.38);
+  --good: #45b183; --good-soft: rgba(69,177,131,.13);
+  --normal: #cf9c43; --normal-soft: rgba(207,156,67,.13);
+  --weak: #e06c6c; --weak-soft: rgba(224,108,108,.13);
+  --bar: #303034;
+}
+:root[data-theme="light"] .bt {
+  --bg: #fcfcfb; --panel: #ffffff; --panel-2: #f6f5f2; --panel-3: #efede9;
+  --line: #eceae6; --line-2: #e1ded8; --line-3: #c6c2b9;
+  --text: #191817; --text-2: #6b6862; --text-3: #9c978d;
+  --accent: #155ff0; --accent-2: #0d4cc9; --accent-ink: #ffffff;
+  --accent-soft: rgba(21,95,240,.08); --accent-line: rgba(21,95,240,.28);
+  --good: #2f9e69; --good-soft: rgba(47,158,105,.11);
+  --normal: #b0791f; --normal-soft: rgba(176,121,31,.12);
+  --weak: #d64545; --weak-soft: rgba(214,69,69,.11);
+  --bar: #dcd9d2;
+}
+
+.bt ::selection { background: var(--accent-soft); color: var(--text); }
+.bt :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.bt button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; letter-spacing: inherit; text-align: left; }
+.bt a { color: inherit; text-decoration: none; }
+.bt svg, .bt img { display: block; max-width: 100%; }
+.bt .mono { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .bt *, .bt *::before, .bt *::after { transition: none !important; animation: none !important; } }
+
+.bt-app { max-width: 1220px; margin: 0 auto; padding: 0 clamp(12px,2vw,24px) 44px; }
+
+/* ---------- Üst çubuk ---------- */
+.bt-top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 16px; height: 58px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); }
+.bt-brand { display: flex; align-items: center; gap: 10px; }
+.bt-logo { width: 26px; height: 26px; flex: none; border: 1.5px solid var(--text); border-radius: 8px; position: relative; }
+.bt-logo::after { content: ""; position: absolute; left: 4px; top: 4px; width: 9px; height: 9px; border-radius: 3px; background: var(--text); }
+.bt-logo::before { content: ""; position: absolute; right: 4px; bottom: 4px; width: 6px; height: 6px; border-radius: 2px; border: 1.5px solid var(--text); opacity: .5; }
+.bt-brand b { font-size: 13.5px; font-weight: 660; letter-spacing: -.01em; }
+.bt-brand small { display: block; font-size: 10.5px; color: var(--text-3); margin-top: -1px; }
+
+.bt-nav { display: flex; gap: 2px; height: 100%; margin-left: 6px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.bt-nav::-webkit-scrollbar { display: none; }
+.bt-nav button { flex: none; padding: 0 12px; font-size: 12.5px; font-weight: 540; color: var(--text-2); border-bottom: 2px solid transparent; border-top: 2px solid transparent; transition: color .14s; }
+.bt-nav button:hover { color: var(--text); }
+.bt-nav button.on { color: var(--text); font-weight: 620; border-bottom-color: var(--text); }
+
+.bt-tright { margin-left: auto; display: flex; align-items: center; gap: 9px; }
+.bt-credit { display: flex; align-items: baseline; gap: 5px; height: 32px; padding: 0 11px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); }
+.bt-credit b { font-size: 12.5px; font-weight: 640; }
+.bt-credit small { font-size: 10.5px; color: var(--text-3); }
+.bt-tbtn { width: 32px; height: 32px; flex: none; border-radius: 8px; border: 1px solid var(--line-2); background: var(--panel); color: var(--text-2); display: grid; place-items: center; position: relative; transition: color .14s, border-color .14s; }
+.bt-tbtn:hover { color: var(--text); border-color: var(--line-3); }
+.bt-tbtn svg { width: 16px; height: 16px; }
+.bt-ndot { position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--panel); }
+.bt-ava { width: 30px; height: 30px; flex: none; border-radius: 9px; background: var(--text); color: var(--bg); display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+
+.bt-uwrap { position: relative; }
+.bt-menu { position: absolute; top: 38px; right: 0; width: 238px; z-index: 50; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; padding: 5px; box-shadow: 0 12px 30px rgba(10,10,12,.10), 0 2px 8px rgba(10,10,12,.05); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .14s, transform .14s, visibility .14s; }
+.bt-uwrap:hover .bt-menu, .bt-uwrap:focus-within .bt-menu { opacity: 1; visibility: visible; transform: none; }
+.bt-menu-head { display: flex; gap: 10px; align-items: center; padding: 9px 9px 10px; }
+.bt-menu-head .bt-ava { width: 34px; height: 34px; font-size: 12.5px; border-radius: 10px; }
+.bt-menu-head b { font-size: 12.5px; font-weight: 620; }
+.bt-menu-head small { display: block; font-size: 10.5px; color: var(--text-3); }
+.bt-menu-sep { height: 1px; background: var(--line); margin: 4px 2px; }
+.bt-mi { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 9px; border-radius: 8px; font-size: 12.5px; transition: background .1s; }
+.bt-mi:hover { background: var(--panel-2); }
+.bt-mi svg { width: 15px; height: 15px; flex: none; color: var(--text-3); }
+.bt-mi .r { margin-left: auto; font-size: 10.5px; color: var(--text-3); }
+.bt-mi.danger { color: var(--weak); } .bt-mi.danger svg { color: var(--weak); }
+
+/* ---------- Bento ızgara ---------- */
+.bt-bento { display: grid; gap: 13px; padding-top: 18px;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  grid-template-areas:
+    "hero  hero  kredi qa"
+    "hero  hero  onay  qa"
+    "batch batch market hizli"
+    "son   son   son    hizli"; }
+.bt-hero   { grid-area: hero; }
+.bt-kredi  { grid-area: kredi; }
+.bt-onay   { grid-area: onay; }
+.bt-qa     { grid-area: qa; }
+.bt-batch  { grid-area: batch; }
+.bt-market { grid-area: market; }
+.bt-hizli  { grid-area: hizli; }
+.bt-son    { grid-area: son; }
+
+.bt-cell { min-width: 0; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; transition: border-color .16s; }
+.bt-cell:hover { border-color: var(--line-3); }
+
+.bt-eb { font-size: 10px; font-weight: 660; letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); }
+.bt-cell-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
+.bt-cell-hd .r { margin-left: auto; }
+.bt-link { font-size: 12px; font-weight: 560; color: var(--text-2); transition: color .13s; }
+.bt-link:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.bt-mini-btn { font-size: 11.5px; font-weight: 580; padding: 4px 11px; border: 1px solid var(--line-2); border-radius: 7px; color: var(--text-2); transition: color .13s, border-color .13s, background .13s; }
+.bt-mini-btn:hover { color: var(--text); border-color: var(--line-3); background: var(--panel-2); }
+
+/* ---------- 1 · Hero: selam + KPI + sparkline ---------- */
+.bt-hero { padding: 18px 18px 16px; border-radius: 16px; }
+.bt-hello { display: flex; align-items: flex-start; gap: 12px; }
+.bt-hello h1 { font-size: 17px; font-weight: 650; letter-spacing: -.015em; text-wrap: balance; }
+.bt-hello small { display: block; font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+.bt-seg { margin-left: auto; flex: none; display: flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2); }
+.bt-seg button { font-size: 11.5px; font-weight: 550; padding: 4px 11px; border-radius: 7px; color: var(--text-2); transition: color .13s, background .13s; }
+.bt-seg button:hover { color: var(--text); }
+.bt-seg button.on { color: var(--text); font-weight: 620; background: var(--panel); box-shadow: 0 0 0 1px var(--line-2); }
+
+.bt-kpi-label { font-size: 11.5px; color: var(--text-2); margin: 18px 0 2px; }
+.bt-kpi { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.bt-kpi .num { font-size: 52px; line-height: 1.04; font-weight: 640; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.bt-kpi .unit { font-size: 15px; font-weight: 550; color: var(--text-2); margin-left: -4px; }
+.bt-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 650; color: var(--good); background: var(--good-soft); padding: 3px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.bt-delta svg { width: 11px; height: 11px; }
+.bt-kpi .cmp { font-size: 11.5px; color: var(--text-3); }
+
+.bt-spark-wrap { position: relative; margin-top: 16px; height: 84px; }
+.bt-spark { width: 100%; height: 100%; }
+.bt-spark-dot { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--panel); }
+.bt-ax { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+
+.bt-ss-row { display: flex; margin-top: auto; padding-top: 15px; }
+.bt-ss { min-width: 0; flex: 1; }
+.bt-ss + .bt-ss { border-left: 1px solid var(--line); padding-left: 16px; margin-left: 16px; }
+.bt-ss small { display: block; font-size: 10.5px; color: var(--text-3); margin-bottom: 2px; }
+.bt-ss b { font-size: 16px; font-weight: 640; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.bt-ss b i { font-style: normal; font-size: 11px; font-weight: 500; color: var(--text-3); margin-left: 3px; }
+
+/* ---------- 2 · Kredi ---------- */
+.bt-num-md { display: flex; align-items: baseline; gap: 6px; }
+.bt-num-md b { font-size: 29px; font-weight: 640; letter-spacing: -.035em; }
+.bt-num-md span { font-size: 11.5px; color: var(--text-2); }
+.bt-bars { display: flex; align-items: flex-end; gap: 4px; height: 42px; margin-top: 13px; }
+.bt-bars span { flex: 1; min-height: 3px; border-radius: 3px 3px 1px 1px; background: var(--bar); }
+.bt-bars span.hi { background: var(--accent); }
+.bt-cap { font-size: 11px; color: var(--text-3); line-height: 1.45; margin-top: auto; padding-top: 10px; }
+
+/* ---------- 3 · Onay bekleyen ---------- */
+.bt-thumbs { display: flex; gap: 6px; margin-top: 12px; }
+.bt-th { width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); display: grid; place-items: center; color: var(--text-3); }
+.bt-th svg { width: 20px; height: 20px; }
+.bt-th.more { font-size: 10.5px; font-weight: 640; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.bt-onay .bt-link { margin-top: auto; padding-top: 12px; display: inline-block; }
+
+/* ---------- 4 · Aktif toplu iş ---------- */
+.bt-run { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--text-2); }
+.bt-run::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.bt-batch h2 { font-size: 14.5px; font-weight: 640; letter-spacing: -.012em; }
+.bt-batch-meta { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-top: 3px; font-size: 11.5px; color: var(--text-2); }
+.bt-batch-meta .pct { margin-left: auto; color: var(--text); font-weight: 640; font-variant-numeric: tabular-nums; }
+.bt-track { height: 5px; border-radius: 4px; background: var(--panel-3); overflow: hidden; margin-top: 10px; }
+.bt-fill { height: 100%; border-radius: 4px; background: var(--accent); }
+.bt-batch-ft { display: flex; gap: 14px; margin-top: 10px; font-size: 11px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+
+/* ---------- 5 · Pazaryerleri ---------- */
+.bt-mrow { display: flex; align-items: center; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.bt-mrow:last-child { border-bottom: none; padding-bottom: 0; }
+.bt-dot { width: 7px; height: 7px; flex: none; border-radius: 50%; }
+.bt-dot.ok { background: var(--good); }
+.bt-dot.off { background: none; border: 1.5px solid var(--line-3); }
+.bt-mrow b { font-size: 12.5px; font-weight: 590; }
+.bt-mrow small { display: block; font-size: 10.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.bt-mstat { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--good); }
+.bt-connect { margin-left: auto; font-size: 11.5px; font-weight: 590; padding: 4px 12px; border: 1px solid var(--line-2); border-radius: 7px; color: var(--text-2); transition: color .13s, border-color .13s, background .13s; }
+.bt-connect:hover { color: var(--text); border-color: var(--line-3); background: var(--panel-2); }
+
+/* ---------- 6 · QA ortalaması ---------- */
+.bt-qa-top { display: flex; align-items: baseline; gap: 8px; }
+.bt-qa-top b { font-size: 40px; font-weight: 640; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.bt-qa-top small { font-size: 11px; color: var(--text-3); }
+.bt-qrow { display: flex; align-items: center; gap: 9px; padding: 7.5px 0; border-bottom: 1px solid var(--line); }
+.bt-qrow:last-of-type { border-bottom: none; }
+.bt-qrow .n { width: 40px; flex: none; font-size: 12px; color: var(--text-2); }
+.bt-qtrack { flex: 1; height: 4px; border-radius: 3px; background: var(--panel-3); overflow: hidden; }
+.bt-qfill { height: 100%; border-radius: 3px; }
+.bt-qfill.good { background: var(--good); } .bt-qfill.normal { background: var(--normal); } .bt-qfill.weak { background: var(--weak); }
+.bt-qrow .v { width: 24px; flex: none; text-align: right; font-size: 11.5px; font-weight: 640; }
+.bt-qrow .v.good { color: var(--good); } .bt-qrow .v.normal { color: var(--normal); } .bt-qrow .v.weak { color: var(--weak); }
+.bt-qnote { margin-top: auto; padding-top: 10px; font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.bt-qlist { margin-top: 14px; }
+
+/* ---------- 7 · Son çekimler ---------- */
+.bt-son-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); }
+.bt-shot { display: flex; gap: 11px; align-items: center; min-width: 0; }
+.bt-shot + .bt-shot { border-left: 1px solid var(--line); padding-left: 16px; margin-left: 16px; }
+.bt-shot-th { width: 46px; height: 56px; flex: none; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); display: grid; place-items: center; color: var(--text-3); }
+.bt-shot-th svg { width: 26px; height: 32px; }
+.bt-shot-info { min-width: 0; }
+.bt-shot-info b { display: block; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bt-shot-info .sku { font-size: 10.5px; color: var(--text-3); }
+.bt-shot-info .meta { display: flex; align-items: center; gap: 7px; margin-top: 4px; }
+.bt-shot-info .ago { font-size: 10.5px; color: var(--text-3); }
+.bt-badge { font-size: 10px; font-weight: 640; padding: 1.5px 7px; border-radius: 999px; }
+.bt-badge.good { color: var(--good); background: var(--good-soft); }
+.bt-badge.normal { color: var(--normal); background: var(--normal-soft); }
+.bt-badge.weak { color: var(--weak); background: var(--weak-soft); }
+
+/* ---------- 8 · Hızlı eylemler ---------- */
+.bt-acts { display: flex; flex-direction: column; gap: 7px; }
+.bt-act { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 13px; border-radius: 10px; border: 1px solid var(--line-2); font-size: 12.5px; font-weight: 580; color: var(--text); transition: border-color .13s, background .13s; }
+.bt-act svg { width: 15px; height: 15px; flex: none; color: var(--text-3); transition: color .13s; }
+.bt-act:hover { border-color: var(--line-3); background: var(--panel-2); }
+.bt-act:hover svg { color: var(--text); }
+.bt-act.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 640; }
+.bt-act.primary svg { color: var(--accent-ink); }
+.bt-act.primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+.bt-act .k { margin-left: auto; font-size: 10.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.bt-act.primary .k { color: var(--accent-ink); opacity: .72; }
+.bt-tip { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.bt-tip b { color: var(--text-2); font-weight: 620; }
+
+/* ---------- Alt bilgi ---------- */
+.bt-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; padding: 0 4px; font-size: 11px; color: var(--text-3); }
+.bt-foot .st { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: var(--text-2); }
+.bt-foot .st::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+
+/* ---------- Duyarlılık ---------- */
+@media (max-width: 1140px) {
+  .bt-bento { grid-template-columns: repeat(2, minmax(0,1fr));
+    grid-template-areas:
+      "hero  hero"
+      "kredi qa"
+      "onay  qa"
+      "batch batch"
+      "market hizli"
+      "son   son"; }
+  .bt-brand small { display: none; }
+}
+@media (max-width: 760px) {
+  .bt-bento { grid-template-columns: minmax(0,1fr);
+    grid-template-areas: "hero" "kredi" "onay" "batch" "qa" "market" "hizli" "son"; }
+  .bt-kpi .num { font-size: 42px; }
+  .bt-hello { flex-wrap: wrap; }
+  .bt-seg { margin-left: 0; order: 3; width: 100%; }
+  .bt-seg button { flex: 1; text-align: center; }
+  .bt-son-grid { grid-template-columns: minmax(0,1fr); gap: 0; }
+  .bt-shot { padding: 10px 0; }
+  .bt-shot + .bt-shot { border-left: none; padding-left: 0; margin-left: 0; border-top: 1px solid var(--line); }
+  .bt-credit small { display: none; }
+  .bt-ss + .bt-ss { padding-left: 12px; margin-left: 12px; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ms-figure" viewBox="0 0 200 340"><circle cx="100" cy="42" r="23"/><path d="M93 66h14v10H93z"/><path d="M74 78 Q100 70 126 78 L133 150 Q118 158 100 158 Q82 158 67 150 Z"/><path d="M69 149 Q100 160 131 149 L151 302 Q100 318 49 302 Z"/><path d="M74 80 Q57 122 61 182 L71 180 Q69 122 84 86 Z"/><path d="M126 80 Q143 122 139 182 L129 180 Q131 122 116 86 Z"/></symbol>
+  <symbol id="ms-garment" viewBox="0 0 200 210"><path d="M70 34 Q100 22 130 34 L164 60 Q170 64 166 72 L149 92 L146 84 L146 188 Q146 194 140 194 L60 194 Q54 194 54 188 L54 84 L51 92 L34 72 Q30 64 36 60 Z"/><path d="M80 34 Q100 54 120 34" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/></symbol>
+  <symbol id="ms-bag" viewBox="0 0 200 200"><path d="M64 84 h72 q10 0 11 10 l7 78 q1 10 -9 10 H55 q-10 0 -9 -10 l7 -78 q1 -10 11 -10 Z"/><path d="M74 84 Q74 48 100 48 Q126 48 126 84" fill="none" stroke="currentColor" stroke-width="7" opacity=".55"/></symbol>
+</svg>
+
+<div class="bt">
+ <div class="bt-app">
+
+  <!-- ÜST ÇUBUK -->
+  <header class="bt-top">
+    <div class="bt-brand"><span class="bt-logo" aria-hidden="true"></span><div><b>Master Studio</b><small>Ürün fotoğraf stüdyosu</small></div></div>
+    <nav class="bt-nav" aria-label="Ana gezinme">
+      <button class="on">Genel Bakış</button>
+      <button>Stüdyo</button>
+      <button>Galeri</button>
+      <button>Toplu Üretim</button>
+      <button>Entegrasyonlar</button>
+    </nav>
+    <div class="bt-tright">
+      <div class="bt-credit"><b class="mono">1.240</b><small>işlem birimi</small></div>
+      <button class="bt-tbtn" aria-label="Bildirimler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bt-ndot"></span></button>
+      <div class="bt-uwrap">
+        <button class="bt-ava" aria-haspopup="true" aria-label="Hesap menüsü: Yeşilmen Ltd.">YG</button>
+        <div class="bt-menu" role="menu">
+          <div class="bt-menu-head"><span class="bt-ava" aria-hidden="true">YG</span><div><b>Yeşilmen Ltd.</b><small>info@masterstudio.ai</small></div></div>
+          <div class="bt-menu-sep"></div>
+          <button class="bt-mi" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>Profil</button>
+          <button class="bt-mi" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Plan ve Faturalandırma<span class="r">Stüdyo Pro</span></button>
+          <button class="bt-mi" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M17 6a3.5 3.5 0 0 1 0 7"/></svg>Ekip<span class="r">3 üye</span></button>
+          <button class="bt-mi" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8 2 2 0 1 1-2.7 2.7 1.6 1.6 0 0 0-2.7 1.1 2 2 0 1 1-4 0 1.6 1.6 0 0 0-2.7-1.1 2 2 0 1 1-2.7-2.7A1.6 1.6 0 0 0 4.3 14a2 2 0 1 1 0-4 1.6 1.6 0 0 0 1.4-2.7 2 2 0 1 1 2.7-2.7"/></svg>Tercihler</button>
+          <div class="bt-menu-sep"></div>
+          <button class="bt-mi danger" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Çıkış yap</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- BENTO -->
+  <div class="bt-bento">
+
+    <!-- 1 · SELAM + KPI + SPARKLINE -->
+    <section class="bt-cell bt-hero">
+      <div class="bt-hello">
+        <div><h1>Günaydın, Yeşilmen</h1><small>1 Ağustos Cumartesi · Yeşilmen Ltd. · Stüdyo Pro</small></div>
+        <div class="bt-seg" id="bt-range" role="group" aria-label="Zaman aralığı">
+          <button data-r="gun" aria-pressed="false">Bugün</button>
+          <button data-r="hafta" class="on" aria-pressed="true">Hafta</button>
+          <button data-r="ay" aria-pressed="false">Ay</button>
+        </div>
+      </div>
+      <p class="bt-kpi-label" id="bt-kpi-label">Bu hafta üretilen kare</p>
+      <div class="bt-kpi">
+        <span><span class="num mono" id="bt-kpi-value">128</span> <span class="unit">kare</span></span>
+        <span class="bt-delta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg><span id="bt-kpi-delta-t">+%34</span></span>
+        <span class="cmp" id="bt-kpi-cmp">geçen haftaya göre</span>
+      </div>
+      <div class="bt-spark-wrap">
+        <svg class="bt-spark" viewBox="0 0 300 80" preserveAspectRatio="none" aria-hidden="true">
+          <path id="bt-spark-area" fill="var(--accent-soft)" d=""></path>
+          <path id="bt-spark-line" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" d=""></path>
+        </svg>
+        <span class="bt-spark-dot" id="bt-spark-dot" aria-hidden="true"></span>
+      </div>
+      <div class="bt-ax"><span id="bt-ax-a">26 Tem</span><span id="bt-ax-b">Bugün</span></div>
+      <div class="bt-ss-row">
+        <div class="bt-ss"><small>Onaylanan</small><b class="mono"><span id="bt-ss-onay">96</span><i>kare</i></b></div>
+        <div class="bt-ss"><small>QA ortalaması</small><b class="mono" id="bt-ss-qa">87</b></div>
+        <div class="bt-ss"><small>Harcanan</small><b class="mono"><span id="bt-ss-birim">742</span><i>birim</i></b></div>
+      </div>
+    </section>
+
+    <!-- 2 · KREDİ -->
+    <section class="bt-cell bt-kredi">
+      <div class="bt-cell-hd"><span class="bt-eb">Kredi bakiyesi</span><button class="bt-mini-btn r">Yükle</button></div>
+      <div class="bt-num-md"><b class="mono">1.240</b><span>işlem birimi</span></div>
+      <div class="bt-bars" aria-hidden="true">
+        <span style="height:63%"></span><span style="height:75%"></span><span style="height:58%"></span><span style="height:92%"></span><span style="height:71%"></span><span style="height:100%"></span><span class="hi" style="height:75%"></span>
+      </div>
+      <p class="bt-cap">Son 7 günde <b class="mono">742</b> birim harcandı · bu hızla bakiye ~11 gün yeter.</p>
+    </section>
+
+    <!-- 3 · ONAY BEKLEYEN -->
+    <section class="bt-cell bt-onay">
+      <div class="bt-cell-hd"><span class="bt-eb">Onay bekleyen</span></div>
+      <div class="bt-num-md"><b class="mono">12</b><span>kare</span></div>
+      <div class="bt-thumbs" aria-hidden="true">
+        <span class="bt-th"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></span>
+        <span class="bt-th"><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></span>
+        <span class="bt-th"><svg viewBox="0 0 200 200"><use href="#ms-bag"/></svg></span>
+        <span class="bt-th more mono">+9</span>
+      </div>
+      <a class="bt-link" href="#">Onay hattına git →</a>
+    </section>
+
+    <!-- 6 · QA ORTALAMASI -->
+    <section class="bt-cell bt-qa">
+      <div class="bt-cell-hd"><span class="bt-eb">QA ortalaması</span><span class="r" style="font-size:10.5px;color:var(--text-3)">son 30 gün</span></div>
+      <div class="bt-qa-top"><b class="mono">87</b><small>214 kare puanlandı</small></div>
+      <div class="bt-qlist">
+        <div class="bt-qrow"><span class="n">Renk</span><span class="bt-qtrack"><span class="bt-qfill good" style="width:92%"></span></span><span class="v good mono">92</span></div>
+        <div class="bt-qrow"><span class="n">Doku</span><span class="bt-qtrack"><span class="bt-qfill good" style="width:88%"></span></span><span class="v good mono">88</span></div>
+        <div class="bt-qrow"><span class="n">Logo</span><span class="bt-qtrack"><span class="bt-qfill normal" style="width:64%"></span></span><span class="v normal mono">64</span></div>
+        <div class="bt-qrow"><span class="n">Poz</span><span class="bt-qtrack"><span class="bt-qfill good" style="width:92%"></span></span><span class="v good mono">92</span></div>
+      </div>
+      <p class="bt-qnote">Logo netliği ortalamanın altında — kareler kadraj kenarında kırpılıyor. Renk sadakati ΔE 3.1 ile hedefte.</p>
+    </section>
+
+    <!-- 4 · AKTİF TOPLU İŞ -->
+    <section class="bt-cell bt-batch">
+      <div class="bt-cell-hd"><span class="bt-eb">Aktif toplu iş</span><span class="bt-run r">Sürüyor</span></div>
+      <h2>Sonbahar Koleksiyonu '26</h2>
+      <div class="bt-batch-meta"><span class="mono">31/48 kare</span><span>· sırada: <span class="mono">BSGAYK4412</span></span><span class="pct mono">%65</span></div>
+      <div class="bt-track"><div class="bt-fill" style="width:64.6%"></div></div>
+      <div class="bt-batch-ft"><span>Kalan süre ~14 dk</span><span>2K kalite · 4:5</span><span>Başlatan: Ayşe K.</span></div>
+    </section>
+
+    <!-- 5 · PAZARYERLERİ -->
+    <section class="bt-cell bt-market">
+      <div class="bt-cell-hd"><span class="bt-eb">Pazaryerleri</span></div>
+      <div class="bt-mrow"><span class="bt-dot ok"></span><div><b>Trendyol</b><small>46 kare aktarıldı</small></div><span class="bt-mstat">Bağlı</span></div>
+      <div class="bt-mrow"><span class="bt-dot ok"></span><div><b>Shopify</b><small>31 kare aktarıldı</small></div><span class="bt-mstat">Bağlı</span></div>
+      <div class="bt-mrow"><span class="bt-dot off"></span><div><b>Hepsiburada</b><small>Bağlı değil</small></div><button class="bt-connect">Bağla</button></div>
+    </section>
+
+    <!-- 8 · HIZLI EYLEMLER -->
+    <section class="bt-cell bt-hizli">
+      <div class="bt-cell-hd"><span class="bt-eb">Hızlı eylemler</span></div>
+      <div class="bt-acts">
+        <button class="bt-act primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Yeni çekim başlat<span class="k">36 birim</span></button>
+        <button class="bt-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Toplu üretim kur</button>
+        <button class="bt-act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3"/><path d="m6 9 6-6 6 6"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Ürün görseli yükle</button>
+      </div>
+      <p class="bt-tip"><b>İpucu:</b> Toplu üretimde 4K yerine 2K seçersen kare başına 6 birim öder, %50 tasarruf edersin.</p>
+    </section>
+
+    <!-- 7 · SON ÇEKİMLER -->
+    <section class="bt-cell bt-son">
+      <div class="bt-cell-hd"><span class="bt-eb">Son çekimler</span><a class="bt-link r" href="#">Galeriye git →</a></div>
+      <div class="bt-son-grid">
+        <article class="bt-shot">
+          <span class="bt-shot-th"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></span>
+          <div class="bt-shot-info"><b>Bel Ceketi · Lacivert</b><span class="sku mono">BSGMARS25337</span><span class="meta"><span class="bt-badge good">İyi</span><span class="ago">2 sa önce</span></span></div>
+        </article>
+        <article class="bt-shot">
+          <span class="bt-shot-th"><svg viewBox="0 0 200 200"><use href="#ms-bag"/></svg></span>
+          <div class="bt-shot-info"><b>Deri Omuz Çantası · Taba</b><span class="sku mono">BSGTOT9021</span><span class="meta"><span class="bt-badge good">İyi</span><span class="ago">5 sa önce</span></span></div>
+        </article>
+        <article class="bt-shot">
+          <span class="bt-shot-th"><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></span>
+          <div class="bt-shot-info"><b>Süet Bot · Kum</b><span class="sku mono">BSGAYK4412</span><span class="meta"><span class="bt-badge normal">Normal</span><span class="ago">Dün</span></span></div>
+        </article>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ALT BİLGİ -->
+  <footer class="bt-foot">
+    <span>Yeşilmen Ltd. · Stüdyo Pro · 3 üye · info@masterstudio.ai</span>
+    <span class="st">Tüm servisler çalışıyor</span>
+  </footer>
+
+ </div>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector('.bt'); if (!root) return;
+  var D = {
+    gun:   { v: '23',  label: 'Bugün üretilen kare',    delta: '+%12', cmp: 'düne göre',           a: '09:00',  b: '20:00',
+             s: [1,2,2,3,1,4,2,3,1,2,1,1],
+             ss: ['17', '88', '138'] },
+    hafta: { v: '128', label: 'Bu hafta üretilen kare', delta: '+%34', cmp: 'geçen haftaya göre',  a: '26 Tem', b: 'Bugün',
+             s: [13,15,17,16,21,22,24],
+             ss: ['96', '87', '742'] },
+    ay:    { v: '486', label: 'Bu ay üretilen kare',    delta: '+%21', cmp: 'geçen aya göre',      a: '3 Tem',  b: 'Bugün',
+             s: [9,12,10,14,11,15,13,12,16,14,18,13,17,15,19,14,21,16,18,15,12,17,24,19,21,16,23,18,24,20],
+             ss: ['371', '86', '2.870'] }
+  };
+  function $(s) { return root.querySelector(s); }
+  var val = $('#bt-kpi-value'), lab = $('#bt-kpi-label'), dlt = $('#bt-kpi-delta-t'), cmp = $('#bt-kpi-cmp'),
+      area = $('#bt-spark-area'), line = $('#bt-spark-line'), dot = $('#bt-spark-dot'),
+      axa = $('#bt-ax-a'), axb = $('#bt-ax-b'),
+      ss = [$('#bt-ss-onay'), $('#bt-ss-qa'), $('#bt-ss-birim')];
+  var W = 300, H = 80, P = 7;
+
+  function draw(s) {
+    var hi = Math.max.apply(null, s), lo = Math.min.apply(null, s);
+    if (hi === lo) hi = lo + 1;
+    var n = s.length, pts = [];
+    for (var i = 0; i < n; i++) {
+      var x = +(i * (W / (n - 1))).toFixed(1);
+      var y = +(P + (1 - (s[i] - lo) / (hi - lo)) * (H - 2 * P)).toFixed(1);
+      pts.push(x + ' ' + y);
+    }
+    var d = 'M' + pts.join(' L');
+    if (line) line.setAttribute('d', d);
+    if (area) area.setAttribute('d', d + ' L' + W + ' ' + H + ' L0 ' + H + ' Z');
+    if (dot) {
+      var last = pts[n - 1].split(' ');
+      dot.style.left = (parseFloat(last[0]) / W * 100) + '%';
+      dot.style.top = (parseFloat(last[1]) / H * 100) + '%';
+    }
+  }
+  function render(k) {
+    var d = D[k]; if (!d) return;
+    if (val) val.textContent = d.v;
+    if (lab) lab.textContent = d.label;
+    if (dlt) dlt.textContent = d.delta;
+    if (cmp) cmp.textContent = d.cmp;
+    if (axa) axa.textContent = d.a;
+    if (axb) axb.textContent = d.b;
+    for (var i = 0; i < 3; i++) { if (ss[i]) ss[i].textContent = d.ss[i]; }
+    draw(d.s);
+  }
+  var seg = $('#bt-range');
+  if (seg) {
+    seg.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || !b.dataset.r) return;
+      seg.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
+      b.classList.add('on'); b.setAttribute('aria-pressed', 'true');
+      render(b.dataset.r);
+    });
+  }
+  render('hafta');
+})();
+</script>

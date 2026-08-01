@@ -1,0 +1,574 @@
+<title>Master Studio — Yön F · Copilot Stüdyo</title>
+
+<style>
+/* ============================================================
+   YÖN F — "Copilot Stüdyo"
+   İstem-öncelikli üretim: kullanıcı çekimi doğal dille tarif eder,
+   yardımcı planı kurar, onayla üretilir. Niyetten sonuca en kısa yol.
+   Ortada konuşma sütunu (max 720px) + sağda canlı "Çekim planı"
+   paneli (sticky) + altta yüzen kompozer.
+   TEMA: ÇİFT — sıcak porselen (#faf8f6) / koyu kakao-gri.
+   ACCENT: derin gül/magenta (#c2417a ailesi) = yardımcı kimliği ve
+   birincil eylem; yardımcı avatarında çok kısık iki-tonlu ışıma
+   (yalnız orada). Mor-mavi gradyan klişesi bilinçli olarak yok.
+   Namespace: .cp — tüm ID'ler "cp-" önekli.
+   ============================================================ */
+
+.cp, .cp *, .cp *::before, .cp *::after { box-sizing: border-box; }
+
+.cp {
+  --bg: #faf8f6; --panel: #ffffff; --panel-2: #f4efee; --panel-3: #ece4e4;
+  --line: #eae2e1; --line-2: #dcd0d1;
+  --text: #241c1f; --text-2: #6f6165; --text-3: #a3949a;
+  --accent: #c2417a; --accent-2: #a72f66; --accent-soft: rgba(194,65,122,.10); --accent-tint: #f9e9f0;
+  --on-accent: #ffffff;
+  --glow-a: rgba(194,65,122,.30); --glow-b: rgba(222,146,92,.22);
+  --good: #2f9e69; --good-soft: rgba(47,158,105,.12);
+  --normal: #b0791f; --normal-soft: rgba(176,121,31,.13);
+  --weak: #d64545; --weak-soft: rgba(214,69,69,.12);
+  --shadow: 0 1px 2px rgba(60,35,45,.05), 0 6px 20px rgba(60,35,45,.06);
+  --shadow-lg: 0 14px 36px rgba(50,28,38,.15), 0 3px 9px rgba(50,28,38,.07);
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text); background: var(--bg); min-height: 100vh;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-size: 13.5px; line-height: 1.55; letter-spacing: -0.007em;
+}
+@media (prefers-color-scheme: dark) {
+  .cp {
+    --bg: #161113; --panel: #1e181b; --panel-2: #251e22; --panel-3: #2e252a;
+    --line: #322830; --line-2: #41343d;
+    --text: #f2eaee; --text-2: #a9979f; --text-3: #786a71;
+    --accent: #e0699e; --accent-2: #ea86b1; --accent-soft: rgba(224,105,158,.15); --accent-tint: #35222b;
+    --on-accent: #2b1119;
+    --glow-a: rgba(224,105,158,.34); --glow-b: rgba(226,151,96,.20);
+    --good: #46bd89; --good-soft: rgba(70,189,137,.15);
+    --normal: #d3a24d; --normal-soft: rgba(211,162,77,.15);
+    --weak: #ee6a6a; --weak-soft: rgba(238,106,106,.15);
+    --shadow: 0 1px 2px rgba(0,0,0,.42), 0 6px 20px rgba(0,0,0,.36);
+    --shadow-lg: 0 16px 42px rgba(0,0,0,.55), 0 3px 9px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] .cp {
+  --bg: #161113; --panel: #1e181b; --panel-2: #251e22; --panel-3: #2e252a;
+  --line: #322830; --line-2: #41343d;
+  --text: #f2eaee; --text-2: #a9979f; --text-3: #786a71;
+  --accent: #e0699e; --accent-2: #ea86b1; --accent-soft: rgba(224,105,158,.15); --accent-tint: #35222b;
+  --on-accent: #2b1119;
+  --glow-a: rgba(224,105,158,.34); --glow-b: rgba(226,151,96,.20);
+  --good: #46bd89; --good-soft: rgba(70,189,137,.15);
+  --normal: #d3a24d; --normal-soft: rgba(211,162,77,.15);
+  --weak: #ee6a6a; --weak-soft: rgba(238,106,106,.15);
+  --shadow: 0 1px 2px rgba(0,0,0,.42), 0 6px 20px rgba(0,0,0,.36);
+  --shadow-lg: 0 16px 42px rgba(0,0,0,.55), 0 3px 9px rgba(0,0,0,.4);
+}
+:root[data-theme="light"] .cp {
+  --bg: #faf8f6; --panel: #ffffff; --panel-2: #f4efee; --panel-3: #ece4e4;
+  --line: #eae2e1; --line-2: #dcd0d1;
+  --text: #241c1f; --text-2: #6f6165; --text-3: #a3949a;
+  --accent: #c2417a; --accent-2: #a72f66; --accent-soft: rgba(194,65,122,.10); --accent-tint: #f9e9f0;
+  --on-accent: #ffffff;
+  --glow-a: rgba(194,65,122,.30); --glow-b: rgba(222,146,92,.22);
+  --good: #2f9e69; --good-soft: rgba(47,158,105,.12);
+  --normal: #b0791f; --normal-soft: rgba(176,121,31,.13);
+  --weak: #d64545; --weak-soft: rgba(214,69,69,.12);
+  --shadow: 0 1px 2px rgba(60,35,45,.05), 0 6px 20px rgba(60,35,45,.06);
+  --shadow-lg: 0 14px 36px rgba(50,28,38,.15), 0 3px 9px rgba(50,28,38,.07);
+}
+
+.cp ::selection { background: var(--accent-soft); }
+.cp :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.cp button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; letter-spacing: inherit; }
+.cp button:disabled { cursor: default; }
+.cp svg, .cp img { display: block; max-width: 100%; }
+.cp .mono { font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .cp *, .cp *::before, .cp *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+.cp-app { max-width: 1180px; margin: 0 auto; padding: 0 clamp(12px, 2vw, 24px); }
+
+/* ---------- Üst bar ---------- */
+.cp-top { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 16px; height: 60px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(12px); }
+.cp-brand { display: flex; align-items: center; gap: 10px; }
+.cp-logo { width: 30px; height: 30px; border-radius: 10px; background: linear-gradient(140deg, #d4568e, var(--accent) 55%, #8e2557); display: grid; place-items: center; box-shadow: var(--shadow); flex: none; }
+.cp-logo svg { width: 16px; color: #fff; }
+.cp-brand b { font-size: 14.5px; font-weight: 680; letter-spacing: -.012em; }
+.cp-brand small { display: block; font-size: 10.5px; color: var(--text-3); }
+.cp-nav { display: flex; gap: 2px; margin-left: 6px; }
+.cp-nav button { padding: 7px 13px; border-radius: 9px; font-size: 13px; font-weight: 550; color: var(--text-2); transition: color .14s, background .14s; }
+.cp-nav button:hover { color: var(--text); background: var(--panel-2); }
+.cp-nav button.on { color: var(--accent-2); background: var(--accent-tint); font-weight: 640; }
+.cp-tright { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.cp-credit { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--panel); }
+.cp-credit b { font-size: 12.5px; font-weight: 660; }
+.cp-credit small { font-size: 10.5px; color: var(--text-3); }
+.cp-user { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 5px; border-radius: 999px; }
+.cp-user:hover { background: var(--panel-2); }
+.cp-uava { width: 29px; height: 29px; border-radius: 50%; background: linear-gradient(140deg, #7d5b6a, #4b363f); color: #f4e9ee; display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+.cp-user .nm { font-size: 12.5px; font-weight: 600; text-align: left; }
+.cp-user .nm small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; }
+.cp-user > svg { width: 14px; color: var(--text-3); }
+
+/* ---------- Ana düzen ---------- */
+.cp-main { display: grid; grid-template-columns: minmax(0,1fr) 308px; gap: 28px; align-items: start; }
+
+/* ---------- Konuşma sütunu ---------- */
+.cp-chat { max-width: 720px; width: 100%; margin: 0 auto; min-width: 0; display: flex; flex-direction: column; min-height: calc(100vh - 60px); }
+.cp-daysep { display: flex; align-items: center; gap: 12px; padding: 18px 0 4px; color: var(--text-3); font-size: 11px; }
+.cp-daysep::before, .cp-daysep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.cp-thread { display: flex; flex-direction: column; gap: 24px; padding: 14px 0 10px; }
+
+/* Kullanıcı mesajı */
+.cp-msg { display: flex; gap: 11px; min-width: 0; }
+.cp-msg.user { justify-content: flex-end; }
+.cp-msg.user .cp-uava { width: 26px; height: 26px; font-size: 10px; flex: none; margin-top: 2px; }
+.cp-ubub { max-width: 82%; background: var(--panel); border: 1px solid var(--line-2); border-radius: 14px 14px 4px 14px; padding: 10px 14px; box-shadow: var(--shadow); }
+.cp-ubub p { margin: 0; }
+.cp-msg .meta { font-size: 10.5px; color: var(--text-3); margin-bottom: 4px; }
+.cp-msg.user .meta { text-align: right; }
+
+/* Yardımcı mesajı — avatarda tek yerdeki kısık iki-tonlu ışıma */
+.cp-aava { width: 28px; height: 28px; border-radius: 9px; flex: none; margin-top: 2px; background: linear-gradient(140deg, #d4568e, var(--accent) 55%, #8e2557); display: grid; place-items: center; box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent), 0 0 14px var(--glow-a), 0 0 30px var(--glow-b); }
+.cp-aava svg { width: 15px; color: #fff; }
+.cp-abody { min-width: 0; flex: 1; max-width: 92%; }
+.cp-abody .who { font-size: 10.5px; color: var(--text-3); margin-bottom: 4px; }
+.cp-abody .who b { color: var(--text-2); font-weight: 640; }
+.cp-abody > p { margin: 0 0 10px; }
+.cp-abody > p:last-child { margin-bottom: 0; }
+
+/* Plan kartı */
+.cp-plan { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); overflow: hidden; }
+.cp-plan-hd { display: flex; align-items: center; gap: 9px; padding: 12px 15px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.cp-plan-hd h3 { font-size: 13px; font-weight: 650; margin: 0; }
+.cp-plan-hd .set { display: flex; gap: 5px; margin-left: auto; flex-wrap: wrap; }
+.cp-mini { font-size: 10.5px; font-weight: 600; color: var(--text-2); background: var(--panel-2); border: 1px solid var(--line); padding: 3px 9px; border-radius: 999px; }
+.cp-prow { display: flex; align-items: center; gap: 11px; padding: 9px 15px; border-bottom: 1px solid var(--line); }
+.cp-prow:last-of-type { border-bottom: none; }
+.cp-prow .ic { width: 27px; height: 27px; border-radius: 8px; background: var(--panel-2); color: var(--text-2); display: grid; place-items: center; flex: none; }
+.cp-prow .ic svg { width: 15px; }
+.cp-prow .t { font-size: 12.5px; font-weight: 570; }
+.cp-prow .t small { display: block; font-size: 10.5px; color: var(--text-3); font-weight: 400; }
+.cp-prow .c { margin-left: auto; font-size: 11px; color: var(--text-3); }
+.cp-plan-ft { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-top: 1px solid var(--line); background: var(--panel-2); flex-wrap: wrap; }
+.cp-plan-ft .sum { font-size: 12px; color: var(--text-2); }
+.cp-plan-ft .sum b { color: var(--text); font-size: 12.5px; }
+.cp-approve { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; padding: 9px 17px; border-radius: 11px; background: var(--accent); color: var(--on-accent); font-weight: 650; font-size: 12.5px; box-shadow: var(--shadow); transition: background .14s, transform .12s; }
+.cp-approve:hover { background: var(--accent-2); transform: translateY(-1px); }
+.cp-approve svg { width: 15px; }
+
+/* Önizleme ızgarası */
+.cp-pgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 4px 0 10px; }
+.cp-frame { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s; }
+.cp-frame:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.cp-fimg { aspect-ratio: 4/5; position: relative; display: grid; place-items: center; }
+.cp-fimg figure { width: 58%; color: var(--text-3); opacity: .92; margin: 0; }
+.cp-fimg figure.close { width: 88%; }
+.cp .pg1 { background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 9%, var(--panel-2)), var(--panel-2)); }
+.cp .pg2 { background: linear-gradient(165deg, color-mix(in srgb, #4d9bb8 10%, var(--panel-2)), var(--panel-2)); }
+.cp .pg3 { background: linear-gradient(165deg, color-mix(in srgb, #66b98c 10%, var(--panel-2)), var(--panel-2)); }
+.cp-fimg .lbl { position: absolute; top: 7px; left: 8px; font-size: 10px; font-weight: 600; color: var(--text-2); background: var(--panel); border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; }
+.cp-fimg .re { position: absolute; top: 7px; right: 8px; display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 650; color: var(--good); background: var(--good-soft); padding: 3px 8px; border-radius: 999px; }
+.cp-fimg .re svg { width: 10px; }
+.cp-frame-ft { display: flex; align-items: center; gap: 6px; padding: 8px 10px; }
+.cp-frame-ft b { font-size: 11px; font-weight: 620; }
+.cp-badge { margin-left: auto; font-size: 9.5px; font-weight: 660; padding: 2px 8px; border-radius: 999px; }
+.cp-badge.good { color: var(--good); background: var(--good-soft); }
+.cp-badge.normal { color: var(--normal); background: var(--normal-soft); }
+.cp-badge.weak { color: var(--weak); background: var(--weak-soft); }
+.cp-oneline { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); }
+.cp-oneline svg { width: 14px; color: var(--good); flex: none; }
+.cp-oneline b { color: var(--text); }
+
+/* Yazıyor göstergesi — reduced-motion'da statik noktalar */
+.cp-typing { display: flex; gap: 11px; align-items: flex-start; }
+.cp-dots { display: inline-flex; align-items: center; gap: 5px; padding: 11px 14px; margin-top: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px 14px 14px 4px; }
+.cp-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--text-3); opacity: .55; animation: cpDot 1.25s infinite ease-in-out; }
+.cp-dots i:nth-child(2) { animation-delay: .18s; }
+.cp-dots i:nth-child(3) { animation-delay: .36s; }
+@keyframes cpDot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+/* ---------- Öneri çipleri + yüzen kompozer ---------- */
+.cp-dock { position: sticky; bottom: 0; z-index: 30; margin-top: auto; padding: 22px 0 16px; background: linear-gradient(to top, var(--bg) 72%, transparent); }
+.cp-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.cp-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 550; color: var(--text-2); background: var(--panel); border: 1px solid var(--line-2); padding: 6px 12px; border-radius: 999px; box-shadow: var(--shadow); transition: color .13s, border-color .13s, transform .12s; }
+.cp-chip svg { width: 14px; color: var(--text-3); transition: color .13s; }
+.cp-chip:hover { color: var(--accent-2); border-color: var(--accent); transform: translateY(-1px); }
+.cp-chip:hover svg { color: var(--accent); }
+.cp-chip:disabled { opacity: .45; transform: none; color: var(--text-3); border-color: var(--line); }
+.cp-chip:disabled svg { color: var(--text-3); }
+
+.cp-composer { border: 1px solid var(--line-2); border-radius: 16px; background: var(--panel); box-shadow: var(--shadow-lg); transition: border-color .15s, box-shadow .15s; }
+.cp-composer:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-lg); }
+.cp-input { display: block; width: 100%; border: none; background: transparent; resize: none; font: inherit; letter-spacing: inherit; color: var(--text); padding: 13px 15px 4px; min-height: 46px; max-height: 130px; }
+.cp-input:focus { outline: none; }
+.cp-input::placeholder { color: var(--text-3); }
+.cp-crow { display: flex; align-items: center; gap: 8px; padding: 6px 8px 8px 8px; }
+.cp-attach { width: 32px; height: 32px; border-radius: 9px; color: var(--text-2); display: grid; place-items: center; transition: color .13s, background .13s; }
+.cp-attach:hover { color: var(--text); background: var(--panel-2); }
+.cp-attach svg { width: 17px; }
+.cp-crow .sp { flex: 1; }
+.cp-send { width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; box-shadow: var(--shadow); transition: background .13s, transform .12s; }
+.cp-send:hover:not(:disabled) { background: var(--accent-2); transform: translateY(-1px); }
+.cp-send:disabled { background: var(--panel-3); color: var(--text-3); box-shadow: none; }
+.cp-send svg { width: 16px; }
+.cp-hint { text-align: center; font-size: 10.5px; color: var(--text-3); margin-top: 8px; }
+.cp-hint kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 9.5px; padding: 2px 5px; border-radius: 5px; background: var(--panel-2); border: 1px solid var(--line-2); color: var(--text-2); }
+
+/* ---------- Sağ panel: Çekim planı (canlı) ---------- */
+.cp-side { position: sticky; top: 76px; min-width: 0; padding-top: 18px; }
+.cp-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+.cp-side-hd { display: flex; align-items: center; gap: 8px; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+.cp-side-hd h2 { font-size: 13px; font-weight: 660; margin: 0; }
+.cp-live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 650; color: var(--good); background: var(--good-soft); padding: 3px 10px; border-radius: 999px; }
+.cp-live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--good); animation: cpPulse 2.2s infinite; }
+@keyframes cpPulse { 0%, 100% { box-shadow: 0 0 0 0 var(--good-soft); } 50% { box-shadow: 0 0 0 4px var(--good-soft); } }
+.cp-sub { font-size: 10.5px; color: var(--text-3); padding: 8px 16px 0; }
+.cp-product { display: flex; gap: 11px; align-items: center; padding: 10px 16px 13px; border-bottom: 1px solid var(--line); }
+.cp-pthumb { width: 46px; height: 56px; border-radius: 9px; background: var(--panel-2); border: 1px solid var(--line); display: grid; place-items: center; flex: none; }
+.cp-pthumb svg { width: 29px; color: var(--text-3); }
+.cp-product b { font-size: 12.5px; }
+.cp-product .sku { font-size: 10.5px; color: var(--text-3); margin-top: 1px; }
+.cp-product .sec { display: inline-block; margin-top: 5px; font-size: 10px; font-weight: 640; color: var(--accent-2); background: var(--accent-tint); padding: 2px 8px; border-radius: 999px; }
+.cp-slabel { display: flex; align-items: baseline; padding: 11px 16px 6px; font-size: 10.5px; font-weight: 680; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); }
+.cp-slabel .r { margin-left: auto; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--accent-2); font-size: 11px; }
+.cp-shotlist { padding: 0 8px 6px; }
+.cp-shotrow { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 8px; font-size: 12.5px; }
+.cp-shotrow .ok { width: 16px; height: 16px; border-radius: 6px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; flex: none; }
+.cp-shotrow .ok svg { width: 10px; }
+.cp-shotrow small { margin-left: auto; font-size: 10.5px; color: var(--text-3); }
+.cp-krows { border-top: 1px solid var(--line); padding: 6px 16px 10px; }
+.cp-krow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 0; font-size: 12.5px; border-bottom: 1px solid var(--line); }
+.cp-krow:last-child { border-bottom: none; }
+.cp-krow .k { color: var(--text-2); }
+.cp-krow .v { font-weight: 630; }
+.cp-total { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-top: 1px solid var(--line); background: var(--panel-2); }
+.cp-total .lbl { font-size: 11.5px; color: var(--text-2); }
+.cp-total .lbl small { display: block; font-size: 10px; color: var(--text-3); margin-top: 2px; }
+.cp-total .amt { margin-left: auto; text-align: right; }
+.cp-total .amt b { font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.cp-total .amt small { display: block; font-size: 10px; color: var(--text-3); }
+.cp-flash { animation: cpFlash .9s ease; border-radius: 6px; }
+@keyframes cpFlash { 0% { background: var(--accent-soft); box-shadow: 0 0 0 4px var(--accent-soft); } 100% { background: transparent; box-shadow: 0 0 0 4px transparent; } }
+
+/* ---------- Duyarlılık ---------- */
+@media (max-width: 1140px) {
+  .cp-main { grid-template-columns: minmax(0,1fr) 272px; gap: 18px; }
+  .cp-nav button { padding: 7px 10px; }
+  .cp-brand small { display: none; }
+}
+@media (max-width: 760px) {
+  .cp-main { grid-template-columns: 1fr; }
+  .cp-side { position: static; order: 2; padding-top: 0; margin-top: 6px; }
+  .cp-chat { order: 1; min-height: 0; }
+  .cp-nav { display: none; }
+  .cp-user .nm { display: none; }
+  .cp-credit small { display: none; }
+  .cp-ubub, .cp-abody { max-width: 100%; }
+  .cp-pgrid { gap: 7px; }
+  .cp-plan-ft .sum { width: 100%; }
+  .cp-approve { margin-left: 0; width: 100%; justify-content: center; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ms-figure" viewBox="0 0 200 340"><circle cx="100" cy="42" r="23"/><path d="M93 66h14v10H93z"/><path d="M74 78 Q100 70 126 78 L133 150 Q118 158 100 158 Q82 158 67 150 Z"/><path d="M69 149 Q100 160 131 149 L151 302 Q100 318 49 302 Z"/><path d="M74 80 Q57 122 61 182 L71 180 Q69 122 84 86 Z"/><path d="M126 80 Q143 122 139 182 L129 180 Q131 122 116 86 Z"/></symbol>
+  <symbol id="ms-garment" viewBox="0 0 200 210"><path d="M70 34 Q100 22 130 34 L164 60 Q170 64 166 72 L149 92 L146 84 L146 188 Q146 194 140 194 L60 194 Q54 194 54 188 L54 84 L51 92 L34 72 Q30 64 36 60 Z"/><path d="M80 34 Q100 54 120 34" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/></symbol>
+</svg>
+
+<div class="cp">
+ <div class="cp-app">
+
+  <!-- ÜST BAR -->
+  <header class="cp-top">
+    <div class="cp-brand">
+      <span class="cp-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/><path d="M18.5 16.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg></span>
+      <div><b>Master Studio</b><small>Ürün fotoğraf stüdyosu</small></div>
+    </div>
+    <nav class="cp-nav">
+      <button class="on">Stüdyo</button>
+      <button>Galeri</button>
+      <button>Toplu Üretim</button>
+      <button>Entegrasyonlar</button>
+    </nav>
+    <div class="cp-tright">
+      <div class="cp-credit"><b class="mono" id="cp-balance">1.240</b><small>işlem birimi</small></div>
+      <button class="cp-user"><span class="cp-uava">YG</span><span class="nm">Yeşilmen<small>Stüdyo Pro</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+    </div>
+  </header>
+
+  <div class="cp-main">
+
+   <!-- KONUŞMA SÜTUNU -->
+   <section class="cp-chat" aria-label="Stüdyo yardımcısıyla konuşma">
+    <div class="cp-daysep">Bugün · Bel Ceketi çekimi</div>
+
+    <div class="cp-thread" id="cp-thread">
+
+      <!-- 1 · Kullanıcı istemi -->
+      <div class="cp-msg user">
+        <div>
+          <div class="meta">14:02</div>
+          <div class="cp-ubub"><p>Lacivert bel ceketi için 6 kare istiyorum — 4:5, stüdyo fonu, manken üzerinde.</p></div>
+        </div>
+        <span class="cp-uava">YG</span>
+      </div>
+
+      <!-- 2 · Yardımcı: kısa metin + plan kartı -->
+      <div class="cp-msg">
+        <span class="cp-aava" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/></svg></span>
+        <div class="cp-abody">
+          <div class="who"><b>Stüdyo Yardımcısı</b> · 14:02</div>
+          <p>Hazır — Bel Ceketi · Lacivert için stüdyo fonunda, 4:5 oranında 6 karelik bir plan kurdum. Beş kare manken üzerinde; askıda görünümü seti tamamlaması için ekledim.</p>
+          <div class="cp-plan">
+            <div class="cp-plan-hd">
+              <h3>Çekim planı</h3>
+              <div class="set"><span class="cp-mini">4:5</span><span class="cp-mini">Stüdyo fonu</span><span class="cp-mini">Manken: Otomatik</span><span class="cp-mini mono">2K</span></div>
+            </div>
+            <div class="cp-prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span><span class="t">Önden tam boy<small>Manken üzerinde</small></span><span class="c mono">6 birim</span></div>
+            <div class="cp-prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 8 4 4-4 4"/><path d="m6 8-4 4 4 4"/><path d="M2 12h20"/></svg></span><span class="t">Yandan görünüm</span><span class="c mono">6 birim</span></div>
+            <div class="cp-prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></span><span class="t">Arkadan görünüm</span><span class="c mono">6 birim</span></div>
+            <div class="cp-prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></span><span class="t">Yakın detay<small>Kumaş &amp; dikiş</small></span><span class="c mono">6 birim</span></div>
+            <div class="cp-prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg></span><span class="t">Bel üstü kadraj</span><span class="c mono">6 birim</span></div>
+            <div class="cp-prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4.5A2.5 2.5 0 1 0 12 7v1.5"/><path d="M12 8.5 20.6 15a1.6 1.6 0 0 1-1 2.9H4.4a1.6 1.6 0 0 1-1-2.9z"/></svg></span><span class="t">Askıda görünüm<small>Mankensiz</small></span><span class="c mono">6 birim</span></div>
+            <div class="cp-plan-ft">
+              <span class="sum">Toplam · 6 kare × 2K → <b class="mono">36 işlem birimi</b></span>
+              <button class="cp-approve"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5L20 6"/></svg>Onayla ve üret</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 · Kullanıcı: düzeltme isteği -->
+      <div class="cp-msg user">
+        <div>
+          <div class="meta">14:05</div>
+          <div class="cp-ubub"><p>Bel üstü karede logo kenarda kırpılmış, düzeltir misin?</p></div>
+        </div>
+        <span class="cp-uava">YG</span>
+      </div>
+
+      <!-- 4 · Yardımcı: 3 kare önizleme + tek satır özet -->
+      <div class="cp-msg">
+        <span class="cp-aava" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/></svg></span>
+        <div class="cp-abody">
+          <div class="who"><b>Stüdyo Yardımcısı</b> · 14:06</div>
+          <p>Bel üstü karesini, logo tam kadrajda kalacak şekilde yeniden ürettim. İşte etkilenen üç kare:</p>
+          <div class="cp-pgrid">
+            <article class="cp-frame">
+              <div class="cp-fimg pg2"><span class="lbl">04 · Detay</span><figure class="close"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div>
+              <div class="cp-frame-ft"><b>04 · Detay</b><span class="cp-badge good">İyi</span></div>
+            </article>
+            <article class="cp-frame">
+              <div class="cp-fimg pg1"><span class="lbl">05 · Bel üstü</span><span class="re"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>Yeniden üretildi</span><figure class="close"><svg viewBox="0 0 200 340"><use href="#ms-figure"/></svg></figure></div>
+              <div class="cp-frame-ft"><b>05 · Bel üstü</b><span class="cp-badge good">İyi</span></div>
+            </article>
+            <article class="cp-frame">
+              <div class="cp-fimg pg3"><span class="lbl">06 · Askıda</span><figure><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></figure></div>
+              <div class="cp-frame-ft"><b>06 · Askıda</b><span class="cp-badge normal">Normal</span></div>
+            </article>
+          </div>
+          <div class="cp-oneline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 12 5 5L20 6"/></svg><span><b>05</b> yeniden üretildi — Logo skoru <b class="mono">64 → 91</b>, kadraj payı <b class="mono">%4</b>. Toplam maliyet değişmedi.</span></div>
+        </div>
+      </div>
+
+      <!-- Yazıyor göstergesi: her zaman akışın sonunda -->
+      <div class="cp-typing" id="cp-typing" role="status" aria-label="Yardımcı yazıyor">
+        <span class="cp-aava" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/></svg></span>
+        <span class="cp-dots"><i></i><i></i><i></i></span>
+      </div>
+
+    </div>
+
+    <!-- ÖNERİ ÇİPLERİ + YÜZEN KOMPOZER -->
+    <div class="cp-dock">
+      <div class="cp-chips" id="cp-chips">
+        <button class="cp-chip" data-chip="mekan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>Arka planı mekâna al</button>
+        <button class="cp-chip" data-chip="4k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 11 7-7 7 7"/><path d="M12 4v16"/></svg>4K kaliteye yükselt</button>
+        <button class="cp-chip" data-chip="flatlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18M12 3v18"/></svg>Flat-lay ekle</button>
+        <button class="cp-chip" data-chip="trendyol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17v3h16v-3"/><path d="M12 4v12"/><path d="m7 9 5-5 5 5"/></svg>Trendyol'a gönder</button>
+      </div>
+      <div class="cp-composer">
+        <textarea class="cp-input" id="cp-input" rows="1" placeholder="Çekimi tarif et… ör. &quot;Taba çanta için 4 kare, sade fon, 1:1&quot;" aria-label="Çekimi tarif et"></textarea>
+        <div class="cp-crow">
+          <button class="cp-attach" aria-label="Ürün ekle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg></button>
+          <span class="sp"></span>
+          <button class="cp-send" id="cp-send" disabled aria-label="Gönder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg></button>
+        </div>
+      </div>
+      <div class="cp-hint"><kbd>⏎</kbd> gönder · <kbd>⇧⏎</kbd> yeni satır</div>
+    </div>
+   </section>
+
+   <!-- SAĞ PANEL: ÇEKİM PLANI (CANLI) -->
+   <aside class="cp-side" aria-label="Çekim planı">
+    <div class="cp-card">
+      <div class="cp-side-hd"><h2>Çekim planı</h2><span class="cp-live">Canlı</span></div>
+      <div class="cp-sub">Konuşmayla eş zamanlı güncellenir</div>
+      <div class="cp-product">
+        <div class="cp-pthumb"><svg viewBox="0 0 200 210"><use href="#ms-garment"/></svg></div>
+        <div><b>Bel Ceketi · Lacivert</b><div class="sku mono">BSGMARS25337</div><span class="sec">Moda &amp; Giyim</span></div>
+      </div>
+      <div class="cp-slabel">Çekimler<span class="r" id="cp-plan-count">6 kare</span></div>
+      <div class="cp-shotlist" id="cp-plan-shots">
+        <div class="cp-shotrow"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="m5 12 5 5L20 6"/></svg></span>Önden tam boy<small>Manken</small></div>
+        <div class="cp-shotrow"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="m5 12 5 5L20 6"/></svg></span>Yandan görünüm</div>
+        <div class="cp-shotrow"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="m5 12 5 5L20 6"/></svg></span>Arkadan görünüm</div>
+        <div class="cp-shotrow"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="m5 12 5 5L20 6"/></svg></span>Yakın detay<small>Kumaş</small></div>
+        <div class="cp-shotrow"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="m5 12 5 5L20 6"/></svg></span>Bel üstü kadraj</div>
+        <div class="cp-shotrow"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="m5 12 5 5L20 6"/></svg></span>Askıda görünüm<small>Mankensiz</small></div>
+      </div>
+      <div class="cp-krows">
+        <div class="cp-krow"><span class="k">Kalite</span><span class="v mono" id="cp-plan-qual">2K</span></div>
+        <div class="cp-krow"><span class="k">Kare başı maliyet</span><span class="v mono" id="cp-plan-unit">6 birim</span></div>
+        <div class="cp-krow"><span class="k">En-boy oranı</span><span class="v mono">4:5</span></div>
+        <div class="cp-krow"><span class="k">Arka plan</span><span class="v" id="cp-plan-bg">Stüdyo</span></div>
+        <div class="cp-krow"><span class="k">Manken</span><span class="v">Otomatik</span></div>
+      </div>
+      <div class="cp-total">
+        <div class="lbl">Toplam maliyet<small>Bakiye: <span class="mono">1.240</span> işlem birimi</small></div>
+        <div class="amt"><b class="mono" id="cp-plan-total">36</b><small>işlem birimi</small></div>
+      </div>
+    </div>
+   </aside>
+
+  </div>
+ </div>
+</div>
+
+<script>
+(function () {
+  var root = document.querySelector('.cp'); if (!root) return;
+  var thread   = root.querySelector('#cp-thread');
+  var typing   = root.querySelector('#cp-typing');
+  var input    = root.querySelector('#cp-input');
+  var send     = root.querySelector('#cp-send');
+  var chips    = root.querySelector('#cp-chips');
+  var qualEl   = root.querySelector('#cp-plan-qual');
+  var unitEl   = root.querySelector('#cp-plan-unit');
+  var bgEl     = root.querySelector('#cp-plan-bg');
+  var countEl  = root.querySelector('#cp-plan-count');
+  var totalEl  = root.querySelector('#cp-plan-total');
+  var shotList = root.querySelector('#cp-plan-shots');
+
+  var state = { unit: 6, qual: '2K', shots: 6 };
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var AVA = '<span class="cp-aava" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/></svg></span>';
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="m5 12 5 5L20 6"/></svg>';
+
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function now() {
+    var d = new Date(), h = d.getHours(), m = d.getMinutes();
+    return (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m);
+  }
+  function total() { return state.shots * state.unit; }
+
+  function flash(el) {
+    if (!el || reduced) return;
+    el.classList.remove('cp-flash');
+    void el.offsetWidth;
+    el.classList.add('cp-flash');
+  }
+  function syncPanel() {
+    if (qualEl)  { qualEl.textContent  = state.qual; flash(qualEl); }
+    if (unitEl)  { unitEl.textContent  = state.unit + ' birim'; flash(unitEl); }
+    if (countEl) { countEl.textContent = state.shots + ' kare'; flash(countEl); }
+    if (totalEl) { totalEl.textContent = total(); flash(totalEl); }
+  }
+  function append(html) {
+    if (!thread) return;
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    while (wrap.firstChild) {
+      var node = wrap.firstChild;
+      if (typing) { thread.insertBefore(node, typing); } else { thread.appendChild(node); }
+    }
+    var anchor = typing || thread.lastElementChild;
+    if (anchor && anchor.scrollIntoView) {
+      anchor.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'end' });
+    }
+  }
+  function userMsg(text) {
+    return '<div class="cp-msg user"><div><div class="meta">' + now() + '</div>' +
+      '<div class="cp-ubub"><p>' + text + '</p></div></div><span class="cp-uava">YG</span></div>';
+  }
+  function aiMsg(text) {
+    return '<div class="cp-msg">' + AVA + '<div class="cp-abody">' +
+      '<div class="who"><b>Stüdyo Yardımcısı</b> · ' + now() + '</div><p>' + text + '</p></div></div>';
+  }
+
+  /* --- Öneri çipleri: hazır kullanıcı+yardımcı mesajı + plan senkronu --- */
+  var actions = {
+    'mekan': function () {
+      if (bgEl) { bgEl.textContent = 'Mekân'; flash(bgEl); }
+      return {
+        u: 'Arka planı mekâna alalım.',
+        a: 'Arka plan <b>Mekân</b> olarak güncellendi — kareler gün ışıklı iç mekân sahnesinde üretilecek, ışık dengesi otomatik ayarlanır. Maliyet değişmedi: toplam <b class="mono">' + total() + ' işlem birimi</b>.'
+      };
+    },
+    '4k': function () {
+      state.unit = 12; state.qual = '4K';
+      return {
+        u: "Kaliteyi 4K'ya yükselt.",
+        a: "Kalite <b>4K</b>'ya alındı — kare başı maliyet <b class=\"mono\">12 işlem birimi</b>. Yeni toplam: <b class=\"mono\">" + total() + ' işlem birimi</b>. Onayladığında bu kaliteyle üretirim.'
+      };
+    },
+    'flatlay': function () {
+      state.shots += 1;
+      if (shotList) {
+        var row = document.createElement('div');
+        row.className = 'cp-shotrow';
+        row.innerHTML = '<span class="ok">' + CHECK + '</span>Düz zemin (flat-lay)<small>Mankensiz</small>';
+        shotList.appendChild(row);
+        flash(row);
+      }
+      return {
+        u: 'Sete bir flat-lay karesi ekle.',
+        a: 'Düz zemin (flat-lay) karesini plana ekledim — mankensiz, üstten kadraj. Set <b class="mono">' + state.shots + ' kareye</b> çıktı; yeni toplam <b class="mono">' + total() + ' işlem birimi</b>.'
+      };
+    },
+    'trendyol': function () {
+      return {
+        u: "Onaylı kareleri Trendyol'a gönder.",
+        a: "Onaylı 3 kareyi Trendyol'daki <b class=\"mono\">BSGMARS25337</b> ilanına 4:5 oranında aktardım. Kalan kareler onaylandıkça listeye otomatik eklenecek."
+      };
+    }
+  };
+
+  if (chips) {
+    chips.addEventListener('click', function (e) {
+      var chip = e.target.closest('.cp-chip');
+      if (!chip || chip.disabled) return;
+      var fn = actions[chip.getAttribute('data-chip')];
+      if (!fn) return;
+      var msg = fn();
+      chip.disabled = true;
+      append(userMsg(esc(msg.u)) + aiMsg(msg.a));
+      syncPanel();
+    });
+  }
+
+  /* --- Kompozer: yazınca gönder aktifleşir, ⏎ gönderir --- */
+  if (input && send) {
+    input.addEventListener('input', function () {
+      send.disabled = input.value.trim() === '';
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 130) + 'px';
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!send.disabled) send.click();
+      }
+    });
+    send.addEventListener('click', function () {
+      var text = input.value.trim();
+      if (!text) return;
+      append(userMsg(esc(text)) + aiMsg('Notunu aldım — planı buna göre güncelliyorum. Ayrıntıları sağdaki çekim planından izleyebilirsin.'));
+      input.value = '';
+      input.style.height = 'auto';
+      send.disabled = true;
+      input.focus();
+    });
+  }
+})();
+</script>
