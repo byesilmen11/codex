@@ -33,6 +33,20 @@ Ama kumarhane mantığıyla değil, **oyuncak kutusu** mantığıyla.
 | 10 | [Sanat Yönü, UX & Ses](docs/10-sanat-ux-ses.md) | Görsel dil, çocuk UX kuralları, ses tasarımı |
 | 11 | [Teknik Mimari & Yol Haritası](docs/11-teknik-mimari-ve-yol-haritasi.md) | Motor seçimi, backend, 12 aylık plan, KPI hedefleri |
 
+## 📦 v2 — Doğrudan Satın Alma Senaryosu (derin araştırma, 5 paralel ajan)
+
+Yumurtaların oyunla kazanılmaya ek olarak **mikro fiyatla satın alınabildiği** senaryonun
+birleşik kılavuzu: **[docs/v2/README.md](docs/v2/README.md)**
+
+| # | Bölüm | Öne çıkan |
+|---|-------|-----------|
+| v2·01 | [Rakip Ekonomiler](docs/v2/01-rakip-ekonomiler.md) | Monopoly GO $6 mlr modeli, PS99 yumurta merdiveni, Brawl Stars vakası, Pop Mart 1/72, 15 tasarım deseni |
+| v2·02 | [Koleksiyon & Algoritma](docs/v2/02-koleksiyon-sistemi-ve-algoritma.md) | Monte Carlo doğrulamalı matematik, pity algoritması pseudocode, Gizli Pufi, 31 isimli örnek aile |
+| v2·03 | [Hikâye & Karakterler](docs/v2/03-hikaye-ve-karakterler.md) | 3 dünya senaryosu + story bible + replikler + S2-3 tohumları |
+| v2·04 | [Oyun Akışı & Zorluk](docs/v2/04-oyun-akisi-ve-zorluk.md) | Dakika dakika FTUE, 7 gün planı, 12 hafta takvimi, Altın Yumurta storyboard'u |
+| v2·05 | [Mağaza & Paketler](docs/v2/05-magaza-ve-yumurta-paketleri.md) | 6 kademeli paket merdiveni (₺9,99-₺199,99), Kiler, Dilek Kavanozu, hediye kanalı, gelir projeksiyonu |
+| — | [Ekonomi simülatörü](tools/economy-sim/collection_sim.py) | v2·02'nin eğrilerini üreten çalıştırılabilir Monte Carlo kodu |
+
 ## ⚖️ Etik Manifesto (Bu projenin anayasası)
 
 Bu oyun çocuklara satış yapmaz; **ebeveynlere değer satar, çocuklara oyun verir.**
