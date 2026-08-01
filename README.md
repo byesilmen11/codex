@@ -102,17 +102,70 @@ biçimindedir — uygulamanızda özellikleri yayına almadan önce panelden aç
 
 | Değişken | Varsayılan | Açıklama |
 | --- | --- | --- |
-| `CMS_DATA_DIR` | `./data` | SQLite dosyasının tutulduğu dizin |
+| `CMS_DATA_DIR` | `./data` | SQLite dosyası **ve** yüklenen medyanın tutulduğu dizin (tek kalıcı dizin) |
 | `CMS_ADMIN_EMAIL` | `admin@codex.local` | İlk tohum yöneticisinin e-postası |
 | `CMS_ADMIN_PASSWORD` | `admin123!` | İlk tohum yöneticisinin şifresi |
 
+> Hem veritabanı (`cms.db`) hem de yüklenen dosyalar (`uploads/`) **tek bir**
+> `CMS_DATA_DIR` altında toplanır — böylece tek bir kalıcı volume tüm durumu kapsar.
+
 ## Üretim (Production)
 
+Bu uygulama **kalıcı bir dosya sistemine bağlı tek konteyner** olarak çalışacak
+şekilde tasarlanmıştır (Ghost, Plausible, Umami gibi). Bu, harici veritabanı/nesne
+depolama bağımlılığı, kimlik bilgisi ve ek maliyet olmadan; yedeklemesi tek dosya
+kopyası kadar basit, güvenilir bir yapı sağlar.
+
+### Docker (önerilen)
+
 ```bash
-npm run build
-npm start
+docker compose up -d --build
 ```
 
-Kalıcı disk gerektirir (SQLite + `public/uploads`). Bu nedenle VPS/Docker/Fly.io/Railway
-gibi kalıcı dosya sistemi sunan ortamlar uygundur; salt okunur serverless ortamlar
-(ör. Vercel'in varsayılan dosya sistemi) veritabanı yazamaz.
+- Uygulama `http://localhost:3000` adresinde yayınlanır.
+- Tüm durum (SQLite + yüklemeler) `codex-data` adlı kalıcı volume'da (`/data`) tutulur.
+- İlk yöneticiyi ortam değişkenleriyle belirleyin:
+
+```bash
+CMS_ADMIN_EMAIL=siz@ornek.com CMS_ADMIN_PASSWORD='güçlü-parola' \
+  docker compose up -d --build
+```
+
+Görüntü Next.js **standalone** çıktısıyla üretilir (küçük imaj, kök olmayan
+kullanıcı, dahili `HEALTHCHECK`). `Dockerfile` ve `docker-compose.yml` depoda hazırdır.
+
+### Konteynersiz (VPS / systemd)
+
+```bash
+npm ci
+npm run build
+CMS_DATA_DIR=/var/lib/codex npm start
+```
+
+`CMS_DATA_DIR`'i kalıcı bir yola verin ve süreci bir servis yöneticisiyle (systemd,
+pm2) çalıştırın. Önüne bir ters vekil (nginx/Caddy) koyup TLS'i orada sonlandırın.
+
+### Dağıtım hedefleri
+
+Kalıcı volume sunan her ortam uygundur: **Fly.io** (volume), **Railway**,
+**Render** (disk), herhangi bir **VPS/Docker** veya **Kubernetes** (PVC).
+
+> Not: Salt okunur/efemer dosya sistemli serverless ortamlar (ör. Vercel'in
+> varsayılan fonksiyon dosya sistemi) SQLite'a yazamaz. Böyle bir hedef zorunluysa
+> depolama katmanı harici Postgres + S3 uyumlu nesne depolamaya taşınmalıdır;
+> mevcut mimari bu geçişe uygun biçimde (tek `CMS_DATA_DIR` soyutlaması) tasarlandı.
+
+## Yedekleme
+
+WAL modunda bile tutarlı bir veritabanı yedeği alır:
+
+```bash
+# Yerel
+node scripts/backup.mjs                 # data/backups/ altına yazar
+
+# Docker (çalışan konteynerde)
+docker compose exec cms node scripts/backup.mjs /data/backups
+```
+
+Yüklenen medya `CMS_DATA_DIR/uploads` altındadır; volume anlık görüntüsü (snapshot)
+veya `uploads/` dizininin kopyalanması medya yedeğini kapsar.
