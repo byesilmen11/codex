@@ -1,0 +1,435 @@
+/* Yuvo — Çekirdek sahne stilleri: Çıtlatma Töreni + Birleştirme Masası.
+   Sahip: scenes-core ajanı. Tokenlar css/style.css'ten gelir. */
+
+/* ============================= TÖREN ============================= */
+
+.cere-stage {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--sky) 0%, var(--bg) 46%, var(--meadow) 100%);
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* Sepet */
+.cere-basket {
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 64px;
+  line-height: 1;
+  filter: drop-shadow(0 6px 8px rgba(74, 59, 42, .25));
+  transition: opacity .5s ease, transform .5s ease;
+  pointer-events: none;
+}
+.cere-basket.gone { opacity: 0; transform: translateX(-50%) translateY(24px); }
+
+/* Yumurta */
+.cere-egg-wrap {
+  position: relative;
+  width: min(62vw, 250px);
+  z-index: 2;
+  pointer-events: none; /* dokunuşlar sahnenin tamamında sayılır */
+}
+.cere-egg svg { width: 100%; height: auto; }
+.cere-egg-wrap.arriving { animation: egg-arrive .9s cubic-bezier(.22, 1, .36, 1) both; }
+.cere-egg-wrap.warm { animation: egg-rock 1.1s ease-in-out infinite; }
+.cere-egg-wrap.warmed { animation: egg-shake .45s ease; }
+.cere-egg-wrap.burst { animation: egg-burst .45s ease forwards; }
+
+@keyframes egg-arrive {
+  from { transform: translateY(46dvh) scale(.55); opacity: .4; }
+  to   { transform: none; opacity: 1; }
+}
+@keyframes egg-rock {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+@keyframes egg-shake {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-6px) rotate(-2deg); }
+  50%  { transform: translateX(6px) rotate(2deg); }
+  75%  { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+@keyframes egg-burst {
+  to { transform: scale(1.3); opacity: 0; }
+}
+
+/* Isıtma jest gösterimi: yumurta üstünde daire çizen yarı saydam el (okuma gerektirmez) */
+.cere-hand {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -24px 0 0 -24px;
+  font-size: 46px;
+  line-height: 1;
+  opacity: .8;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 2px 3px rgba(74, 59, 42, .35));
+  animation: hand-circle 1.8s linear infinite;
+}
+.cere-egg-wrap.warm .cere-hand { display: block; }
+@keyframes hand-circle {
+  from { transform: rotate(0deg) translateX(58px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(58px) rotate(-360deg); }
+}
+
+/* Isınma parıltısı (opaklık JS'ten ilerlemeyle gelir) */
+.cere-warmth {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 122, 140, .75) 0%, rgba(255, 160, 130, .35) 55%, transparent 75%);
+  opacity: 0;
+  transition: opacity .15s linear;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Ritim halkaları — beklerler, kaçırmak imkânsız */
+.cere-rings { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.cere-ring {
+  position: absolute;
+  width: 84px;
+  height: 84px;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(255, 255, 255, .85), inset 0 0 10px rgba(255, 255, 255, .5);
+  transform: translate(-50%, -50%);
+  animation: ring-pop .35s ease both, ring-pulse 1.1s ease-in-out .35s infinite;
+}
+.ring-p0 { left: 32%; top: 40%; }
+.ring-p1 { left: 68%; top: 46%; }
+.ring-p2 { left: 50%; top: 62%; }
+/* Halkanın altında zıplayan işaret parmağı: "buraya dokun" jest eşdeğeri */
+.cere-ring-finger {
+  position: absolute;
+  left: 50%;
+  top: 96%;
+  font-size: 36px;
+  line-height: 1;
+  animation: finger-bob .8s ease-in-out infinite;
+}
+@keyframes finger-bob {
+  0%, 100% { transform: translateX(-50%) translateY(4px); }
+  50%      { transform: translateX(-50%) translateY(-8px); }
+}
+@keyframes ring-pop {
+  from { transform: translate(-50%, -50%) scale(.3); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+@keyframes ring-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-50%, -50%) scale(1.14); }
+}
+
+/* Efekt katmanı: flaş, konfeti, pufi, kart */
+.cere-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.cere-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, #fff 0%, rgba(255, 255, 255, .6) 35%, transparent 70%);
+  animation: flash-out .7s ease forwards;
+}
+@keyframes flash-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* Konfeti (CSS parçacıklar; --dx/--dy/--rot JS'ten) */
+.cere-confetti { position: absolute; inset: 0; overflow: hidden; }
+.cere-confetti i {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  transform: translate(-50%, -50%);
+  animation: confetti-fly 1.15s cubic-bezier(.16, .84, .44, 1) both;
+}
+@keyframes confetti-fly {
+  0%   { transform: translate(-50%, -50%) scale(.6) rotate(0deg); opacity: 1; }
+  70%  { opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px) + 60px)) rotate(var(--rot, 180deg));
+    opacity: 0;
+  }
+}
+
+/* Pufi zıplayarak çıkar */
+.cere-pufi {
+  width: min(54vw, 215px);
+  animation: pufi-bounce .9s cubic-bezier(.34, 1.56, .64, 1) both;
+  filter: drop-shadow(0 8px 12px rgba(74, 59, 42, .25));
+}
+.cere-pufi svg { width: 100%; height: auto; }
+@keyframes pufi-bounce {
+  0%   { transform: translateY(18px) scale(.2); opacity: 0; }
+  55%  { transform: translateY(-26px) scale(1.08); opacity: 1; }
+  75%  { transform: translateY(6px) scale(.97); }
+  100% { transform: none; opacity: 1; }
+}
+
+/* Tier 3: ekran ışıması */
+.cere-stage.tier3glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 38%,
+    rgba(255, 244, 200, .95) 0%, rgba(255, 211, 77, .45) 42%, transparent 78%);
+  animation: big-glow 1.9s ease forwards;
+}
+@keyframes big-glow {
+  0%   { opacity: 0; }
+  25%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* İpucu metni */
+.cere-hint {
+  position: absolute;
+  bottom: calc(5% + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  max-width: 88%;
+  text-align: center;
+  font-size: 19px;
+  font-weight: bold;
+  color: var(--ink);
+  background: rgba(255, 255, 255, .78);
+  border-radius: 999px;
+  padding: 10px 20px;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+.cere-hint:empty { display: none; }
+
+/* Sonuç kartı */
+.cere-stage.show-card .cere-egg-wrap,
+.cere-stage.show-card .cere-basket { display: none; }
+.cere-card {
+  pointer-events: auto;
+  width: 86%;
+  max-width: 330px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: pop-in .35s ease;
+}
+.cere-portrait {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--bg2);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cere-portrait svg { width: 100%; height: 100%; }
+.cere-name { font-size: 26px; }
+.cere-tags { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.cere-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: bold;
+}
+.cere-badge-new { background: var(--sun); color: var(--ink); }
+.cere-badge-copy { background: var(--bg2); color: var(--ink); }
+.cere-bio { color: var(--ink-soft); font-size: 15px; line-height: 1.45; }
+.cere-card .btn { width: 100%; margin-top: 4px; }
+
+/* Yumurta kalmadıysa nazik mesaj */
+.cere-noegg { cursor: default; }
+.cere-noegg-box {
+  width: 86%;
+  max-width: 330px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  animation: pop-in .3s ease;
+}
+.cere-noegg-ico { font-size: 52px; line-height: 1; }
+.cere-noegg-box p { color: var(--ink-soft); line-height: 1.5; }
+.cere-noegg-box .btn { width: 100%; }
+
+/* ========================= BİRLEŞTİRME ========================= */
+
+.asm-stage {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  touch-action: none;
+}
+.asm-title { font-size: 20px; text-align: center; padding: 0 76px; }
+
+/* Takılan çocuk için görünür çıkış: köşede Atla düğmesi */
+.asm-skip {
+  position: absolute;
+  top: calc(10px + env(safe-area-inset-top));
+  right: 10px;
+  z-index: 6;
+  min-height: 64px;
+  padding: 10px 16px;
+  font-size: 16px;
+}
+
+/* Hedef silüet tahtası */
+.asm-board {
+  position: relative;
+  width: min(82vw, 330px);
+  flex: 1;
+  max-height: 52dvh;
+  align-self: center;
+}
+.asm-slot {
+  position: absolute;
+  border: 3px dashed rgba(74, 59, 42, .28);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, .35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6%;
+  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.asm-slot-bas      { width: 38%; aspect-ratio: 1; top: 0;   left: 50%; transform: translateX(-50%); }
+.asm-slot-govde    { width: 48%; aspect-ratio: 1; top: 34%; left: 50%; transform: translateX(-50%); }
+.asm-slot-aksesuar { width: 32%; aspect-ratio: 1; bottom: 0; right: 4%; }
+
+/* Silüet hayaleti — ince parçalar krem zeminde de seçilsin diye .4 opaklık */
+.slot-ghost { width: 100%; height: 100%; }
+.slot-ghost svg { width: 100%; height: 100%; filter: brightness(0) opacity(.4); }
+
+/* Mıknatıs yaklaşınca parıltı */
+.asm-slot.near {
+  border-color: var(--accent);
+  background: rgba(255, 211, 77, .3);
+  box-shadow: 0 0 18px rgba(255, 138, 92, .65);
+}
+.asm-slot.filled {
+  border-color: transparent;
+  border-style: solid;
+  background: transparent;
+}
+.slot-fill { width: 100%; height: 100%; animation: fill-pop .3s ease; }
+.slot-fill svg { width: 100%; height: 100%; }
+@keyframes fill-pop {
+  0%   { transform: scale(1.15); }
+  60%  { transform: scale(.96); }
+  100% { transform: scale(1); }
+}
+
+/* Oturma parıltısı */
+.asm-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-style: normal;
+  pointer-events: none;
+  animation: spark-pop .6s ease forwards;
+}
+.asm-spark::before { content: '✨'; font-size: 42px; }
+@keyframes spark-pop {
+  0%   { transform: translate(-50%, -50%) scale(.3); opacity: 0; }
+  35%  { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+.asm-hint {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+/* Alt raf */
+.asm-shelf {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 116px;
+  padding: 10px;
+  background: rgba(255, 255, 255, .55);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.asm-piece {
+  width: 92px;
+  height: 92px;
+  min-width: 64px;
+  touch-action: none;
+  cursor: grab;
+  position: relative;
+  padding: 4px;
+  background: rgba(255, 255, 255, .9);   /* tutamaç plakası: minik parça da kutu gibi tutulur */
+  border: 3px dashed rgba(74, 59, 42, .22);
+  border-radius: 18px;
+  filter: drop-shadow(0 4px 6px rgba(74, 59, 42, .2));
+}
+.asm-piece svg { width: 100%; height: 100%; pointer-events: none; }
+.asm-piece.dragging { z-index: 30; cursor: grabbing; filter: drop-shadow(0 10px 14px rgba(74, 59, 42, .3)); }
+.asm-piece.returning { transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+.asm-piece.placed { opacity: 0; pointer-events: none; }
+
+/* Bitiş: oyuncak + sevinç dansı */
+.asm-done {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  animation: pop-in .3s ease;
+}
+.asm-toy { width: min(50vw, 200px); animation: fill-pop .5s ease; }
+.asm-toy svg { width: 100%; height: auto; }
+.asm-dance { width: min(38vw, 150px); animation: joy-dance .55s ease-in-out infinite alternate; }
+.asm-dance svg { width: 100%; height: auto; }
+@keyframes joy-dance {
+  from { transform: translateY(0) rotate(-7deg); }
+  to   { transform: translateY(-16px) rotate(7deg); }
+}
+.asm-banner {
+  font-size: 24px;
+  font-weight: bold;
+  background: var(--card);
+  border-radius: 999px;
+  padding: 12px 26px;
+  box-shadow: var(--shadow);
+  animation: pop-in .4s ease .2s both;
+}

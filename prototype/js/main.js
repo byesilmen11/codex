@@ -13,8 +13,10 @@
   var current = null, currentName = null;
 
   Yuvo.go = function (name, params) {
+    if (name === currentName && !params) return; // aynı sekmeye çift dokunuş oyunu sıfırlamasın
     if (current && current.unmount) { try { current.unmount(); } catch (e) { console.error(e); } }
     sceneRoot.innerHTML = '';
+    overlayRoot.innerHTML = ''; // sahne değişince açık modal kalmasın
     sceneRoot.scrollTop = 0;
     currentName = name;
     current = Yuvo.scenes[name];
@@ -24,6 +26,11 @@
     current.mount(sceneRoot, params || {});
   };
 
+  // Arka plana tıklayınca kapatma: kalıcı overlayRoot'a BİR KEZ bağlanır (dinleyici birikmez)
+  overlayRoot.addEventListener('click', function (e) {
+    if (e.target === overlayRoot) overlayRoot.innerHTML = '';
+  });
+
   Yuvo.modal = function (html) {
     var wrap = document.createElement('div');
     wrap.className = 'modal';
@@ -32,7 +39,6 @@
     overlayRoot.appendChild(wrap);
     function close () { overlayRoot.innerHTML = ''; }
     wrap.querySelector('.modal-close').addEventListener('click', close);
-    overlayRoot.addEventListener('click', function (e) { if (e.target === overlayRoot) close(); });
     return close;
   };
 

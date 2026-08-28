@@ -1,0 +1,4098 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Yuvo Prototip</title>
+<style>
+/* == css/style.css == */
+/* Yuvo Prototip — temel stil ve tasarım tokenları (docs/10 görsel dili) */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg:#FFF6E3; --bg2:#FFEFD0; --card:#FFFFFF; --ink:#4A3B2A; --ink-soft:#6E5F49;
+  --meadow:#A8E06E; --meadow-deep:#7BC94C; --sky:#BDE8FF; --sun:#FFD34D;
+  --accent:#FF8A5C; --accent-deep:#F0703E;
+  --r-yaygin:#9AA5B1; --r-azbulunur:#58B368; --r-nadir:#4FB8D8;
+  --r-destansi:#B266E8; --r-efsanevi:#F2A61B; --r-gizli:#5C4A9E;
+  --radius:22px; --radius-sm:14px;
+  --shadow:0 4px 14px rgba(74,59,42,.14);
+}
+html, body { height:100%; }
+body {
+  background:var(--bg); color:var(--ink);
+  font-family:"Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  overscroll-behavior:none; touch-action:manipulation;
+  -webkit-user-select:none; user-select:none;
+}
+#app { height:100dvh; display:flex; flex-direction:column; max-width:560px; margin:0 auto;
+  position:relative; overflow:hidden; }
+#scene-root { flex:1; overflow-y:auto; overflow-x:hidden; position:relative; }
+
+/* HUD */
+#hud { display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:calc(8px + env(safe-area-inset-top)) 12px 8px; background:var(--bg2);
+  border-bottom:2px solid rgba(74,59,42,.08); z-index:5; }
+#hud .pill { background:var(--card); border-radius:999px; padding:7px 14px; font-weight:bold;
+  font-size:16px; box-shadow:var(--shadow); display:inline-flex; align-items:center; gap:6px;
+  min-height:38px; }
+#hud .pill small { font-weight:normal; color:var(--ink-soft); }
+
+/* Alt gezinme */
+#bottom-nav { display:flex; gap:8px; padding:8px 10px calc(10px + env(safe-area-inset-bottom));
+  background:var(--bg2); border-top:2px solid rgba(74,59,42,.08); z-index:5; }
+#bottom-nav button { flex:1; min-height:64px; border:none; border-radius:var(--radius-sm);
+  background:var(--card); color:var(--ink); font-size:16px; font-weight:bold;
+  box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:2px; cursor:pointer; }
+#bottom-nav button .ico { font-size:24px; line-height:1; }
+#bottom-nav button.active { background:var(--sun); }
+#bottom-nav button:active { transform:scale(.96); }
+
+/* Tam ekran sahne modu (tören/birleştirme) */
+#app.fullscreen #hud, #app.fullscreen #bottom-nav { display:none; }
+
+/* Ortak bileşenler */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:64px; padding:12px 22px; border:none; border-radius:var(--radius);
+  font-size:18px; font-weight:bold; font-family:inherit; cursor:pointer;
+  background:var(--card); color:var(--ink); box-shadow:var(--shadow); }
+.btn:active { transform:scale(.96); }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-primary:active { background:var(--accent-deep); }
+.btn-soft { background:var(--bg2); }
+.btn[disabled] { opacity:.55; pointer-events:none; }
+
+.card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:16px; }
+
+/* Modal */
+#overlay-root:empty { display:none; }
+#overlay-root { position:absolute; inset:0; z-index:50; display:flex; align-items:center;
+  justify-content:center; background:rgba(74,59,42,.45); padding:20px; }
+.modal { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+  width:100%; max-width:420px; max-height:82dvh; overflow-y:auto; padding:20px;
+  position:relative; animation:pop-in .25s ease; }
+.modal .modal-close { position:absolute; top:8px; right:8px; width:64px; height:64px;
+  border:none; border-radius:50%; background:var(--bg2); font-size:26px; cursor:pointer; }
+@keyframes pop-in { from { transform:scale(.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+
+/* Toast */
+#toast-root { position:absolute; left:0; right:0; bottom:110px; display:flex;
+  flex-direction:column; align-items:center; gap:8px; z-index:60; pointer-events:none; }
+.toast { background:var(--ink); color:#fff; border-radius:999px; padding:10px 20px;
+  font-size:15px; font-weight:bold; box-shadow:var(--shadow); animation:toast-in .25s ease;
+  max-width:90%; text-align:center; }
+@keyframes toast-in { from { transform:translateY(12px); opacity:0; } to { transform:none; opacity:1; } }
+
+/* Nadirlik çerçeveleri (albüm + kartlar)
+   Renk körlüğü için renk DIŞI kodlama: her kademede farklı çerçeve deseni
+   (düz/kesikli/çift/noktalı/kalın) + köşe simge rozeti (● ▲ ◆ ★ ✹ ☾). */
+.rf { position:relative; border:3px solid var(--r-yaygin); }
+.rf::after { content:'●'; position:absolute; left:3px; bottom:3px; z-index:2;
+  width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,.92);
+  color:var(--ink); font-size:12px; line-height:20px; text-align:center;
+  font-style:normal; font-weight:bold; pointer-events:none;
+  box-shadow:0 1px 3px rgba(74,59,42,.25); }
+.rf-yaygin { border-color:var(--r-yaygin); }
+.rf-azbulunur { border-color:var(--r-azbulunur); border-style:dashed; }
+.rf-azbulunur::after { content:'▲'; }
+.rf-nadir { border-color:var(--r-nadir); border-width:6px; border-style:double;
+  box-shadow:0 0 10px rgba(79,184,216,.4); }
+.rf-nadir::after { content:'◆'; }
+.rf-destansi { border-color:var(--r-destansi); border-width:4px; border-style:dotted;
+  box-shadow:0 0 12px rgba(178,102,232,.45); }
+.rf-destansi::after { content:'★'; }
+.rf-efsanevi { border-color:var(--r-efsanevi); border-width:5px;
+  box-shadow:0 0 16px rgba(242,166,27,.55);
+  animation:glow 1.6s ease-in-out infinite alternate; }
+.rf-efsanevi::after { content:'✹'; }
+.rf-gizli { border-color:var(--r-gizli); border-width:5px; border-style:dashed;
+  box-shadow:0 0 14px rgba(92,74,158,.55); }
+.rf-gizli::after { content:'☾'; }
+@keyframes glow { from { box-shadow:0 0 8px rgba(242,166,27,.35); }
+  to { box-shadow:0 0 20px rgba(242,166,27,.75); } }
+
+/* Rozet: koyu mürekkep + açık pastel zemin (WCAG ≥4.5:1); kademe rengi çerçevede,
+   simge (● ▲ ◆ …) JS'ten metnin başına eklenir — renk tek başına kod değil. */
+.rarity-tag { display:inline-block; padding:4px 12px; border-radius:999px;
+  color:var(--ink); background:var(--bg2); border:2px solid var(--r-yaygin);
+  font-size:15px; font-weight:bold; }
+
+/* Yardımcılar */
+.center { text-align:center; }
+.stack { display:flex; flex-direction:column; gap:12px; }
+.row { display:flex; align-items:center; gap:10px; }
+.grow { flex:1; }
+.hidden { display:none !important; }
+img, svg { max-width:100%; display:block; }
+
+/* == css/scenes-core.css == */
+/* Yuvo — Çekirdek sahne stilleri: Çıtlatma Töreni + Birleştirme Masası.
+   Sahip: scenes-core ajanı. Tokenlar css/style.css'ten gelir. */
+
+/* ============================= TÖREN ============================= */
+
+.cere-stage {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--sky) 0%, var(--bg) 46%, var(--meadow) 100%);
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* Sepet */
+.cere-basket {
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 64px;
+  line-height: 1;
+  filter: drop-shadow(0 6px 8px rgba(74, 59, 42, .25));
+  transition: opacity .5s ease, transform .5s ease;
+  pointer-events: none;
+}
+.cere-basket.gone { opacity: 0; transform: translateX(-50%) translateY(24px); }
+
+/* Yumurta */
+.cere-egg-wrap {
+  position: relative;
+  width: min(62vw, 250px);
+  z-index: 2;
+  pointer-events: none; /* dokunuşlar sahnenin tamamında sayılır */
+}
+.cere-egg svg { width: 100%; height: auto; }
+.cere-egg-wrap.arriving { animation: egg-arrive .9s cubic-bezier(.22, 1, .36, 1) both; }
+.cere-egg-wrap.warm { animation: egg-rock 1.1s ease-in-out infinite; }
+.cere-egg-wrap.warmed { animation: egg-shake .45s ease; }
+.cere-egg-wrap.burst { animation: egg-burst .45s ease forwards; }
+
+@keyframes egg-arrive {
+  from { transform: translateY(46dvh) scale(.55); opacity: .4; }
+  to   { transform: none; opacity: 1; }
+}
+@keyframes egg-rock {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+@keyframes egg-shake {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-6px) rotate(-2deg); }
+  50%  { transform: translateX(6px) rotate(2deg); }
+  75%  { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+@keyframes egg-burst {
+  to { transform: scale(1.3); opacity: 0; }
+}
+
+/* Isıtma jest gösterimi: yumurta üstünde daire çizen yarı saydam el (okuma gerektirmez) */
+.cere-hand {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -24px 0 0 -24px;
+  font-size: 46px;
+  line-height: 1;
+  opacity: .8;
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 2px 3px rgba(74, 59, 42, .35));
+  animation: hand-circle 1.8s linear infinite;
+}
+.cere-egg-wrap.warm .cere-hand { display: block; }
+@keyframes hand-circle {
+  from { transform: rotate(0deg) translateX(58px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(58px) rotate(-360deg); }
+}
+
+/* Isınma parıltısı (opaklık JS'ten ilerlemeyle gelir) */
+.cere-warmth {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 122, 140, .75) 0%, rgba(255, 160, 130, .35) 55%, transparent 75%);
+  opacity: 0;
+  transition: opacity .15s linear;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Ritim halkaları — beklerler, kaçırmak imkânsız */
+.cere-rings { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.cere-ring {
+  position: absolute;
+  width: 84px;
+  height: 84px;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(255, 255, 255, .85), inset 0 0 10px rgba(255, 255, 255, .5);
+  transform: translate(-50%, -50%);
+  animation: ring-pop .35s ease both, ring-pulse 1.1s ease-in-out .35s infinite;
+}
+.ring-p0 { left: 32%; top: 40%; }
+.ring-p1 { left: 68%; top: 46%; }
+.ring-p2 { left: 50%; top: 62%; }
+/* Halkanın altında zıplayan işaret parmağı: "buraya dokun" jest eşdeğeri */
+.cere-ring-finger {
+  position: absolute;
+  left: 50%;
+  top: 96%;
+  font-size: 36px;
+  line-height: 1;
+  animation: finger-bob .8s ease-in-out infinite;
+}
+@keyframes finger-bob {
+  0%, 100% { transform: translateX(-50%) translateY(4px); }
+  50%      { transform: translateX(-50%) translateY(-8px); }
+}
+@keyframes ring-pop {
+  from { transform: translate(-50%, -50%) scale(.3); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+@keyframes ring-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-50%, -50%) scale(1.14); }
+}
+
+/* Efekt katmanı: flaş, konfeti, pufi, kart */
+.cere-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.cere-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, #fff 0%, rgba(255, 255, 255, .6) 35%, transparent 70%);
+  animation: flash-out .7s ease forwards;
+}
+@keyframes flash-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* Konfeti (CSS parçacıklar; --dx/--dy/--rot JS'ten) */
+.cere-confetti { position: absolute; inset: 0; overflow: hidden; }
+.cere-confetti i {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  transform: translate(-50%, -50%);
+  animation: confetti-fly 1.15s cubic-bezier(.16, .84, .44, 1) both;
+}
+@keyframes confetti-fly {
+  0%   { transform: translate(-50%, -50%) scale(.6) rotate(0deg); opacity: 1; }
+  70%  { opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px) + 60px)) rotate(var(--rot, 180deg));
+    opacity: 0;
+  }
+}
+
+/* Pufi zıplayarak çıkar */
+.cere-pufi {
+  width: min(54vw, 215px);
+  animation: pufi-bounce .9s cubic-bezier(.34, 1.56, .64, 1) both;
+  filter: drop-shadow(0 8px 12px rgba(74, 59, 42, .25));
+}
+.cere-pufi svg { width: 100%; height: auto; }
+@keyframes pufi-bounce {
+  0%   { transform: translateY(18px) scale(.2); opacity: 0; }
+  55%  { transform: translateY(-26px) scale(1.08); opacity: 1; }
+  75%  { transform: translateY(6px) scale(.97); }
+  100% { transform: none; opacity: 1; }
+}
+
+/* Tier 3: ekran ışıması */
+.cere-stage.tier3glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 38%,
+    rgba(255, 244, 200, .95) 0%, rgba(255, 211, 77, .45) 42%, transparent 78%);
+  animation: big-glow 1.9s ease forwards;
+}
+@keyframes big-glow {
+  0%   { opacity: 0; }
+  25%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* İpucu metni */
+.cere-hint {
+  position: absolute;
+  bottom: calc(5% + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  max-width: 88%;
+  text-align: center;
+  font-size: 19px;
+  font-weight: bold;
+  color: var(--ink);
+  background: rgba(255, 255, 255, .78);
+  border-radius: 999px;
+  padding: 10px 20px;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+.cere-hint:empty { display: none; }
+
+/* Sonuç kartı */
+.cere-stage.show-card .cere-egg-wrap,
+.cere-stage.show-card .cere-basket { display: none; }
+.cere-card {
+  pointer-events: auto;
+  width: 86%;
+  max-width: 330px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: pop-in .35s ease;
+}
+.cere-portrait {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--bg2);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cere-portrait svg { width: 100%; height: 100%; }
+.cere-name { font-size: 26px; }
+.cere-tags { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.cere-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: bold;
+}
+.cere-badge-new { background: var(--sun); color: var(--ink); }
+.cere-badge-copy { background: var(--bg2); color: var(--ink); }
+.cere-bio { color: var(--ink-soft); font-size: 15px; line-height: 1.45; }
+.cere-card .btn { width: 100%; margin-top: 4px; }
+
+/* Yumurta kalmadıysa nazik mesaj */
+.cere-noegg { cursor: default; }
+.cere-noegg-box {
+  width: 86%;
+  max-width: 330px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  animation: pop-in .3s ease;
+}
+.cere-noegg-ico { font-size: 52px; line-height: 1; }
+.cere-noegg-box p { color: var(--ink-soft); line-height: 1.5; }
+.cere-noegg-box .btn { width: 100%; }
+
+/* ========================= BİRLEŞTİRME ========================= */
+
+.asm-stage {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  touch-action: none;
+}
+.asm-title { font-size: 20px; text-align: center; padding: 0 76px; }
+
+/* Takılan çocuk için görünür çıkış: köşede Atla düğmesi */
+.asm-skip {
+  position: absolute;
+  top: calc(10px + env(safe-area-inset-top));
+  right: 10px;
+  z-index: 6;
+  min-height: 64px;
+  padding: 10px 16px;
+  font-size: 16px;
+}
+
+/* Hedef silüet tahtası */
+.asm-board {
+  position: relative;
+  width: min(82vw, 330px);
+  flex: 1;
+  max-height: 52dvh;
+  align-self: center;
+}
+.asm-slot {
+  position: absolute;
+  border: 3px dashed rgba(74, 59, 42, .28);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, .35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6%;
+  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.asm-slot-bas      { width: 38%; aspect-ratio: 1; top: 0;   left: 50%; transform: translateX(-50%); }
+.asm-slot-govde    { width: 48%; aspect-ratio: 1; top: 34%; left: 50%; transform: translateX(-50%); }
+.asm-slot-aksesuar { width: 32%; aspect-ratio: 1; bottom: 0; right: 4%; }
+
+/* Silüet hayaleti — ince parçalar krem zeminde de seçilsin diye .4 opaklık */
+.slot-ghost { width: 100%; height: 100%; }
+.slot-ghost svg { width: 100%; height: 100%; filter: brightness(0) opacity(.4); }
+
+/* Mıknatıs yaklaşınca parıltı */
+.asm-slot.near {
+  border-color: var(--accent);
+  background: rgba(255, 211, 77, .3);
+  box-shadow: 0 0 18px rgba(255, 138, 92, .65);
+}
+.asm-slot.filled {
+  border-color: transparent;
+  border-style: solid;
+  background: transparent;
+}
+.slot-fill { width: 100%; height: 100%; animation: fill-pop .3s ease; }
+.slot-fill svg { width: 100%; height: 100%; }
+@keyframes fill-pop {
+  0%   { transform: scale(1.15); }
+  60%  { transform: scale(.96); }
+  100% { transform: scale(1); }
+}
+
+/* Oturma parıltısı */
+.asm-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-style: normal;
+  pointer-events: none;
+  animation: spark-pop .6s ease forwards;
+}
+.asm-spark::before { content: '✨'; font-size: 42px; }
+@keyframes spark-pop {
+  0%   { transform: translate(-50%, -50%) scale(.3); opacity: 0; }
+  35%  { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+.asm-hint {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+/* Alt raf */
+.asm-shelf {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 116px;
+  padding: 10px;
+  background: rgba(255, 255, 255, .55);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.asm-piece {
+  width: 92px;
+  height: 92px;
+  min-width: 64px;
+  touch-action: none;
+  cursor: grab;
+  position: relative;
+  padding: 4px;
+  background: rgba(255, 255, 255, .9);   /* tutamaç plakası: minik parça da kutu gibi tutulur */
+  border: 3px dashed rgba(74, 59, 42, .22);
+  border-radius: 18px;
+  filter: drop-shadow(0 4px 6px rgba(74, 59, 42, .2));
+}
+.asm-piece svg { width: 100%; height: 100%; pointer-events: none; }
+.asm-piece.dragging { z-index: 30; cursor: grabbing; filter: drop-shadow(0 10px 14px rgba(74, 59, 42, .3)); }
+.asm-piece.returning { transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+.asm-piece.placed { opacity: 0; pointer-events: none; }
+
+/* Bitiş: oyuncak + sevinç dansı */
+.asm-done {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  animation: pop-in .3s ease;
+}
+.asm-toy { width: min(50vw, 200px); animation: fill-pop .5s ease; }
+.asm-toy svg { width: 100%; height: auto; }
+.asm-dance { width: min(38vw, 150px); animation: joy-dance .55s ease-in-out infinite alternate; }
+.asm-dance svg { width: 100%; height: auto; }
+@keyframes joy-dance {
+  from { transform: translateY(0) rotate(-7deg); }
+  to   { transform: translateY(-16px) rotate(7deg); }
+}
+.asm-banner {
+  font-size: 24px;
+  font-weight: bold;
+  background: var(--card);
+  border-radius: 999px;
+  padding: 12px 26px;
+  box-shadow: var(--shadow);
+  animation: pop-in .4s ease .2s both;
+}
+
+/* == css/scenes-meta.css == */
+/* Yuvo — Meta sahne stilleri: home (Yuva), album (Güneş Çayırı), minigame (Eşle & Bul).
+   Sahip: scenes-meta ajanı. Dokunma hedefleri ≥64px (docs/10 §2); yatay taşma yok. */
+
+/* ============================== HOME (Yuva) ============================== */
+.home-scene {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(to bottom,
+    var(--sky) 0%, #DFF3FF 30%, var(--bg) 46%,
+    var(--meadow) 62%, var(--meadow-deep) 100%);
+}
+
+/* Gök dekoru */
+.home-sky { position: absolute; inset: 0 0 auto 0; height: 44%; pointer-events: none; }
+.home-sun {
+  position: absolute; top: 18px; right: 22px; width: 74px; height: 74px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, #FFE79A, var(--sun) 62%, #F5B93A);
+  box-shadow: 0 0 36px 12px rgba(255, 211, 77, .55);
+  animation: home-sun-breathe 4s ease-in-out infinite alternate;
+}
+@keyframes home-sun-breathe {
+  from { box-shadow: 0 0 26px 8px rgba(255, 211, 77, .45); }
+  to   { box-shadow: 0 0 44px 16px rgba(255, 211, 77, .65); }
+}
+.home-cloud {
+  position: absolute; height: 26px; width: 74px; border-radius: 999px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 22px -12px 0 -4px rgba(255, 255, 255, .92),
+              44px -2px 0 -6px rgba(255, 255, 255, .85);
+  animation: home-cloud-drift linear infinite;
+}
+.home-cloud.c1 { top: 34px; left: -90px; animation-duration: 42s; }
+.home-cloud.c2 { top: 86px; left: -140px; animation-duration: 58s; transform: scale(.75); }
+@keyframes home-cloud-drift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(100vw + 200px)); }
+}
+
+/* Albüm ilerleme şeridi */
+.home-progress {
+  position: relative; z-index: 2;
+  margin: 12px 14px 0;
+  min-height: 64px;
+  border: none; border-radius: var(--radius);
+  background: rgba(255, 255, 255, .88);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; align-items: stretch; justify-content: center;
+  gap: 6px; padding: 10px 16px;
+  font-family: inherit; font-size: 16px; color: var(--ink); cursor: pointer;
+  text-align: left;
+}
+.home-progress:active { transform: scale(.98); }
+.home-progress-label b { color: var(--accent-deep); }
+.home-progress-bar {
+  display: block; height: 10px; border-radius: 999px;
+  background: rgba(74, 59, 42, .12); overflow: hidden;
+}
+.home-progress-fill {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--sun), var(--accent));
+  transition: width .4s ease;
+}
+
+/* Yuva sepeti */
+.home-nest-wrap { position: relative; z-index: 2; padding: 14px 14px 0; text-align: center; }
+.home-hint { font-size: 16px; font-weight: bold; color: var(--ink); margin-bottom: 8px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .6); }
+.home-nest { position: relative; width: min(340px, 92%); margin: 0 auto; }
+.home-eggs {
+  position: relative; z-index: 2;
+  display: flex; justify-content: center; align-items: flex-end;
+  gap: 2px; margin-bottom: -30px; min-height: 64px;
+}
+.home-egg {
+  width: 64px; height: 72px; min-width: 64px; min-height: 64px;
+  margin: 0;
+  border: none; background: transparent; padding: 0; cursor: pointer;
+  animation: home-egg-bob 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * .35s);
+  filter: drop-shadow(0 3px 4px rgba(74, 59, 42, .25));
+}
+.home-egg:active { transform: scale(.92); }
+.home-egg svg { width: 100%; height: 100%; }
+@keyframes home-egg-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-5px) rotate(2deg); }
+}
+.home-egg-more {
+  align-self: center; z-index: 3;
+  background: var(--accent); color: #fff; font-weight: bold; font-size: 14px;
+  border-radius: 999px; padding: 6px 10px; margin-left: 4px;
+  box-shadow: var(--shadow);
+}
+.home-nest-empty { font-size: 30px; z-index: 2; align-self: center; }
+.home-basket {
+  position: relative; height: 62px;
+  border-radius: 14px 14px 70px 70px / 10px 10px 52px 52px;
+  background: repeating-linear-gradient(45deg, #C98A4B 0 9px, #B4763B 9px 18px);
+  border-top: 7px solid #8F5A2B;
+  box-shadow: inset 0 8px 12px rgba(74, 42, 20, .35), var(--shadow);
+}
+.home-art-fallback { font-size: 40px; line-height: 1; display: inline-block; }
+
+/* Gün sonu paneli */
+.home-dayend {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 20px 18px 6px;
+}
+.home-dayend .btn { width: min(340px, 100%); }
+.home-extra small { font-weight: normal; opacity: .9; }
+.home-note {
+  font-size: 14px; color: var(--ink); text-align: center;
+  background: rgba(255, 255, 255, .75); border-radius: 999px; padding: 6px 14px;
+  max-width: 100%;
+}
+
+/* Çayır + gezinen Pufiler */
+.home-meadow { position: relative; flex: 1; min-height: 170px; margin-top: 8px; }
+.home-grass {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 46px;
+  background:
+    radial-gradient(circle at 12% 120%, var(--meadow-deep) 22%, transparent 23%),
+    radial-gradient(circle at 30% 130%, #6DBB40 26%, transparent 27%),
+    radial-gradient(circle at 52% 118%, var(--meadow-deep) 22%, transparent 23%),
+    radial-gradient(circle at 72% 132%, #6DBB40 26%, transparent 27%),
+    radial-gradient(circle at 90% 120%, var(--meadow-deep) 22%, transparent 23%);
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+.home-meadow-hint {
+  position: absolute; left: 0; right: 0; bottom: 54px;
+  text-align: center; font-size: 15px; color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+  padding: 0 20px;
+}
+.home-roamer {
+  position: absolute; bottom: 16px;
+  width: 76px; height: 76px; min-width: 56px; min-height: 56px;
+  border: none; background: transparent; padding: 0; cursor: pointer;
+  animation-name: home-roam;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  z-index: 2;
+}
+.home-roamer.alt { animation-direction: alternate-reverse; }
+@keyframes home-roam {
+  from { transform: translateX(0); }
+  to   { transform: translateX(72px); }
+}
+.home-roamer-body {
+  display: block; width: 100%; height: 100%;
+  animation: home-bob 1.3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 3px rgba(46, 82, 24, .35));
+}
+.home-roamer-body svg { width: 100%; height: 100%; }
+@keyframes home-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+.home-roamer-body.jump {
+  animation: home-jump .65s cubic-bezier(.3, 1.6, .5, 1);
+}
+@keyframes home-jump {
+  0%   { transform: translateY(0) scale(1, 1); }
+  25%  { transform: translateY(2px) scale(1.12, .82); }
+  55%  { transform: translateY(-30px) scale(.92, 1.1); }
+  80%  { transform: translateY(0) scale(1.06, .92); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* ============================== ALBUM (Güneş Çayırı) ============================== */
+.alb-scene { padding: 14px 14px calc(34px + env(safe-area-inset-bottom)); }
+
+.alb-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.alb-title { font-size: 22px; }
+.alb-shell {
+  background: var(--card); border-radius: 999px; padding: 8px 16px;
+  font-weight: bold; font-size: 16px; box-shadow: var(--shadow);
+  white-space: nowrap;
+}
+
+.alb-progress { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+.alb-progress-num { font-size: 16px; white-space: nowrap; }
+.alb-progress-num b { font-size: 20px; color: var(--accent-deep); }
+.alb-progress-bar {
+  flex: 1; height: 12px; border-radius: 999px;
+  background: rgba(74, 59, 42, .12); overflow: hidden;
+}
+.alb-progress-fill {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--sun), var(--accent));
+  transition: width .4s ease;
+}
+
+/* Kilometre taşı çipleri */
+.alb-chips { display: flex; gap: 8px; margin-bottom: 14px; }
+.alb-chip {
+  flex: 1; min-height: 64px; min-width: 0;
+  border: none; border-radius: var(--radius-sm);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font-family: inherit; cursor: pointer;
+  background: var(--card); color: var(--ink); box-shadow: var(--shadow);
+}
+.alb-chip b { font-size: 17px; }
+.alb-chip small { font-size: 14px; color: var(--ink-soft); white-space: nowrap; }
+/* Kilitli çip: metni soldurmadan yalnız zemini yumuşat (kontrast korunur) */
+.alb-chip.locked { background: rgba(255, 255, 255, .6); box-shadow: none; }
+.alb-chip.done { background: var(--bg2); }
+.alb-chip.done small { color: var(--meadow-deep); font-weight: bold; }
+.alb-chip.ready {
+  background: var(--sun);
+  animation: alb-chip-glow 1.1s ease-in-out infinite alternate;
+}
+.alb-chip.ready small { color: var(--ink); font-weight: bold; }
+@keyframes alb-chip-glow {
+  from { box-shadow: 0 0 4px rgba(242, 166, 27, .4); transform: scale(1); }
+  to   { box-shadow: 0 0 16px rgba(242, 166, 27, .85); transform: scale(1.04); }
+}
+
+/* Izgara: 30 hücre */
+.alb-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+  max-width: 100%;
+}
+.alb-cell {
+  position: relative; aspect-ratio: 1 / 1; min-width: 0; min-height: 64px;
+  border-radius: var(--radius-sm);
+  background: var(--card); cursor: pointer; padding: 6px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.alb-cell:active { transform: scale(.94); }
+.alb-cell svg { width: 100%; height: 100%; }
+.alb-cell.missing { background: var(--bg2); }
+.alb-cell.missing svg { opacity: .5; }
+.alb-q {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; font-weight: bold; color: var(--ink-soft);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
+  pointer-events: none;
+}
+.alb-q.big { position: static; font-size: 22px; color: #CBB8FF; text-shadow: none; }
+.alb-copy {
+  position: absolute; top: 3px; right: 3px;
+  background: var(--accent); color: #fff;
+  border-radius: 999px; font-size: 13px; font-weight: bold;
+  padding: 2px 7px; box-shadow: var(--shadow);
+  pointer-events: none;
+}
+.alb-art-fallback { font-size: 30px; line-height: 1; }
+.alb-art-fallback.dim { opacity: .4; }
+
+/* Ayrık gizli hücre — pastel gece-laciverti (sayfa diliyle uyumlu, ebeveyn alanıyla karışmaz) */
+.alb-secret-row {
+  display: flex; align-items: center; gap: 14px;
+  margin-top: 16px; padding: 12px;
+  background: linear-gradient(120deg, #574A8E, #7A6BB8);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.alb-secret {
+  flex: 0 0 84px; width: 84px; height: 84px; aspect-ratio: auto;
+  background: #241E42;
+}
+.alb-secret.missing { background: #241E42; }
+.alb-secret-label { color: #E8E0FF; font-size: 15px; font-weight: bold; }
+
+/* Detay modalı + Atölye */
+.alb-modal { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 8px; }
+.alb-modal-art {
+  width: 150px; height: 150px; border-radius: var(--radius);
+  background: var(--bg2); padding: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.alb-modal-art svg { width: 100%; height: 100%; }
+.alb-modal-art.missing svg { opacity: .55; }
+.alb-modal-name { font-size: 22px; }
+.alb-modal-tur { color: var(--ink-soft); font-size: 15px; }
+.alb-modal-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.alb-copy-tag {
+  background: var(--bg2); border-radius: 999px; padding: 4px 12px;
+  font-size: 13px; font-weight: bold; color: var(--ink);
+}
+.alb-bio { font-size: 15px; line-height: 1.45; color: var(--ink); font-style: italic; }
+.alb-workshop { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+.alb-workshop-note { font-size: 15px; color: var(--ink); }
+.alb-cost {
+  background: var(--bg2); border-radius: var(--radius-sm);
+  padding: 10px 14px; font-size: 15px; width: 100%;
+}
+.alb-craft-btn { width: 100%; }
+.alb-locked { font-size: 15px; color: var(--ink-soft); }
+
+/* Minik üretim töreni */
+.alb-craft-anim {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 16px 4px 8px;
+}
+.alb-craft-spark {
+  position: absolute; top: 4px; left: 50%;
+  font-size: 34px; pointer-events: none;
+  animation: alb-spark 1.6s ease-out forwards;
+}
+@keyframes alb-spark {
+  0%   { transform: translateX(-50%) scale(.4) rotate(0deg); opacity: 0; }
+  30%  { transform: translateX(-50%) scale(1.6) rotate(40deg); opacity: 1; }
+  100% { transform: translateX(-50%) scale(2.4) rotate(160deg); opacity: 0; }
+}
+.alb-pop { animation: alb-pop-in .55s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes alb-pop-in {
+  from { transform: scale(.3); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ============================== MINIGAME (Eşle & Bul) ============================== */
+.mg-scene {
+  position: relative; min-height: 100%;
+  padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 14px;
+  background: linear-gradient(to bottom, var(--bg), #FDE9C8);
+}
+.mg-title { font-size: 22px; }
+.mg-sub { font-size: 16px; color: var(--ink-soft); margin-top: 4px; }
+
+.mg-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  max-width: 420px; width: 100%; margin: 0 auto;
+  perspective: 900px;
+}
+.mg-card {
+  position: relative; aspect-ratio: 3 / 4; min-width: 0; min-height: 56px;
+  border: none; background: transparent; padding: 0; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mg-inner {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transition: transform .38s cubic-bezier(.4, .2, .2, 1);
+}
+.mg-card.flipped .mg-inner { transform: rotateY(180deg); }
+.mg-face {
+  position: absolute; inset: 0;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.mg-front {
+  font-size: 34px;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .35), transparent 55%),
+    linear-gradient(140deg, var(--accent), #F7A96B);
+  color: #fff;
+}
+.mg-back {
+  background: var(--card); padding: 8px;
+  transform: rotateY(180deg);
+}
+.mg-back svg { width: 100%; height: 100%; }
+.mg-art-fallback { font-size: 38px; line-height: 1; }
+.mg-card.matched { pointer-events: none; }
+.mg-card.matched .mg-back {
+  animation: mg-sparkle .9s ease;
+  box-shadow: 0 0 18px rgba(255, 211, 77, .95);
+}
+@keyframes mg-sparkle {
+  0%   { transform: rotateY(180deg) scale(1); filter: brightness(1); }
+  35%  { transform: rotateY(180deg) scale(1.12); filter: brightness(1.5); }
+  100% { transform: rotateY(180deg) scale(1); filter: brightness(1); }
+}
+
+/* Sonuç paneli */
+.mg-result {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(74, 59, 42, .4);
+  padding: 20px;
+  animation: mg-fade-in .3s ease;
+}
+@keyframes mg-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.mg-result-card {
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+  width: 100%; max-width: 340px; padding: 24px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  animation: alb-pop-in .4s cubic-bezier(.3, 1.6, .5, 1);
+}
+.mg-stars { display: flex; gap: 6px; font-size: 40px; }
+.mg-star { opacity: .35; transform: scale(.7); display: inline-block; }
+.mg-star.on {
+  opacity: 1;
+  animation: mg-star-pop .5s cubic-bezier(.3, 1.8, .5, 1) forwards;
+  animation-delay: var(--d, 0s);
+  transform: scale(.2);
+}
+@keyframes mg-star-pop {
+  from { transform: scale(.2) rotate(-30deg); }
+  to   { transform: scale(1) rotate(0deg); }
+}
+.mg-result-title { font-size: 21px; }
+.mg-note { font-size: 15px; color: var(--ink-soft); }
+.mg-reward { font-size: 26px; font-weight: bold; color: var(--accent-deep); }
+.mg-btns { width: 100%; }
+.mg-btns .btn { width: 100%; }
+
+/* ============================== Hareket azaltma ============================== */
+@media (prefers-reduced-motion: reduce) {
+  .home-sun, .home-cloud, .home-egg, .home-roamer, .home-roamer-body,
+  .alb-chip.ready, .mg-star.on { animation: none; }
+  .mg-star.on { transform: scale(1); }
+  .mg-inner { transition-duration: .01s; }
+}
+
+
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hud"></header>
+  <main id="scene-root"></main>
+  <nav id="bottom-nav"></nav>
+  <div id="overlay-root"></div>
+  <div id="toast-root"></div>
+</div>
+<script>
+/* == js/data/pufis.js == */
+/* Yuvo — Veri: nadirlik tablosu + Güneş Çayırı ailesi (31 Pufi). Sahip: engine ajanı. */
+(function () {
+  var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  Yuvo.data = Yuvo.data || {};
+
+  // simge: renk körlüğü için renk DIŞI nadirlik kodu (docs/10 §1 — desen+çerçeve+simge)
+  Yuvo.data.RARITIES = {
+    yaygin:    { ad:'Yaygın',     renk:'#9AA5B1', simge:'●', kabuk:1,  uretim:5,   oran:0.550 },
+    azbulunur: { ad:'Az Bulunur', renk:'#58B368', simge:'▲', kabuk:2,  uretim:10,  oran:0.250 },
+    nadir:     { ad:'Nadir',      renk:'#4FB8D8', simge:'◆', kabuk:4,  uretim:25,  oran:0.140 },
+    destansi:  { ad:'Destansı',   renk:'#B266E8', simge:'★', kabuk:10, uretim:80,  oran:0.046 },
+    efsanevi:  { ad:'Efsanevi',   renk:'#F2A61B', simge:'✹', kabuk:25, uretim:200, oran:0.009 },
+    gizli:     { ad:'Gizli',      renk:'#5C4A9E', simge:'☾', kabuk:60, uretim:300, oran:0.005 }
+  };
+
+  // Kademe sıralaması (düşükten yükseğe) — pity karşılaştırmaları için.
+  Yuvo.data.RARITY_ORDER = ['yaygin', 'azbulunur', 'nadir', 'destansi', 'efsanevi', 'gizli'];
+
+  // 31 Pufi — adlar/türler/biyografiler docs/v2/02 §2.3 tablosundan birebir;
+  // id/kind eşlemesi ARCHITECTURE.md'de sabit.
+  Yuvo.data.PUFIS = [
+    // Yaygın (12)
+    { id:'cikcik',   ad:'Cikcik',   tur:'Civciv',               kind:'civciv',        rarity:'yaygin',    bio:'Horoz çırağı; güneşten önce ötmeye çalışır, hep esner' },
+    { id:'pamus',    ad:'Pamuş',    tur:'Kuzu',                 kind:'kuzu',          rarity:'yaygin',    bio:'Bulutları koyun sanıp gökyüzüne "mee" der' },
+    { id:'vizbiz',   ad:'Vızbız',   tur:'Bal arıcığı',          kind:'ari',           rarity:'yaygin',    bio:'Bütün çiçeklerin adresini bilir, kendi kovanını unutur' },
+    { id:'molu',     ad:'Mölü',     tur:'Buzağı',               kind:'buzagi',        rarity:'yaygin',    bio:'Papatya koklamayı sever; her seferinde hapşırır' },
+    { id:'gidak',    ad:'Gıdak',    tur:'Tavukçuk',             kind:'tavuk',         rarity:'yaygin',    bio:'Sürpriz yumurta görünce heyecandan gıdaklar' },
+    { id:'badi',     ad:'Badi',     tur:'Ördek yavrusu',        kind:'ordek',         rarity:'yaygin',    bio:'Sıra olmayı hep şaşırır, hep en önde biter' },
+    { id:'hophop',   ad:'Hophop',   tur:'Çekirge',              kind:'cekirge',       rarity:'yaygin',    bio:'Zıplayışlarını sayar, hep "üç"te kaybolur' },
+    { id:'fistik',   ad:'Fıstık',   tur:'Yer sincabı',          kind:'sincap',        rarity:'yaygin',    bio:'Yanaklarında tohum saklar; yerini asla hatırlamaz' },
+    { id:'boncuk',   ad:'Boncuk',   tur:'Uğur böceği',          kind:'ugurbocegi',    rarity:'yaygin',    bio:'Sırtındaki puanları sayarken uyuyakalır' },
+    { id:'kivrik',   ad:'Kıvrık',   tur:'Solucancık',           kind:'solucan',       rarity:'yaygin',    bio:'Toprak altı tünellerin haritasını çizer' },
+    { id:'toprik',   ad:'Toprik',   tur:'Tarla faresi',         kind:'fare',          rarity:'yaygin',    bio:'Hasat şarkıları mırıldanır' },
+    { id:'cigdem',   ad:'Çiğdem',   tur:'Çayır çiçeği perisi',  kind:'peri',          rarity:'yaygin',    bio:'Sabah çiyinden kendine minicik taçlar yapar' },
+    // Az Bulunur (9)
+    { id:'pirpir',   ad:'Pırpır',   tur:'Kelebek',              kind:'kelebek',       rarity:'azbulunur', bio:'Her sabah kanat desenini değiştirir; ikisi asla eş olmaz' },
+    { id:'zipzip',   ad:'Zıpzıp',   tur:'Yavru tavşan',         kind:'tavsan',        rarity:'azbulunur', bio:'Havuç değil çilek delisi; kimseye söylemeyin' },
+    { id:'civil',    ad:'Cıvıl',    tur:'Serçe',                kind:'serce',         rarity:'azbulunur', bio:'Her melodiyi ezberler — hep yanlış' },
+    { id:'evcik',    ad:'Evcik',    tur:'Salyangoz',            kind:'salyangoz',     rarity:'azbulunur', bio:'Kabuğunu misafire açar, papatya çayı ikram eder' },
+    { id:'dikenik',  ad:'Dikenik',  tur:'Kirpi',                kind:'kirpi',         rarity:'azbulunur', bio:'Sarılmayı çok ister; herkes uzaktan sarılır' },
+    { id:'kosti',    ad:'Kösti',    tur:'Köstebek',             kind:'kostebek',      rarity:'azbulunur', bio:'Gözlüğünü toprakta unutur, yine de yolu bulur' },
+    { id:'meke',     ad:'Meke',     tur:'Oğlak',                kind:'oglak',         rarity:'azbulunur', bio:'Kafa tokuşturmayı selamlaşma sanır' },
+    { id:'findik',   ad:'Fındık',   tur:'Çoban köpeği yavrusu', kind:'kopek',         rarity:'azbulunur', bio:'Kuzular yerine kelebekleri güder' },
+    { id:'kirinti',  ad:'Kırıntı',  tur:'Karınca',              kind:'karinca',       rarity:'azbulunur', bio:'Yüz kat büyük yük taşır; teşekkür bekler' },
+    // Nadir (6)
+    { id:'petek',    ad:'Petek',    tur:'Arı kraliçesi',        kind:'arikralice',    rarity:'nadir',     bio:'Baldan tacı güneşte parlar; Vızbız\'ın tek hatırladığı adres' },
+    { id:'ibik',     ad:'İbik',     tur:'Horoz',                kind:'horoz',         rarity:'nadir',     bio:'Sesini sezonda bir kez tam ayarında bulur; o gün bayramdır' },
+    { id:'yele',     ad:'Yele',     tur:'Midilli',              kind:'midilli',       rarity:'nadir',     bio:'Koşarken yelesinden altın toz savrulur' },
+    { id:'makas',    ad:'Makas',    tur:'Kırlangıç',            kind:'kirlangic',     rarity:'nadir',     bio:'Kuyruğuyla bulutları ikiye böler' },
+    { id:'tavus',    ad:'Tavus',    tur:'Tavuskuşu',            kind:'tavuskusu',     rarity:'nadir',     bio:'Kuyruğunu yalnızca içten bir iltifat duyunca açar' },
+    { id:'ipekce',   ad:'İpekçe',   tur:'İpek örümceği',        kind:'orumcek',       rarity:'nadir',     bio:'Çayıra sabah çiyinden dantel örer' },
+    // Destansı (2)
+    { id:'bogac',    ad:'Boğaç',    tur:'Güneş buzağısı',       kind:'gunesbuzagisi', rarity:'destansi',  bio:'Boynuzları gün doğumu ışığı saçar; kışın çayırı o ısıtır' },
+    { id:'safak',    ad:'Şafak',    tur:'Altın tarlakuşu',      kind:'tarlakusu',     rarity:'destansi',  bio:'Sabahı onun şarkısı getirir; geç kalkarsa sis basar' },
+    // Efsanevi (1)
+    { id:'gundogan', ad:'Gündoğan', tur:'Güneş kuşu',           kind:'guneskusu',     rarity:'efsanevi',  bio:'Kanat çırpınca altın polen yağar; adanın ilk sabahının şarkısını hatırlayan tek Pufi' },
+    // Gizli (1)
+    { id:'hisir',    ad:'Hışır',    tur:'Korkuluk Pufisi',      kind:'korkuluk',      rarity:'gizli',     bio:'Herkes onu cansız sanır; ay ışığında tek başına dans eder' }
+  ];
+
+  // Yardımcı: id → Pufi kaydı (bulunamazsa null).
+  Yuvo.data.pufiById = function (id) {
+    var list = Yuvo.data.PUFIS;
+    for (var i = 0; i < list.length; i++) { if (list[i].id === id) return list[i]; }
+    return null;
+  };
+
+  // Yardımcı: kademe rank'ı (yaygin=0 … gizli=5); bilinmeyen → -1.
+  Yuvo.data.rarityRank = function (rarity) {
+    return Yuvo.data.RARITY_ORDER.indexOf(rarity);
+  };
+})();
+
+/* == js/art/pufi-svg.js == */
+/* Yuvo — pufi-svg.js (art-audio ajanı)
+   İnline SVG üretimi: yumurta, Pufi, silüet, oyuncak parçaları, birleşmiş oyuncak.
+   Stil: docs/10 "vinil oyuncak" — yuvarlak formlar, pastel + canlı vurgu,
+   yumuşak radyal gradyan + parlama noktası + kocaman gözler.
+   Tümü deterministik (id hash'i); gradient id'leri pufi id önekli (çakışma yok). */
+(function () {
+  window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  var Y = window.Yuvo;
+  Y.art = Y.art || {};
+
+  var SIL = '#3A3550';      // silüet rengi
+  var INK = '#2B2440';      // göz/ağız
+
+  /* ---------- küçük yardımcılar ---------- */
+
+  function N (x) { return Math.round(x * 100) / 100; }
+
+  function E (name, attrs, inner) {
+    var s = '<' + name;
+    for (var k in attrs) {
+      var v = attrs[k];
+      if (v === null || v === undefined || v === '') continue;
+      s += ' ' + k + '="' + v + '"';
+    }
+    return (inner === undefined || inner === null) ? s + '/>' : s + '>' + inner + '</' + name + '>';
+  }
+
+  function hash (s) {
+    s = String(s);
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+  }
+
+  function seeded (a) { // mulberry32
+    a = a >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function sanit (s) { return String(s).replace(/[^a-zA-Z0-9_-]/g, ''); }
+
+  // Aynı sanat aynı sayfada tekrar basıldığında gradient/clipPath id'leri
+  // çakışmasın diye artan örnek sayacı (geçerli DOM: id'ler belge içinde tekil).
+  var SEQ = 0;
+
+  /* ---------- çizim bağlamı (ctx) ---------- */
+
+  function makeCtx (id, opts) {
+    opts = opts || {};
+    var h = hash(id);
+    var c = {
+      id: id,
+      uid: 'yv-' + sanit(id) + '-' + (opts.tag || 'm') + '-' + (SEQ++),
+      sil: !!opts.sil,
+      mood: opts.mood === 'sleep' ? 'sleep' : 'happy',
+      defs: [],
+      E: E, N: N
+    };
+    // 0..1 arası deterministik mikro-varyasyon
+    c.v = function (n) { return ((h >>> ((n * 5) % 27)) & 31) / 31; };
+    // radyal vinil gradyanı; silüette düz koyu renk
+    c.g = function (name, lt, md, dk) {
+      if (c.sil) return SIL;
+      var gid = c.uid + '-' + name;
+      c.defs.push(
+        '<radialGradient id="' + gid + '" cx="0.35" cy="0.3" r="0.9">' +
+        '<stop offset="0" stop-color="' + lt + '"/>' +
+        '<stop offset="0.55" stop-color="' + md + '"/>' +
+        '<stop offset="1" stop-color="' + dk + '"/>' +
+        '</radialGradient>');
+      return 'url(#' + gid + ')';
+    };
+    c.f = function (col) { return c.sil ? SIL : col; };      // düz dolgu
+    c.st = function (col) { return c.sil ? SIL : col; };     // stroke rengi
+    c.o = function (v) { return c.sil ? 1 : v; };            // opaklık (silüette tam)
+    c.gloss = function (cx, cy, rx, ry) {                    // parlama noktası
+      if (c.sil) return '';
+      return E('ellipse', { cx: N(cx), cy: N(cy), rx: N(rx), ry: N(ry), fill: '#FFFFFF', opacity: 0.5 }) +
+             E('ellipse', { cx: N(cx + rx * 0.9), cy: N(cy + ry * 1.3), rx: N(rx * 0.35), ry: N(ry * 0.35), fill: '#FFFFFF', opacity: 0.25 });
+    };
+    c._hn = 0;
+    c.halo = function (col, cy, r) {                          // efsanevi/gizli ışıması
+      if (c.sil) return '';
+      var gid = c.uid + '-halo' + (c._hn++);
+      c.defs.push(
+        '<radialGradient id="' + gid + '" cx="0.5" cy="0.5" r="0.5">' +
+        '<stop offset="0" stop-color="' + col + '" stop-opacity="0.55"/>' +
+        '<stop offset="0.7" stop-color="' + col + '" stop-opacity="0.22"/>' +
+        '<stop offset="1" stop-color="' + col + '" stop-opacity="0"/>' +
+        '</radialGradient>');
+      return E('circle', { cx: 60, cy: cy || 58, r: r || 52, fill: 'url(#' + gid + ')' });
+    };
+    // kocaman gözler + ağız + yanaklar
+    c.face = function (cx, cy, o) {
+      if (c.sil) return '';
+      o = o || {};
+      var dx = (o.dx || 8) + (c.v(1) - 0.5) * 1.4;
+      var ey = cy - 2 + (o.ey || 0);
+      var r = o.r || 4.6;
+      var s = '';
+      var closed = (c.mood === 'sleep') || o.lidded;
+      if (closed) {
+        s += E('path', { d: 'M' + N(cx - dx - 4) + ' ' + N(ey) + ' Q' + N(cx - dx) + ' ' + N(ey + 4) + ' ' + N(cx - dx + 4) + ' ' + N(ey),
+                         stroke: INK, 'stroke-width': 2.6, fill: 'none', 'stroke-linecap': 'round' });
+        s += E('path', { d: 'M' + N(cx + dx - 4) + ' ' + N(ey) + ' Q' + N(cx + dx) + ' ' + N(ey + 4) + ' ' + N(cx + dx + 4) + ' ' + N(ey),
+                         stroke: INK, 'stroke-width': 2.6, fill: 'none', 'stroke-linecap': 'round' });
+      } else {
+        if (o.onDark) {
+          s += E('circle', { cx: N(cx - dx), cy: N(ey), r: N(r + 1.6), fill: '#FFF8F0' });
+          s += E('circle', { cx: N(cx + dx), cy: N(ey), r: N(r + 1.6), fill: '#FFF8F0' });
+        }
+        s += E('circle', { cx: N(cx - dx), cy: N(ey), r: N(r), fill: INK });
+        s += E('circle', { cx: N(cx + dx), cy: N(ey), r: N(r), fill: INK });
+        if (!o.noHi) {
+          s += E('circle', { cx: N(cx - dx - r * 0.32), cy: N(ey - r * 0.36), r: N(r * 0.36), fill: '#FFFFFF' });
+          s += E('circle', { cx: N(cx + dx - r * 0.32), cy: N(ey - r * 0.36), r: N(r * 0.36), fill: '#FFFFFF' });
+        }
+      }
+      if (o.mouth !== 'none') {
+        var my = ey + (o.my || 8);
+        if (closed) {
+          s += E('path', { d: 'M' + N(cx - 2.5) + ' ' + N(my) + ' Q' + N(cx) + ' ' + N(my + 2) + ' ' + N(cx + 2.5) + ' ' + N(my),
+                           stroke: INK, 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' });
+        } else {
+          s += E('path', { d: 'M' + N(cx - 4) + ' ' + N(my) + ' Q' + N(cx) + ' ' + N(my + 3.5) + ' ' + N(cx + 4) + ' ' + N(my),
+                           stroke: INK, 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' });
+        }
+      }
+      if (o.cheeks !== false) {
+        var co = 0.4 + c.v(2) * 0.2;
+        s += E('ellipse', { cx: N(cx - dx - 6.5), cy: N(ey + 6), rx: 3.6, ry: 2.3, fill: '#FF9EAE', opacity: N(co) });
+        s += E('ellipse', { cx: N(cx + dx + 6.5), cy: N(ey + 6), rx: 3.6, ry: 2.3, fill: '#FF9EAE', opacity: N(co) });
+      }
+      return s;
+    };
+    return c;
+  }
+
+  function svgWrap (c, inner) {
+    var defs = c.defs.length ? '<defs>' + c.defs.join('') + '</defs>' : '';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" aria-hidden="true">' + defs + inner + '</svg>';
+  }
+
+  /* ---------- ortak gövde şablonları ---------- */
+
+  function feet (c, col) {
+    return E('ellipse', { cx: 50, cy: 100, rx: 6, ry: 3.4, fill: c.f(col) }) +
+           E('ellipse', { cx: 70, cy: 100, rx: 6, ry: 3.4, fill: c.f(col) });
+  }
+
+  function birdBody (c, lt, md, dk, o) {
+    o = o || {};
+    var s = E('ellipse', { cx: 60, cy: 76, rx: o.rx || 25, ry: o.ry || 22, fill: c.g('bd', lt, md, dk) });
+    s += E('ellipse', { cx: 38, cy: 78, rx: 8, ry: 13, fill: c.f(dk), transform: 'rotate(20 38 78)' });
+    s += E('ellipse', { cx: 82, cy: 78, rx: 8, ry: 13, fill: c.f(dk), transform: 'rotate(-20 82 78)' });
+    if (o.belly) s += E('ellipse', { cx: 60, cy: 81, rx: 13, ry: 11, fill: c.f(o.belly) });
+    s += feet(c, o.feet || '#F5A05A');
+    s += c.gloss(50, 66, 9, 6);
+    return s;
+  }
+
+  function mamBody (c, lt, md, dk, o) {
+    o = o || {};
+    var s = E('ellipse', { cx: 60, cy: 78, rx: o.rx || 26, ry: o.ry || 20, fill: c.g('bd', lt, md, dk) });
+    if (o.belly) s += E('ellipse', { cx: 60, cy: 82, rx: 13, ry: 11, fill: c.f(o.belly) });
+    s += E('ellipse', { cx: 47, cy: 96, rx: 7, ry: 4.4, fill: c.f(dk) });
+    s += E('ellipse', { cx: 73, cy: 96, rx: 7, ry: 4.4, fill: c.f(dk) });
+    s += c.gloss(49, 69, 9, 5.5);
+    return s;
+  }
+
+  function bugBody (c, lt, md, dk, o) {
+    o = o || {};
+    var s = E('ellipse', { cx: 60, cy: 78, rx: o.rx || 19, ry: o.ry || 15, fill: c.g('bd', lt, md, dk) });
+    s += E('circle', { cx: 50, cy: 94, r: 3.2, fill: c.f(dk) });
+    s += E('circle', { cx: 70, cy: 94, r: 3.2, fill: c.f(dk) });
+    s += c.gloss(52, 71, 7, 4.5);
+    return s;
+  }
+
+  function headBall (c, lt, md, dk, o) {
+    o = o || {};
+    var r = o.r || 19, cy = o.cy || 43;
+    var s = E('circle', { cx: 60, cy: cy, r: r, fill: c.g('hd', lt, md, dk) });
+    s += c.gloss(60 - r * 0.42, cy - r * 0.42, r * 0.3, r * 0.2);
+    if (o.pre) s += o.pre;
+    s += c.face(60, cy + 2, o.face || {});
+    if (o.post) s += o.post;
+    return s;
+  }
+
+  function beak (c, col, cy, w) {
+    w = w || 8;
+    return E('path', { d: 'M' + N(60 - w / 2) + ' ' + N(cy) + ' Q60 ' + N(cy + 8) + ' ' + N(60 + w / 2) + ' ' + N(cy) +
+                          ' Q60 ' + N(cy + 3) + ' ' + N(60 - w / 2) + ' ' + N(cy) + ' Z',
+                       fill: c.f(col), 'stroke-linejoin': 'round' });
+  }
+
+  function antennae (c, col, o) {
+    o = o || {};
+    var y0 = o.y0 || 28, len = o.len || 14, spread = o.spread || 10;
+    var s = '';
+    s += E('path', { d: 'M' + N(60 - spread) + ' ' + N(y0) + ' Q' + N(56 - spread) + ' ' + N(y0 - len) + ' ' + N(48 - spread) + ' ' + N(y0 - len - 2),
+                     stroke: c.st(col), 'stroke-width': 2.4, fill: 'none', 'stroke-linecap': 'round' });
+    s += E('path', { d: 'M' + N(60 + spread) + ' ' + N(y0) + ' Q' + N(64 + spread) + ' ' + N(y0 - len) + ' ' + N(72 + spread) + ' ' + N(y0 - len - 2),
+                     stroke: c.st(col), 'stroke-width': 2.4, fill: 'none', 'stroke-linecap': 'round' });
+    s += E('circle', { cx: N(48 - spread), cy: N(y0 - len - 2), r: 2.6, fill: c.f(col) });
+    s += E('circle', { cx: N(72 + spread), cy: N(y0 - len - 2), r: 2.6, fill: c.f(col) });
+    return s;
+  }
+
+  function crest (c, col, cx, cy) { // tepe tüyü (3 çizgi)
+    return E('path', { d: 'M' + N(cx - 6) + ' ' + N(cy + 7) + ' Q' + N(cx - 8) + ' ' + N(cy - 2) + ' ' + N(cx - 4) + ' ' + N(cy),
+                       stroke: c.st(col), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+           E('path', { d: 'M' + N(cx) + ' ' + N(cy + 5) + ' Q' + N(cx) + ' ' + N(cy - 5) + ' ' + N(cx + 1) + ' ' + N(cy - 1),
+                       stroke: c.st(col), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+           E('path', { d: 'M' + N(cx + 6) + ' ' + N(cy + 7) + ' Q' + N(cx + 9) + ' ' + N(cy - 1) + ' ' + N(cx + 5) + ' ' + N(cy + 1),
+                       stroke: c.st(col), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' });
+  }
+
+  function combShape (c, col, big) { // horoz/tavuk ibiği
+    var s = E('path', { d: big
+      ? 'M46 26 Q48 10 55 20 Q58 6 64 18 Q70 8 74 24 Q62 30 46 26 Z'
+      : 'M50 26 Q52 16 57 23 Q60 13 64 22 Q68 16 70 26 Q60 30 50 26 Z',
+      fill: c.f(col), 'stroke-linejoin': 'round' });
+    return s;
+  }
+
+  /* ---------- kind çizicileri (31) ---------- */
+  /* Her çizici: { b0 (arkada), govde, bas, a1 (önde) } döndürür.
+     toyParts: aksesuar = b0 + a1. */
+
+  var KINDS = {};
+
+  KINDS._def = function (c) { // güvenli varsayılan blob
+    return {
+      govde: E('ellipse', { cx: 60, cy: 76, rx: 24, ry: 21, fill: c.g('bd', '#EFE6F8', '#D8C8EE', '#B8A4D8') }) + c.gloss(50, 66, 9, 6),
+      bas: headBall(c, '#EFE6F8', '#D8C8EE', '#B8A4D8', {}),
+      a1: crest(c, '#B8A4D8', 60, 22)
+    };
+  };
+
+  KINDS.civciv = function (c) {
+    return {
+      govde: birdBody(c, '#FFF6C9', '#FFE083', '#EFBE4C', { feet: '#F5A05A' }),
+      bas: headBall(c, '#FFF6C9', '#FFE083', '#EFBE4C', { r: 20, cy: 42, face: { mouth: 'none' } }) + beak(c, '#F5A05A', 51, 7),
+      a1: crest(c, '#EFBE4C', 60, 20)
+    };
+  };
+
+  KINDS.kuzu = function (c) {
+    var wool = '';
+    var bumps = [[46, 26, 8], [56, 22, 9], [67, 23, 9], [76, 28, 7], [40, 33, 6], [80, 35, 6]];
+    for (var i = 0; i < bumps.length; i++) {
+      wool += E('circle', { cx: bumps[i][0], cy: bumps[i][1], r: bumps[i][2], fill: c.g('w' + i, '#FFFDF8', '#F3ECDD', '#DFD4C0') });
+    }
+    return {
+      govde: mamBody(c, '#FFFDF8', '#F3ECDD', '#D8CCB6', {}),
+      bas: headBall(c, '#FFF6EC', '#F8DFD0', '#E0BCA8', { r: 18, cy: 44 }),
+      a1: wool +
+        E('ellipse', { cx: 38, cy: 46, rx: 5.5, ry: 9, fill: c.f('#F3ECDD'), transform: 'rotate(24 38 46)' }) +
+        E('ellipse', { cx: 82, cy: 46, rx: 5.5, ry: 9, fill: c.f('#F3ECDD'), transform: 'rotate(-24 82 46)' }) +
+        E('ellipse', { cx: 38, cy: 47, rx: 2.6, ry: 5, fill: c.f('#F4A9B8'), transform: 'rotate(24 38 47)', opacity: c.o(0.7) }) +
+        E('ellipse', { cx: 82, cy: 47, rx: 2.6, ry: 5, fill: c.f('#F4A9B8'), transform: 'rotate(-24 82 47)', opacity: c.o(0.7) })
+    };
+  };
+
+  function beeDraw (c, queen) {
+    var b0 = E('ellipse', { cx: 42, cy: 58, rx: 9, ry: 15, fill: c.f('#EAF6FF'), opacity: c.o(0.85), transform: 'rotate(24 42 58)' }) +
+             E('ellipse', { cx: 78, cy: 58, rx: 9, ry: 15, fill: c.f('#EAF6FF'), opacity: c.o(0.85), transform: 'rotate(-24 78 58)' });
+    var govde = bugBody(c, '#FFEFA8', '#FFD95C', '#E8B83A', { rx: queen ? 21 : 19 }) +
+      E('ellipse', { cx: 60, cy: 74, rx: queen ? 19 : 17.5, ry: 3.6, fill: c.f('#4A4238') }) +
+      E('ellipse', { cx: 60, cy: 84, rx: queen ? 16 : 14.5, ry: 3.4, fill: c.f('#4A4238') });
+    var bas = headBall(c, '#FFEFA8', '#FFD95C', '#E8B83A', { r: 16, cy: 48, face: { dx: 7 } });
+    var a1 = antennae(c, '#4A4238', { y0: 34, len: 12, spread: 8 });
+    if (queen) {
+      a1 += E('path', { d: 'M50 24 L53 15 L57 20 L60 12 L63 20 L67 15 L70 24 Q60 28 50 24 Z',
+                        fill: c.f('#F2C14E'), 'stroke-linejoin': 'round' }) +
+            E('circle', { cx: 60, cy: 12, r: 2, fill: c.f('#FF6F61') });
+    }
+    return { b0: b0, govde: govde, bas: bas, a1: a1 };
+  }
+  KINDS.ari = function (c) { return beeDraw(c, false); };
+  KINDS.arikralice = function (c) { return beeDraw(c, true); };
+
+  KINDS.buzagi = function (c) {
+    return {
+      govde: mamBody(c, '#F6E3CC', '#E8C9A8', '#C9A176', {}) +
+        E('ellipse', { cx: 73, cy: 73, rx: 8, ry: 6, fill: c.f('#B98A5E'), opacity: c.o(0.8) }),
+      bas: headBall(c, '#F6E3CC', '#E8C9A8', '#C9A176', { r: 19, cy: 43, face: { mouth: 'none', ey: -2 } }) +
+        E('ellipse', { cx: 60, cy: 53, rx: 11, ry: 7, fill: c.f('#F7DFC8') }) +
+        E('circle', { cx: 56, cy: 53, r: 1.5, fill: c.f('#B98A5E') }) +
+        E('circle', { cx: 64, cy: 53, r: 1.5, fill: c.f('#B98A5E') }),
+      a1: E('path', { d: 'M47 27 Q44 18 50 19 Q53 24 50 28 Z', fill: c.f('#EFE3D0'), 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M73 27 Q76 18 70 19 Q67 24 70 28 Z', fill: c.f('#EFE3D0'), 'stroke-linejoin': 'round' }) +
+          E('ellipse', { cx: 39, cy: 38, rx: 7, ry: 4.4, fill: c.f('#E8C9A8'), transform: 'rotate(-22 39 38)' }) +
+          E('ellipse', { cx: 81, cy: 38, rx: 7, ry: 4.4, fill: c.f('#E8C9A8'), transform: 'rotate(22 81 38)' })
+    };
+  };
+
+  KINDS.tavuk = function (c) {
+    return {
+      b0: E('ellipse', { cx: 85, cy: 70, rx: 7, ry: 11, fill: c.f('#D9CDB9'), transform: 'rotate(-35 85 70)' }),
+      govde: birdBody(c, '#FFFDF6', '#F5EDDE', '#D9CDB9', { feet: '#F5A623' }),
+      bas: headBall(c, '#FFFDF6', '#F5EDDE', '#D9CDB9', { r: 19, cy: 43, face: { mouth: 'none' } }) + beak(c, '#F5A623', 52, 7),
+      a1: combShape(c, '#FF6B6B', false) +
+          E('ellipse', { cx: 60, cy: 61, rx: 3, ry: 4, fill: c.f('#FF6B6B') })
+    };
+  };
+
+  KINDS.ordek = function (c) {
+    return {
+      b0: E('path', { d: 'M84 68 Q94 62 90 54', stroke: c.st('#EFC44E'), 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }),
+      govde: birdBody(c, '#FFF3B8', '#FFE27A', '#EFC44E', { feet: '#FF9E3D' }),
+      bas: headBall(c, '#FFF3B8', '#FFE27A', '#EFC44E', { r: 19, cy: 42, face: { mouth: 'none', ey: -2 } }),
+      a1: E('ellipse', { cx: 60, cy: 53, rx: 11, ry: 4.8, fill: c.f('#FF9E3D') }) +
+          E('circle', { cx: 56, cy: 51.5, r: 1.1, fill: c.f('#E07A1E') }) +
+          E('circle', { cx: 64, cy: 51.5, r: 1.1, fill: c.f('#E07A1E') }) +
+          (c.sil ? '' : E('ellipse', { cx: 55, cy: 52, rx: 3, ry: 1.2, fill: '#FFFFFF', opacity: 0.4 }))
+    };
+  };
+
+  KINDS.cekirge = function (c) {
+    return {
+      b0: E('path', { d: 'M44 86 L33 68 L38 92', stroke: c.st('#6CB84A'), 'stroke-width': 6, fill: 'none',
+                      'stroke-linecap': 'round', 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M76 86 L87 68 L82 92', stroke: c.st('#6CB84A'), 'stroke-width': 6, fill: 'none',
+                      'stroke-linecap': 'round', 'stroke-linejoin': 'round' }),
+      govde: bugBody(c, '#C9EF9E', '#9ADB6E', '#6CB84A', { rx: 21, ry: 14 }),
+      bas: headBall(c, '#C9EF9E', '#9ADB6E', '#6CB84A', { r: 15, cy: 50, face: { dx: 6.5 } }),
+      a1: antennae(c, '#6CB84A', { y0: 37, len: 18, spread: 7 })
+    };
+  };
+
+  KINDS.sincap = function (c) {
+    return {
+      b0: E('path', { d: 'M78 90 Q106 86 102 56 Q99 36 82 42 Q94 54 86 66 Q78 78 74 88 Z',
+                      fill: c.g('tl', '#E8A25E', '#C97B3C', '#A85E28'), 'stroke-linejoin': 'round' }) +
+          (c.sil ? '' : E('path', { d: 'M84 84 Q100 78 96 58', stroke: '#F2C69E', 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', opacity: 0.7 })),
+      govde: mamBody(c, '#F8CFA0', '#E8A25E', '#C97B3C', { rx: 24, belly: '#FFE9CF' }),
+      bas: headBall(c, '#F8CFA0', '#E8A25E', '#C97B3C', { r: 18, cy: 44, face: { dx: 7.5 } }),
+      a1: E('circle', { cx: 47, cy: 27, r: 5.5, fill: c.f('#E8A25E') }) +
+          E('circle', { cx: 73, cy: 27, r: 5.5, fill: c.f('#E8A25E') }) +
+          E('circle', { cx: 47, cy: 27.5, r: 2.6, fill: c.f('#C97B3C') }) +
+          E('circle', { cx: 73, cy: 27.5, r: 2.6, fill: c.f('#C97B3C') })
+    };
+  };
+
+  KINDS.ugurbocegi = function (c) {
+    var spots = '';
+    var sp = [[50, 68], [70, 68], [46, 80], [74, 80], [60, 86]];
+    for (var i = 0; i < sp.length; i++) spots += E('circle', { cx: sp[i][0], cy: sp[i][1], r: 3, fill: c.f('#4A4238') });
+    return {
+      govde: E('ellipse', { cx: 60, cy: 82, rx: 19, ry: 13, fill: c.g('bd', '#7A7060', '#5A5248', '#443E36') }) +
+        E('circle', { cx: 48, cy: 96, r: 3, fill: c.f('#443E36') }) +
+        E('circle', { cx: 72, cy: 96, r: 3, fill: c.f('#443E36') }),
+      bas: headBall(c, '#6A6054', '#4A4238', '#332E28', { r: 14, cy: 46, face: { dx: 6, r: 3.8, onDark: true, my: 7 } }),
+      a1: E('path', { d: 'M41 80 Q41 58 60 58 Q79 58 79 80 Q60 90 41 80 Z',
+                      fill: c.g('sh', '#FF9E8E', '#FF6F61', '#E04C3E'), 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M60 58 L60 86', stroke: c.st('#B03A30'), 'stroke-width': 2, 'stroke-linecap': 'round' }) +
+          spots + c.gloss(50, 64, 6, 3.5) +
+          antennae(c, '#4A4238', { y0: 34, len: 9, spread: 6 })
+    };
+  };
+
+  KINDS.solucan = function (c) {
+    var tube = 'M30 94 Q44 100 54 92 Q64 84 62 74 Q60 64 68 57 Q74 51 75 46';
+    return {
+      govde: E('path', { d: tube, stroke: c.g('bd', '#FCD0C8', '#F5A9A0', '#E08578'), 'stroke-width': 15,
+                         fill: 'none', 'stroke-linecap': 'round' }) +
+        (c.sil ? '' : E('path', { d: tube, stroke: '#FFFFFF', 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round', opacity: 0.25 })),
+      bas: E('circle', { cx: 76, cy: 42, r: 13, fill: c.g('hd', '#FCD0C8', '#F5A9A0', '#E08578') }) +
+        c.gloss(71, 37, 4, 2.8) + c.face(76, 43, { dx: 5.5, r: 3.6, my: 7 }),
+      a1: E('path', { d: 'M50 92 Q52 86 57 87', stroke: c.st('#E08578'), 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M60 74 Q64 72 67 74', stroke: c.st('#E08578'), 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M76 30 Q76 24 82 22', stroke: c.st('#8FBF6A'), 'stroke-width': 2.4, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('ellipse', { cx: 85, cy: 20, rx: 5, ry: 3, fill: c.f('#A8D878'), transform: 'rotate(-25 85 20)' })
+    };
+  };
+
+  KINDS.fare = function (c) {
+    return {
+      b0: E('path', { d: 'M82 90 Q102 92 100 78 Q98 70 90 74', stroke: c.st('#E8A0B0'), 'stroke-width': 3,
+                      fill: 'none', 'stroke-linecap': 'round' }),
+      govde: mamBody(c, '#E8EAF2', '#C9CDD8', '#A8AEC0', { rx: 24 }),
+      bas: headBall(c, '#E8EAF2', '#C9CDD8', '#A8AEC0', { r: 18, cy: 44, face: { mouth: 'none' } }) +
+        E('circle', { cx: 60, cy: 52, r: 2.6, fill: c.f('#E8879E') }),
+      a1: E('circle', { cx: 43, cy: 27, r: 11, fill: c.g('e1', '#E8EAF2', '#C9CDD8', '#A8AEC0') }) +
+          E('circle', { cx: 77, cy: 27, r: 11, fill: c.g('e2', '#E8EAF2', '#C9CDD8', '#A8AEC0') }) +
+          E('circle', { cx: 43, cy: 28, r: 6, fill: c.f('#FFC9D8') }) +
+          E('circle', { cx: 77, cy: 28, r: 6, fill: c.f('#FFC9D8') })
+    };
+  };
+
+  KINDS.peri = function (c) {
+    return {
+      b0: E('ellipse', { cx: 40, cy: 60, rx: 10, ry: 17, fill: c.f('#D8ECFF'), opacity: c.o(0.8), transform: 'rotate(20 40 60)' }) +
+          E('ellipse', { cx: 80, cy: 60, rx: 10, ry: 17, fill: c.f('#D8ECFF'), opacity: c.o(0.8), transform: 'rotate(-20 80 60)' }) +
+          E('ellipse', { cx: 44, cy: 78, rx: 7, ry: 11, fill: c.f('#E8F4FF'), opacity: c.o(0.75), transform: 'rotate(30 44 78)' }) +
+          E('ellipse', { cx: 76, cy: 78, rx: 7, ry: 11, fill: c.f('#E8F4FF'), opacity: c.o(0.75), transform: 'rotate(-30 76 78)' }),
+      govde: E('path', { d: 'M60 56 Q77 62 79 88 Q60 99 41 88 Q43 62 60 56 Z',
+                         fill: c.g('bd', '#EFE3FF', '#D8C2F0', '#B49BE0'), 'stroke-linejoin': 'round' }) +
+        E('circle', { cx: 52, cy: 100, r: 3, fill: c.f('#B49BE0') }) +
+        E('circle', { cx: 68, cy: 100, r: 3, fill: c.f('#B49BE0') }) +
+        c.gloss(51, 70, 7, 5),
+      bas: headBall(c, '#FFF0E0', '#FFE0CC', '#EFC0A8', { r: 17, cy: 42,
+        pre: E('path', { d: 'M44 40 Q44 24 60 24 Q76 24 76 40 Q68 32 60 33 Q52 32 44 40 Z',
+                         fill: c.f('#B98AE0'), 'stroke-linejoin': 'round' }),
+        face: { ey: 2 } }),
+      a1: E('circle', { cx: 50, cy: 26, r: 3.2, fill: c.f('#FF8FB8') }) + E('circle', { cx: 50, cy: 26, r: 1.3, fill: c.f('#FFF3D0') }) +
+          E('circle', { cx: 60, cy: 23, r: 3.2, fill: c.f('#FFD070') }) + E('circle', { cx: 60, cy: 23, r: 1.3, fill: c.f('#FFF8E8') }) +
+          E('circle', { cx: 70, cy: 26, r: 3.2, fill: c.f('#FF8FB8') }) + E('circle', { cx: 70, cy: 26, r: 1.3, fill: c.f('#FFF3D0') })
+    };
+  };
+
+  KINDS.kelebek = function (c) {
+    var wing = function (cx, cy, rx, ry, rot, n) {
+      return E('ellipse', { cx: cx, cy: cy, rx: rx, ry: ry, fill: c.g('w' + n, '#FFD6EA', '#FFB3D9', '#E888B8'),
+                            transform: 'rotate(' + rot + ' ' + cx + ' ' + cy + ')' });
+    };
+    return {
+      b0: wing(37, 52, 15, 20, -24, 1) + wing(83, 52, 15, 20, 24, 2) +
+          wing(42, 80, 10, 13, 18, 3) + wing(78, 80, 10, 13, -18, 4) +
+          E('circle', { cx: 37, cy: 48, r: 4.5, fill: c.f('#FFB56B'), opacity: c.o(0.9) }) +
+          E('circle', { cx: 83, cy: 48, r: 4.5, fill: c.f('#FFB56B'), opacity: c.o(0.9) }) +
+          E('circle', { cx: 42, cy: 80, r: 3, fill: c.f('#FFE9B8'), opacity: c.o(0.9) }) +
+          E('circle', { cx: 78, cy: 80, r: 3, fill: c.f('#FFE9B8'), opacity: c.o(0.9) }),
+      govde: E('ellipse', { cx: 60, cy: 74, rx: 10, ry: 19, fill: c.g('bd', '#B4A4E0', '#8E7CC3', '#6E5CA8') }) +
+        c.gloss(56, 62, 3.5, 6),
+      bas: headBall(c, '#B4A4E0', '#8E7CC3', '#6E5CA8', { r: 13, cy: 46, face: { dx: 5.5, r: 3.8, my: 7 } }),
+      a1: E('path', { d: 'M54 36 Q48 24 42 22 Q46 26 45 29', stroke: c.st('#6E5CA8'), 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M66 36 Q72 24 78 22 Q74 26 75 29', stroke: c.st('#6E5CA8'), 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' })
+    };
+  };
+
+  KINDS.tavsan = function (c) {
+    return {
+      b0: E('circle', { cx: 84, cy: 88, r: 7, fill: c.f('#FFFFFF') }),
+      govde: mamBody(c, '#FFFFFF', '#F5F2EC', '#D8D2C6', {}),
+      bas: headBall(c, '#FFFFFF', '#F5F2EC', '#D8D2C6', { r: 18, cy: 44, face: { mouth: 'none' } }) +
+        E('path', { d: 'M57 52 Q60 55 63 52', stroke: c.st(INK), 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }) +
+        E('circle', { cx: 60, cy: 50, r: 2, fill: c.f('#F4A9B8') }),
+      a1: E('ellipse', { cx: 48, cy: 20, rx: 6.5, ry: 16, fill: c.g('e1', '#FFFFFF', '#F5F2EC', '#D8D2C6'), transform: 'rotate(-8 48 20)' }) +
+          E('ellipse', { cx: 72, cy: 20, rx: 6.5, ry: 16, fill: c.g('e2', '#FFFFFF', '#F5F2EC', '#D8D2C6'), transform: 'rotate(8 72 20)' }) +
+          E('ellipse', { cx: 48, cy: 22, rx: 3, ry: 11, fill: c.f('#FFC9D8'), transform: 'rotate(-8 48 22)' }) +
+          E('ellipse', { cx: 72, cy: 22, rx: 3, ry: 11, fill: c.f('#FFC9D8'), transform: 'rotate(8 72 22)' })
+    };
+  };
+
+  KINDS.serce = function (c) {
+    return {
+      b0: E('path', { d: 'M80 84 Q98 92 97 101 Q86 99 77 92 Z', fill: c.f('#A8825A'), 'stroke-linejoin': 'round' }),
+      govde: birdBody(c, '#E8CDA8', '#C9A176', '#A8825A', { feet: '#C98A4E', belly: '#F2E3CC' }),
+      bas: headBall(c, '#E8CDA8', '#C9A176', '#A8825A', { r: 18, cy: 43, face: { mouth: 'none' } }) + beak(c, '#6E5E4A', 51, 6),
+      a1: E('path', { d: 'M44 34 Q60 24 76 34', stroke: c.st('#A8825A'), 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', opacity: c.o(0.6) }) +
+          E('circle', { cx: 47, cy: 49, r: 2.4, fill: c.f('#6E5E4A'), opacity: c.o(0.7) }) +
+          E('circle', { cx: 73, cy: 49, r: 2.4, fill: c.f('#6E5E4A'), opacity: c.o(0.7) })
+    };
+  };
+
+  KINDS.salyangoz = function (c) {
+    return {
+      govde: E('path', { d: 'M26 96 Q24 86 36 84 L74 84 Q88 84 90 92 Q90 100 78 100 L38 100 Q28 100 26 96 Z',
+                         fill: c.g('bd', '#E2F5CC', '#C9E8B0', '#A0C888'), 'stroke-linejoin': 'round' }) +
+        E('ellipse', { cx: 36, cy: 74, rx: 9, ry: 13, fill: c.g('nk', '#E2F5CC', '#C9E8B0', '#A0C888'), transform: 'rotate(8 36 74)' }) +
+        c.gloss(34, 90, 8, 3),
+      bas: E('circle', { cx: 36, cy: 60, r: 12, fill: c.g('hd', '#E2F5CC', '#C9E8B0', '#A0C888') }) +
+        c.gloss(31, 55, 3.5, 2.5) + c.face(36, 61, { dx: 5, r: 3.4, my: 6.5 }),
+      a1: E('circle', { cx: 68, cy: 68, r: 20, fill: c.g('sh', '#FCD9A8', '#F2B36B', '#D98E3E') }) +
+          E('path', { d: 'M68 68 Q77 68 77 61 Q77 52 67 52 Q56 52 56 63 Q56 76 69 77',
+                      stroke: c.st('#C97B3C'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+          c.gloss(60, 58, 5, 3.5) +
+          E('path', { d: 'M31 50 Q29 44 26 42', stroke: c.st('#A0C888'), 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M41 50 Q43 44 46 42', stroke: c.st('#A0C888'), 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('circle', { cx: 26, cy: 41, r: 2, fill: c.f('#A0C888') }) +
+          E('circle', { cx: 46, cy: 41, r: 2, fill: c.f('#A0C888') })
+    };
+  };
+
+  KINDS.kirpi = function (c) {
+    var spikes = '';
+    var cx = 62, cy = 72;
+    for (var i = 0; i < 9; i++) {
+      var a = Math.PI * (1.08 - i * 0.145);
+      var x1 = cx + Math.cos(a + 0.13) * 24, y1 = cy + Math.sin(a + 0.13) * 22;
+      var x2 = cx + Math.cos(a) * 38, y2 = cy + Math.sin(a) * 36;
+      var x3 = cx + Math.cos(a - 0.13) * 24, y3 = cy + Math.sin(a - 0.13) * 22;
+      spikes += E('path', { d: 'M' + N(x1) + ' ' + N(y1) + ' Q' + N(x2) + ' ' + N(y2) + ' ' + N(x3) + ' ' + N(y3) + ' Z',
+                            fill: c.f(i % 2 ? '#8A6D4E' : '#A08058'), 'stroke-linejoin': 'round' });
+    }
+    return {
+      b0: spikes,
+      govde: mamBody(c, '#FBEFD8', '#F5E3C8', '#D9C4A0', { rx: 23, ry: 18 }),
+      bas: headBall(c, '#FBEFD8', '#F5E3C8', '#D9C4A0', { r: 16, cy: 47, face: { mouth: 'none', dx: 7 } }) +
+        E('circle', { cx: 60, cy: 55, r: 2.6, fill: c.f('#6E5E4A') }) +
+        E('path', { d: 'M56 60 Q60 63 64 60', stroke: c.st(INK), 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }),
+      a1: E('path', { d: 'M50 30 Q52 22 56 28 Z', fill: c.f('#8A6D4E'), 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M58 28 Q60 20 64 27 Z', fill: c.f('#A08058'), 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M66 29 Q70 22 71 29 Z', fill: c.f('#8A6D4E'), 'stroke-linejoin': 'round' })
+    };
+  };
+
+  KINDS.kostebek = function (c) {
+    return {
+      govde: mamBody(c, '#B8AEC6', '#9A8FA8', '#7A7088', {}),
+      bas: headBall(c, '#B8AEC6', '#9A8FA8', '#7A7088', { r: 18, cy: 44, face: { lidded: true, mouth: 'none' } }) +
+        E('ellipse', { cx: 60, cy: 52, rx: 5, ry: 4, fill: c.f('#FF9EAE') }) +
+        E('path', { d: 'M55 60 Q60 64 65 60', stroke: c.st(INK), 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }),
+      a1: E('ellipse', { cx: 42, cy: 88, rx: 8.5, ry: 6, fill: c.f('#EFB8C0'), transform: 'rotate(-18 42 88)' }) +
+          E('ellipse', { cx: 78, cy: 88, rx: 8.5, ry: 6, fill: c.f('#EFB8C0'), transform: 'rotate(18 78 88)' }) +
+          E('path', { d: 'M38 85 L36 82 M42 84 L41 80 M46 85 L47 81', stroke: c.st('#D98A98'), 'stroke-width': 1.8, 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M74 85 L73 81 M78 84 L79 80 M82 85 L84 82', stroke: c.st('#D98A98'), 'stroke-width': 1.8, 'stroke-linecap': 'round' })
+    };
+  };
+
+  KINDS.oglak = function (c) {
+    return {
+      govde: mamBody(c, '#F8F0E0', '#EFE3D0', '#CDBB9E', {}),
+      bas: headBall(c, '#F8F0E0', '#EFE3D0', '#CDBB9E', { r: 18, cy: 44, face: { mouth: 'none' } }) +
+        E('ellipse', { cx: 60, cy: 53, rx: 8, ry: 5.5, fill: c.f('#F8E8D4') }) +
+        E('path', { d: 'M56 53 Q60 56 64 53', stroke: c.st(INK), 'stroke-width': 2, fill: 'none', 'stroke-linecap': 'round' }) +
+        E('path', { d: 'M57 61 Q60 68 63 61 Z', fill: c.f('#CDBB9E'), 'stroke-linejoin': 'round' }),
+      a1: E('path', { d: 'M50 28 Q45 17 36 18', stroke: c.st('#C9A176'), 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M70 28 Q75 17 84 18', stroke: c.st('#C9A176'), 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('ellipse', { cx: 40, cy: 44, rx: 6, ry: 4, fill: c.f('#EFE3D0'), transform: 'rotate(-30 40 44)' }) +
+          E('ellipse', { cx: 80, cy: 44, rx: 6, ry: 4, fill: c.f('#EFE3D0'), transform: 'rotate(30 80 44)' })
+    };
+  };
+
+  KINDS.kopek = function (c) {
+    return {
+      b0: E('path', { d: 'M84 84 Q98 78 94 66', stroke: c.st('#B08048'), 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }),
+      govde: mamBody(c, '#F2CD9E', '#D9A868', '#B08048', { belly: '#F8E8CE' }),
+      bas: headBall(c, '#F2CD9E', '#D9A868', '#B08048', { r: 19, cy: 44, face: { mouth: 'none', ey: -1 } }) +
+        E('ellipse', { cx: 60, cy: 53, rx: 10, ry: 7, fill: c.f('#F8E8CE') }) +
+        E('ellipse', { cx: 60, cy: 49.5, rx: 3.4, ry: 2.6, fill: c.f('#4A4238') }) +
+        (c.mood === 'sleep' ? '' : E('path', { d: 'M57 57 Q60 64 63 57 Z', fill: c.f('#FF8FA0'), 'stroke-linejoin': 'round' })),
+      a1: E('ellipse', { cx: 44, cy: 31, rx: 7, ry: 12, fill: c.g('e1', '#C99058', '#A87848', '#8A5E34'), transform: 'rotate(22 44 31)' }) +
+          E('ellipse', { cx: 76, cy: 31, rx: 7, ry: 12, fill: c.g('e2', '#C99058', '#A87848', '#8A5E34'), transform: 'rotate(-22 76 31)' })
+    };
+  };
+
+  KINDS.karinca = function (c) {
+    return {
+      govde: E('circle', { cx: 60, cy: 88, r: 14, fill: c.g('ab', '#E89A7E', '#C96A4A', '#A04E34') }) +
+        E('circle', { cx: 60, cy: 68, r: 10, fill: c.g('th', '#E89A7E', '#C96A4A', '#A04E34') }) +
+        E('path', { d: 'M48 70 Q38 74 34 82', stroke: c.st('#A04E34'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+        E('path', { d: 'M72 70 Q82 74 86 82', stroke: c.st('#A04E34'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+        E('path', { d: 'M50 86 Q42 92 40 98', stroke: c.st('#A04E34'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+        E('path', { d: 'M70 86 Q78 92 80 98', stroke: c.st('#A04E34'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+        c.gloss(53, 82, 5, 3.5),
+      bas: headBall(c, '#E89A7E', '#C96A4A', '#A04E34', { r: 15, cy: 46, face: { dx: 6, r: 4, my: 7 } }),
+      a1: antennae(c, '#A04E34', { y0: 33, len: 12, spread: 7 }) +
+          E('ellipse', { cx: 60, cy: 64, rx: 7, ry: 5, fill: c.f('#F2D5A0'), transform: 'rotate(12 60 64)' }) +
+          E('circle', { cx: 57, cy: 63, r: 0.9, fill: c.f('#C9A66B') }) +
+          E('circle', { cx: 62, cy: 66, r: 0.9, fill: c.f('#C9A66B') }) +
+          E('circle', { cx: 63, cy: 62, r: 0.9, fill: c.f('#C9A66B') })
+    };
+  };
+
+  KINDS.horoz = function (c) {
+    return {
+      b0: E('path', { d: 'M82 74 Q102 62 96 42', stroke: c.st('#4FB8D8'), 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M84 78 Q106 72 102 54', stroke: c.st('#58B368'), 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M84 82 Q104 84 104 66', stroke: c.st('#B266E8'), 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' }),
+      govde: birdBody(c, '#FFFDF6', '#F5EFE5', '#D9CFC0', { feet: '#F5A623' }),
+      bas: headBall(c, '#FFFDF6', '#F5EFE5', '#D9CFC0', { r: 19, cy: 42, face: { mouth: 'none' } }) + beak(c, '#F5A623', 51, 8),
+      a1: combShape(c, '#FF5A5A', true) +
+          E('ellipse', { cx: 57, cy: 61, rx: 2.8, ry: 4.2, fill: c.f('#FF5A5A') }) +
+          E('ellipse', { cx: 63, cy: 61, rx: 2.8, ry: 4.2, fill: c.f('#FF5A5A') })
+    };
+  };
+
+  KINDS.midilli = function (c) {
+    return {
+      b0: E('path', { d: 'M86 82 Q98 88 94 100', stroke: c.st('#7EC8E3'), 'stroke-width': 7, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M86 84 Q94 92 88 101', stroke: c.st('#A8DCEF'), 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' }),
+      govde: mamBody(c, '#F5DFC0', '#E8C9A0', '#C9A578', {}),
+      bas: headBall(c, '#F5DFC0', '#E8C9A0', '#C9A578', { r: 20, cy: 43, face: { mouth: 'none', ey: -2 } }) +
+        E('ellipse', { cx: 60, cy: 54, rx: 11, ry: 7.5, fill: c.f('#F8EAD8') }) +
+        E('circle', { cx: 56, cy: 54, r: 1.4, fill: c.f('#C9A578') }) +
+        E('circle', { cx: 64, cy: 54, r: 1.4, fill: c.f('#C9A578') }),
+      a1: E('circle', { cx: 54, cy: 20, r: 7, fill: c.g('m0', '#A8DCEF', '#7EC8E3', '#5AA8C8') }) +
+          E('circle', { cx: 68, cy: 22, r: 6, fill: c.g('m1', '#A8DCEF', '#7EC8E3', '#5AA8C8') }) +
+          E('circle', { cx: 77, cy: 30, r: 6, fill: c.g('m2', '#A8DCEF', '#7EC8E3', '#5AA8C8') }) +
+          E('circle', { cx: 82, cy: 41, r: 5.5, fill: c.g('m3', '#A8DCEF', '#7EC8E3', '#5AA8C8') }) +
+          E('ellipse', { cx: 42, cy: 27, rx: 4.5, ry: 7, fill: c.f('#E8C9A0'), transform: 'rotate(-14 42 27)' }) +
+          E('ellipse', { cx: 42, cy: 28, rx: 2, ry: 4, fill: c.f('#F4A9B8'), transform: 'rotate(-14 42 28)', opacity: c.o(0.7) })
+    };
+  };
+
+  KINDS.kirlangic = function (c) {
+    return {
+      b0: E('path', { d: 'M78 84 Q96 94 103 107 Q92 103 78 92 Z', fill: c.f('#3E5FA8'), 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M80 80 Q102 82 110 90 Q97 92 80 88 Z', fill: c.f('#5A7EC8'), 'stroke-linejoin': 'round' }),
+      govde: birdBody(c, '#8FAEE8', '#5A7EC8', '#3E5FA8', { feet: '#E8A0A8', belly: '#F5EFE0' }),
+      bas: headBall(c, '#8FAEE8', '#5A7EC8', '#3E5FA8', { r: 18, cy: 43,
+        pre: E('ellipse', { cx: 60, cy: 48, rx: 10, ry: 8, fill: c.f('#F5EFE0') }),
+        face: { mouth: 'none' } }) + beak(c, '#4A4238', 52, 6),
+      a1: E('path', { d: 'M40 70 Q34 80 38 88', stroke: c.st('#8FAEE8'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', opacity: c.o(0.8) }) +
+          E('path', { d: 'M80 70 Q86 80 82 88', stroke: c.st('#8FAEE8'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', opacity: c.o(0.8) })
+    };
+  };
+
+  KINDS.tavuskusu = function (c) {
+    var fan = '';
+    for (var i = -2; i <= 2; i++) {
+      var a = -Math.PI / 2 + i * 0.42;
+      var fx = 60 + Math.cos(a) * 38, fy = 62 + Math.sin(a) * 38;
+      var deg = N(a * 180 / Math.PI + 90);
+      fan += E('ellipse', { cx: N(fx), cy: N(fy), rx: 8.5, ry: 15, fill: c.g('f' + (i + 2), '#8FD8EC', '#4FB8D8', '#2E8FB0'),
+                            transform: 'rotate(' + deg + ' ' + N(fx) + ' ' + N(fy) + ')' });
+      fan += E('circle', { cx: N(fx), cy: N(fy - 4), r: 4, fill: c.f('#B266E8') });
+      fan += E('circle', { cx: N(fx), cy: N(fy - 4), r: 1.8, fill: c.f('#F2C14E') });
+    }
+    return {
+      b0: fan,
+      govde: birdBody(c, '#9EDCEC', '#4FB8D8', '#2E8FB0', { feet: '#E8A85E' }),
+      bas: headBall(c, '#9EDCEC', '#4FB8D8', '#2E8FB0', { r: 17, cy: 44, face: { mouth: 'none' } }) + beak(c, '#E8A85E', 52, 6),
+      a1: E('path', { d: 'M54 30 L51 21 M60 28 L60 19 M66 30 L69 21', stroke: c.st('#2E8FB0'), 'stroke-width': 2, 'stroke-linecap': 'round' }) +
+          E('circle', { cx: 51, cy: 20, r: 2.2, fill: c.f('#B266E8') }) +
+          E('circle', { cx: 60, cy: 18, r: 2.2, fill: c.f('#B266E8') }) +
+          E('circle', { cx: 69, cy: 20, r: 2.2, fill: c.f('#B266E8') })
+    };
+  };
+
+  KINDS.orumcek = function (c) {
+    var legs = '';
+    var L = [
+      'M44 76 Q28 72 24 60', 'M42 82 Q26 84 20 76', 'M44 88 Q30 94 26 102',
+      'M76 76 Q92 72 96 60', 'M78 82 Q94 84 100 76', 'M76 88 Q90 94 94 102'
+    ];
+    for (var i = 0; i < L.length; i++) {
+      legs += E('path', { d: L[i], stroke: c.st('#7A65A8'), 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' });
+    }
+    return {
+      b0: E('path', { d: 'M60 4 L60 30', stroke: c.st('#E8E2F5'), 'stroke-width': 2, 'stroke-linecap': 'round', opacity: c.o(0.8) }) + legs,
+      govde: E('circle', { cx: 60, cy: 80, r: 17, fill: c.g('bd', '#B9A8D8', '#9A85C8', '#7A65A8') }) +
+        E('circle', { cx: 60, cy: 74, r: 3, fill: c.f('#C9BBE8'), opacity: c.o(0.8) }) +
+        c.gloss(53, 73, 5.5, 4),
+      bas: headBall(c, '#B9A8D8', '#9A85C8', '#7A65A8', { r: 14, cy: 52, face: { dx: 6, r: 4, my: 7 } }) +
+        E('circle', { cx: 53, cy: 44, r: 1.8, fill: c.f(INK) }) +
+        E('circle', { cx: 67, cy: 44, r: 1.8, fill: c.f(INK) }),
+      a1: c.sil ? E('circle', { cx: 60, cy: 6, r: 2, fill: SIL })
+                : E('circle', { cx: 60, cy: 6, r: 2, fill: '#FFF8D8', opacity: 0.9 })
+    };
+  };
+
+  KINDS.gunesbuzagisi = function (c) {
+    return {
+      b0: (c.sil ? '' : c.halo('#F2C14E', 46, 40)) +
+          E('circle', { cx: 60, cy: 44, r: 26, fill: c.g('sn', '#FFF3C0', '#F8DC8A', '#F2C14E'), opacity: c.o(0.55) }),
+      govde: mamBody(c, '#FCE8B0', '#F2C14E', '#D9A32E', {}),
+      bas: headBall(c, '#FCE8B0', '#F2C14E', '#D9A32E', { r: 19, cy: 43, face: { mouth: 'none', ey: -1 } }) +
+        E('ellipse', { cx: 60, cy: 53, rx: 10, ry: 6.5, fill: c.f('#FFF0CC') }) +
+        E('circle', { cx: 56, cy: 53, r: 1.4, fill: c.f('#D9A32E') }) +
+        E('circle', { cx: 64, cy: 53, r: 1.4, fill: c.f('#D9A32E') }),
+      a1: E('path', { d: 'M49 27 Q45 17 37 16', stroke: c.st('#FFE8A0'), 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M71 27 Q75 17 83 16', stroke: c.st('#FFE8A0'), 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M60 27 L60 31 M56 29 L64 29', stroke: c.st('#FFF6D0'), 'stroke-width': 2.4, 'stroke-linecap': 'round' }) +
+          E('circle', { cx: 60, cy: 29, r: 1.6, fill: c.f('#FFF6D0') })
+    };
+  };
+
+  KINDS.tarlakusu = function (c) {
+    return {
+      b0: E('circle', { cx: 60, cy: 52, r: 30, fill: c.g('gl', '#FDE0C8', '#F8C8A8', '#F2A888'), opacity: c.o(0.45) }),
+      govde: birdBody(c, '#FCD9B0', '#F5B87A', '#E08A5C', { feet: '#B06A4E', belly: '#FADCE0' }),
+      bas: headBall(c, '#FCD9B0', '#F5B87A', '#E08A5C', { r: 18, cy: 43, face: { mouth: 'none' } }) + beak(c, '#B06A4E', 51, 6),
+      a1: E('path', { d: 'M54 30 Q48 18 42 15', stroke: c.st('#E88AA0'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M58 28 Q56 15 51 10', stroke: c.st('#E88AA0'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M62 28 Q64 15 69 10', stroke: c.st('#F5B87A'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('path', { d: 'M66 30 Q72 18 78 15', stroke: c.st('#F5B87A'), 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }) +
+          E('circle', { cx: 42, cy: 14, r: 2.4, fill: c.f('#E86A8A') }) +
+          E('circle', { cx: 51, cy: 9, r: 2.4, fill: c.f('#E86A8A') }) +
+          E('circle', { cx: 69, cy: 9, r: 2.4, fill: c.f('#F2A05C') }) +
+          E('circle', { cx: 78, cy: 14, r: 2.4, fill: c.f('#F2A05C') })
+    };
+  };
+
+  KINDS.guneskusu = function (c) {
+    var rays = '';
+    for (var i = 0; i < 10; i++) {
+      var a = -Math.PI / 2 + i * (Math.PI * 2 / 10);
+      var r1 = 34, r2 = (i % 2 ? 46 : 52);
+      var x1 = 60 + Math.cos(a + 0.16) * r1, y1 = 52 + Math.sin(a + 0.16) * r1;
+      var x2 = 60 + Math.cos(a) * r2, y2 = 52 + Math.sin(a) * r2;
+      var x3 = 60 + Math.cos(a - 0.16) * r1, y3 = 52 + Math.sin(a - 0.16) * r1;
+      rays += E('path', { d: 'M' + N(x1) + ' ' + N(y1) + ' Q' + N(x2) + ' ' + N(y2) + ' ' + N(x3) + ' ' + N(y3) + ' Z',
+                          fill: c.f('#FFD98A'), opacity: c.o(0.85), 'stroke-linejoin': 'round' });
+    }
+    return {
+      b0: (c.sil ? '' : c.halo('#F2A61B', 52, 54)) + rays +
+          E('path', { d: 'M82 84 Q104 80 100 62 Q95 76 85 78 Z', fill: c.f('#FF9E5C'), 'stroke-linejoin': 'round' }),
+      govde: birdBody(c, '#FFD9A0', '#FFB347', '#F27E4A', { feet: '#E86A3A' }),
+      bas: headBall(c, '#FFD9A0', '#FFB347', '#F27E4A', { r: 19, cy: 43, face: { mouth: 'none' } }) + beak(c, '#E86A3A', 52, 7),
+      a1: E('path', { d: 'M52 28 Q50 16 44 12 Q50 18 51 24 Z', fill: c.f('#FF7A5C'), 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M60 26 Q60 12 60 6 Q63 14 62 24 Z', fill: c.f('#FFB347'), 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M68 28 Q70 16 76 12 Q70 18 69 24 Z', fill: c.f('#FFD98A'), 'stroke-linejoin': 'round' })
+    };
+  };
+
+  KINDS.korkuluk = function (c) {
+    var straw = '';
+    var sx = [42, 48, 55, 65, 72, 78];
+    for (var i = 0; i < sx.length; i++) {
+      straw += E('path', { d: 'M' + sx[i] + ' 94 L' + N(sx[i] + (i % 2 ? 3 : -3)) + ' 103',
+                           stroke: c.st('#E8C96E'), 'stroke-width': 2.6, 'stroke-linecap': 'round' });
+    }
+    return {
+      b0: c.sil ? '' : c.halo('#5C4A9E', 58, 50),
+      govde: E('path', { d: 'M44 58 Q40 58 40 72 L40 84 Q40 96 52 96 L68 96 Q80 96 80 84 L80 72 Q80 58 76 58 Q60 52 44 58 Z',
+                         fill: c.g('bd', '#E0CBA4', '#C9B08A', '#A8905E'), 'stroke-linejoin': 'round' }) +
+        straw +
+        E('rect', { x: 48, y: 70, width: 11, height: 10, rx: 3, fill: c.f('#A8905E'), transform: 'rotate(-8 53 75)' }) +
+        E('path', { d: 'M48 71 L59 71 M48 75 L59 75', stroke: c.st('#8A7248'), 'stroke-width': 1.4, 'stroke-linecap': 'round', transform: 'rotate(-8 53 75)' }) +
+        E('path', { d: 'M66 84 L72 84 M69 81 L69 87', stroke: c.st('#8A7248'), 'stroke-width': 1.6, 'stroke-linecap': 'round' }) +
+        c.gloss(50, 66, 7, 4),
+      bas: headBall(c, '#EFDDB8', '#DCC494', '#B89E6A', { r: 17, cy: 42, face: { noHi: true, dx: 7, r: 4, my: 8 } }) +
+        E('path', { d: 'M50 50 L54 54 M54 50 L50 54', stroke: c.st('#8A7248'), 'stroke-width': 1.6, 'stroke-linecap': 'round' }),
+      a1: E('ellipse', { cx: 60, cy: 27, rx: 21, ry: 5, fill: c.f('#8A6D4E') }) +
+          E('path', { d: 'M46 27 Q52 6 74 10 Q78 20 74 27 Q60 31 46 27 Z',
+                      fill: c.g('ht', '#A8885E', '#8A6D4E', '#6A5238'), 'stroke-linejoin': 'round' }) +
+          E('path', { d: 'M44 30 L40 36 M48 31 L46 38 M72 31 L75 37', stroke: c.st('#E8C96E'), 'stroke-width': 2.4, 'stroke-linecap': 'round' }) +
+          E('rect', { x: 62, y: 12, width: 8, height: 7, rx: 2, fill: c.f('#C9A86E'), transform: 'rotate(12 66 15)' })
+    };
+  };
+
+  /* ---------- API: pufiSVG / silüet / oyuncak ---------- */
+
+  var HALO_BY_RARITY = { efsanevi: '#F2A61B', gizli: '#5C4A9E' };
+
+  function drawerFor (pufi) {
+    var kind = (pufi && pufi.kind) ? String(pufi.kind) : '';
+    return KINDS[kind] || KINDS._def;
+  }
+
+  function buildLayers (pufi, opts) {
+    var id = (pufi && pufi.id) ? String(pufi.id) : 'pufi';
+    var c = makeCtx(id, opts);
+    var d;
+    try { d = drawerFor(pufi)(c); } catch (e) { d = KINDS._def(c); }
+    return { c: c, d: d };
+  }
+
+  Y.art.pufiSVG = function (pufi, opts) {
+    opts = opts || {};
+    var r = buildLayers(pufi, { tag: 'm', mood: opts.mood });
+    var inner = '';
+    var haloCol = HALO_BY_RARITY[(pufi && pufi.rarity) || ''];
+    if (haloCol) inner += r.c.halo(haloCol, 58, 54);
+    inner += E('ellipse', { cx: 60, cy: 105, rx: 24, ry: 5, fill: SIL, opacity: 0.12 });
+    inner += (r.d.b0 || '') + (r.d.govde || '') + (r.d.bas || '') + (r.d.a1 || '');
+    return svgWrap(r.c, inner);
+  };
+
+  Y.art.pufiSilhouetteSVG = function (pufi) {
+    var r = buildLayers(pufi, { tag: 's', sil: true });
+    var inner = (r.d.b0 || '') + (r.d.govde || '') + (r.d.bas || '') + (r.d.a1 || '');
+    return svgWrap(r.c, inner);
+  };
+
+  Y.art.toyParts = function (pufi) {
+    var parts = [];
+    var specs = [
+      { id: 'govde', tag: 'pg', pick: function (d) { return d.govde || ''; } },
+      { id: 'bas', tag: 'pb', pick: function (d) { return d.bas || ''; } },
+      { id: 'aksesuar', tag: 'pa', pick: function (d) { return (d.b0 || '') + (d.a1 || ''); } }
+    ];
+    for (var i = 0; i < specs.length; i++) {
+      var r = buildLayers(pufi, { tag: specs[i].tag });
+      var inner = specs[i].pick(r.d);
+      if (!inner) { // savunmacı: boş parça olmasın
+        inner = E('circle', { cx: 60, cy: 60, r: 10, fill: r.c.f('#D8C8EE') });
+      }
+      parts.push({ id: specs[i].id, svg: svgWrap(r.c, inner) });
+    }
+    return parts;
+  };
+
+  Y.art.toyAssembledSVG = function (pufi) {
+    var r = buildLayers(pufi, { tag: 't' });
+    var inner = '';
+    var haloCol = HALO_BY_RARITY[(pufi && pufi.rarity) || ''];
+    if (haloCol) inner += r.c.halo(haloCol, 56, 54);
+    // vinil oyuncak kaidesi
+    inner += E('ellipse', { cx: 60, cy: 107, rx: 31, ry: 7, fill: '#C9BFAE' });
+    inner += E('ellipse', { cx: 60, cy: 104.5, rx: 31, ry: 7, fill: r.c.g('pd', '#FBF6EA', '#EFE6D2', '#D5C9B0') });
+    inner += (r.d.b0 || '') + (r.d.govde || '') + (r.d.bas || '') + (r.d.a1 || '');
+    // minik parıltılar
+    inner += E('path', { d: 'M20 34 L20 42 M16 38 L24 38', stroke: '#FFE9A8', 'stroke-width': 2, 'stroke-linecap': 'round', opacity: 0.9 });
+    inner += E('path', { d: 'M100 26 L100 32 M97 29 L103 29', stroke: '#FFE9A8', 'stroke-width': 2, 'stroke-linecap': 'round', opacity: 0.9 });
+    return svgWrap(r.c, inner);
+  };
+
+  /* ---------- API: eggSVG ---------- */
+
+  var EGG_D = 'M60 16 C81 16 95 42 95 68 C95 90 79 105 60 105 C41 105 25 90 25 68 C25 42 39 16 60 16 Z';
+
+  var EGGS = {
+    yaygin:    { lt: '#FFFDF7', md: '#F0E8D8', dk: '#CBC0A8', crackCol: '#6E5E4A' },
+    azbulunur: { lt: '#F4FBEF', md: '#DFF2D8', dk: '#A8CFA0', crackCol: '#4E7A48', spot: '#58B368' },
+    nadir:     { lt: '#F2FBFF', md: '#D8F0F8', dk: '#9FCFE0', crackCol: '#3E7A94' },
+    destansi:  { lt: '#F8F1FF', md: '#E8D8F8', dk: '#C2A0E0', crackCol: '#7A4EA8', motif: '#B266E8' },
+    efsanevi:  { lt: '#FFFBEA', md: '#FFEDC0', dk: '#E8C070', crackCol: '#A87A2E', halo: '#F2A61B' },
+    gizli:     { lt: '#8A7AC8', md: '#5C4A9E', dk: '#3A2E6E', crackCol: '#241C48', halo: '#5C4A9E' }
+  };
+
+  var CRACKS = [
+    'M58 26 L52 34 L60 40 L55 47',
+    'M55 47 L63 54 L57 62 M60 40 L68 44',
+    'M57 62 L48 68 L58 74 M68 44 L76 52 L70 60 M48 68 L40 66'
+  ];
+
+  function sparkle (x, y, s, col, op) {
+    return E('path', { d: 'M' + N(x) + ' ' + N(y - s) + ' Q' + N(x + s * 0.25) + ' ' + N(y - s * 0.25) + ' ' + N(x + s) + ' ' + N(y) +
+                          ' Q' + N(x + s * 0.25) + ' ' + N(y + s * 0.25) + ' ' + N(x) + ' ' + N(y + s) +
+                          ' Q' + N(x - s * 0.25) + ' ' + N(y + s * 0.25) + ' ' + N(x - s) + ' ' + N(y) +
+                          ' Q' + N(x - s * 0.25) + ' ' + N(y - s * 0.25) + ' ' + N(x) + ' ' + N(y - s) + ' Z',
+                       fill: col, opacity: op });
+  }
+
+  Y.art.eggSVG = function (rarity, opts) {
+    rarity = EGGS[rarity] ? rarity : 'yaygin';
+    var P = EGGS[rarity];
+    var crack = Math.max(0, Math.min(3, (opts && opts.crack) | 0));
+    var uid = 'yv-egg-' + rarity + '-' + (SEQ++);
+    var defs = [];
+    defs.push(
+      '<radialGradient id="' + uid + '-g" cx="0.38" cy="0.28" r="0.95">' +
+      '<stop offset="0" stop-color="' + P.lt + '"/>' +
+      '<stop offset="0.55" stop-color="' + P.md + '"/>' +
+      '<stop offset="1" stop-color="' + P.dk + '"/>' +
+      '</radialGradient>');
+    defs.push('<clipPath id="' + uid + '-c"><path d="' + EGG_D + '"/></clipPath>');
+    var inner = '';
+
+    // ışıma / aura (efsanevi altın, gizli karanlık mor)
+    if (P.halo) {
+      defs.push(
+        '<radialGradient id="' + uid + '-h" cx="0.5" cy="0.5" r="0.5">' +
+        '<stop offset="0" stop-color="' + P.halo + '" stop-opacity="0.5"/>' +
+        '<stop offset="1" stop-color="' + P.halo + '" stop-opacity="0"/>' +
+        '</radialGradient>');
+      inner += E('circle', { cx: 60, cy: 60, r: 58, fill: 'url(#' + uid + '-h)' });
+    }
+
+    inner += E('ellipse', { cx: 60, cy: 107, rx: 26, ry: 5, fill: SIL, opacity: 0.12 });
+    inner += E('path', { d: EGG_D, fill: 'url(#' + uid + '-g)' });
+
+    // nadirlik dokusu (yumurta içine kırpılmış)
+    var tex = '';
+    var rnd = seeded(hash('egg-' + rarity));
+    var i, a, rr, x, y;
+    if (rarity === 'azbulunur') { // benekli
+      for (i = 0; i < 10; i++) {
+        a = rnd() * Math.PI * 2; rr = Math.sqrt(rnd());
+        x = 60 + Math.cos(a) * rr * 28; y = 64 + Math.sin(a) * rr * 34;
+        tex += E('circle', { cx: N(x), cy: N(y), r: N(1.4 + rnd() * 1.8), fill: P.spot, opacity: 0.45 });
+      }
+    } else if (rarity === 'nadir') { // sedefli şeritler
+      tex += E('ellipse', { cx: 48, cy: 52, rx: 34, ry: 9, fill: '#FFFFFF', opacity: 0.35, transform: 'rotate(-24 48 52)' });
+      tex += E('ellipse', { cx: 68, cy: 78, rx: 30, ry: 6, fill: '#FFFFFF', opacity: 0.25, transform: 'rotate(-24 68 78)' });
+      for (i = 0; i < 5; i++) {
+        x = 34 + rnd() * 52; y = 34 + rnd() * 56;
+        tex += E('circle', { cx: N(x), cy: N(y), r: 1.1, fill: '#FFFFFF', opacity: 0.6 });
+      }
+    } else if (rarity === 'destansi') { // hareketli desen hissi (dalga + elmas)
+      tex += E('path', { d: 'M22 56 Q34 48 46 56 Q58 64 70 56 Q82 48 98 56', stroke: P.motif, 'stroke-width': 3,
+                         fill: 'none', opacity: 0.35, 'stroke-linecap': 'round' });
+      tex += E('path', { d: 'M22 72 Q34 64 46 72 Q58 80 70 72 Q82 64 98 72', stroke: P.motif, 'stroke-width': 3,
+                         fill: 'none', opacity: 0.3, 'stroke-linecap': 'round' });
+      for (i = 0; i < 6; i++) {
+        x = 34 + rnd() * 52; y = 30 + rnd() * 60;
+        tex += E('rect', { x: N(x - 2), y: N(y - 2), width: 4, height: 4, rx: 1.2, fill: P.motif, opacity: 0.35,
+                           transform: 'rotate(45 ' + N(x) + ' ' + N(y) + ')' });
+      }
+    } else if (rarity === 'efsanevi') { // altın ışıma + parıltı
+      tex += E('ellipse', { cx: 52, cy: 48, rx: 26, ry: 16, fill: '#FFF6D8', opacity: 0.5 });
+      tex += sparkle(46, 44, 5, '#FFF0B8', 0.95) + sparkle(72, 60, 4, '#FFF0B8', 0.85) +
+             sparkle(54, 82, 3.4, '#FFF0B8', 0.8) + sparkle(78, 36, 2.6, '#FFFFFF', 0.9);
+    } else if (rarity === 'gizli') { // karanlık mor: hilal + yıldız
+      tex += E('circle', { cx: 70, cy: 46, r: 10, fill: '#C9BFEF', opacity: 0.8 });
+      tex += E('circle', { cx: 74, cy: 43, r: 9, fill: P.md });
+      tex += E('circle', { cx: 44, cy: 62, r: 1.6, fill: '#C9BFEF', opacity: 0.9 });
+      tex += E('circle', { cx: 56, cy: 76, r: 1.2, fill: '#C9BFEF', opacity: 0.7 });
+      tex += E('circle', { cx: 40, cy: 82, r: 1.4, fill: '#C9BFEF', opacity: 0.8 });
+      tex += sparkle(46, 38, 3, '#C9BFEF', 0.85);
+    }
+    if (tex) inner += E('g', { 'clip-path': 'url(#' + uid + '-c)' }, tex);
+
+    // parlama noktası
+    inner += E('ellipse', { cx: 47, cy: 38, rx: 9, ry: 13, fill: '#FFFFFF', opacity: rarity === 'gizli' ? 0.25 : 0.5, transform: 'rotate(18 47 38)' });
+
+    // çatlaklar (0-3, birikimli)
+    if (crack > 0) {
+      var cg = '';
+      if (crack >= 3) { // içeriden ışık sızıntısı
+        for (i = 0; i < crack; i++) {
+          cg += E('path', { d: CRACKS[i], stroke: '#FFF3B0', 'stroke-width': 5, fill: 'none',
+                            'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.55 });
+        }
+      }
+      for (i = 0; i < crack; i++) {
+        cg += E('path', { d: CRACKS[i], stroke: P.crackCol, 'stroke-width': 2.4, fill: 'none',
+                          'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 0.8 });
+      }
+      inner += E('g', { 'clip-path': 'url(#' + uid + '-c)' }, cg);
+    }
+
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" aria-hidden="true"><defs>' +
+           defs.join('') + '</defs>' + inner + '</svg>';
+  };
+})();
+
+/* == js/audio.js == */
+/* Yuvo — audio.js (art-audio ajanı)
+   WebAudio sentez, dosyasız. Ses yoksa / başlatılamazsa SESSİZCE çalışır, asla hata fırlatmaz.
+   Crack'ler: filtreli noise burst + pitch düşüşü (ASMR). Fanfarlar: pentatonik arpej.
+   docs/10: yumuşak zarflar, ses seviyesi sıçraması yok, çan/klakson yok. */
+(function () {
+  window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  var Y = window.Yuvo;
+  Y.audio = Y.audio || {};
+
+  var ctx = null, master = null, noiseBuf = null, failed = false;
+
+  Y.audio.unlock = function () {
+    if (failed) return;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) { failed = true; return; }
+      if (!ctx) {
+        ctx = new AC();
+        master = ctx.createGain();
+        master.gain.value = 0.5;
+        master.connect(ctx.destination);
+        var len = Math.max(1, Math.floor(ctx.sampleRate * 1.2));
+        noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+        var d = noiseBuf.getChannelData(0);
+        for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+    } catch (e) { ctx = null; master = null; noiseBuf = null; failed = true; }
+  };
+
+  /* tek ton: osc + yumuşak zarf; glide ile pitch kayması */
+  function tone (t0, dur, f0, o) {
+    o = o || {};
+    var osc = ctx.createOscillator();
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(Math.max(1, f0), t0);
+    if (o.glide) osc.frequency.exponentialRampToValueAtTime(Math.max(1, o.glide), t0 + dur * (o.glideT || 1));
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(o.gain || 0.16, t0 + (o.att || 0.01));
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(master);
+    osc.start(t0); osc.stop(t0 + dur + 0.03);
+  }
+
+  /* filtreli noise burst; f0→f1 pitch düşüşü (ASMR çıtırtısı) */
+  function burst (t0, dur, o) {
+    o = o || {};
+    var src = ctx.createBufferSource();
+    src.buffer = noiseBuf;
+    var f = ctx.createBiquadFilter();
+    f.type = o.ftype || 'bandpass';
+    f.Q.value = o.q || 1.1;
+    f.frequency.setValueAtTime(Math.max(1, o.f0 || 2000), t0);
+    if (o.f1) f.frequency.exponentialRampToValueAtTime(Math.max(1, o.f1), t0 + dur);
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(o.gain || 0.2, t0 + (o.att || 0.004));
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(f); f.connect(g); g.connect(master);
+    var maxOff = Math.max(0.01, noiseBuf.duration - dur - 0.05);
+    src.start(t0, Math.random() * maxOff, dur + 0.05);
+  }
+
+  /* Do-majör pentatonik (C5'ten): sıcak, çocuksu arpej malzemesi */
+  var PENT = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5];
+
+  var SOUNDS = {
+    tap: function (t) {
+      tone(t, 0.07, 540, { glide: 470, gain: 0.11 });
+    },
+    crack1: function (t) {
+      burst(t, 0.09, { f0: 2600, f1: 1100, gain: 0.2 });
+      tone(t, 0.04, 1700, { type: 'triangle', glide: 1200, gain: 0.06, att: 0.003 });
+    },
+    crack2: function (t) {
+      burst(t, 0.08, { f0: 2200, f1: 900, gain: 0.22 });
+      burst(t + 0.07, 0.1, { f0: 1800, f1: 700, gain: 0.19 });
+      tone(t, 0.05, 1400, { type: 'triangle', glide: 900, gain: 0.07, att: 0.003 });
+    },
+    crackBig: function (t) {
+      burst(t, 0.12, { f0: 2400, f1: 600, gain: 0.26 });
+      burst(t + 0.08, 0.16, { ftype: 'lowpass', f0: 1600, f1: 350, gain: 0.28, q: 0.8 });
+      burst(t + 0.18, 0.2, { ftype: 'lowpass', f0: 900, f1: 220, gain: 0.24, q: 0.7 });
+      tone(t + 0.05, 0.25, 240, { glide: 130, gain: 0.11 });
+    },
+    pop: function (t) {
+      tone(t, 0.12, 300, { glide: 900, glideT: 0.6, gain: 0.18, att: 0.005 });
+      burst(t, 0.03, { f0: 3200, gain: 0.09 });
+    },
+    chime: function (t) {
+      tone(t, 0.6, 880, { gain: 0.11, att: 0.015 });
+      tone(t + 0.02, 0.7, 1318.5, { gain: 0.07, att: 0.02 });
+    },
+    click: function (t) {
+      tone(t, 0.035, 900, { type: 'triangle', gain: 0.08, att: 0.002 });
+    },
+    snap: function (t) { // parça yerine oturdu
+      tone(t, 0.05, 620, { type: 'square', glide: 520, gain: 0.1, att: 0.002 });
+      burst(t, 0.025, { ftype: 'highpass', f0: 2500, gain: 0.11 });
+    },
+    fanfare: function (t) { // tier2: kısa pentatonik arpej
+      var seq = [PENT[0], PENT[2], PENT[3], PENT[5]];
+      for (var i = 0; i < seq.length; i++) {
+        tone(t + i * 0.09, 0.32, seq[i], { type: 'triangle', gain: 0.13, att: 0.012 });
+      }
+      tone(t + 0.32, 0.5, PENT[5], { gain: 0.05, att: 0.02 });
+    },
+    fanfareBig: function (t) { // tier3: iki oktavlı arpej + akor + parıltı
+      var seq = [392.0, PENT[0], PENT[1], PENT[2], PENT[3], PENT[4], PENT[5]];
+      for (var i = 0; i < seq.length; i++) {
+        tone(t + i * 0.085, 0.3, seq[i], { type: 'triangle', gain: 0.12, att: 0.012 });
+      }
+      tone(t + 0.62, 0.8, PENT[3], { gain: 0.09, att: 0.02 });
+      tone(t + 0.62, 0.8, PENT[5], { gain: 0.07, att: 0.02 });
+      tone(t + 0.62, 0.8, 1567.98, { gain: 0.05, att: 0.02 });
+      burst(t + 0.6, 0.7, { ftype: 'highpass', f0: 5000, gain: 0.045, att: 0.05, q: 0.7 });
+    },
+    star: function (t) { // ⭐ kazanımı
+      tone(t, 0.16, 1568, { glide: 2093, glideT: 0.7, gain: 0.11, att: 0.006 });
+      tone(t + 0.06, 0.18, 2093, { gain: 0.06, att: 0.01 });
+    },
+    page: function (t) { // albüm sayfası hışırtısı
+      burst(t, 0.13, { ftype: 'lowpass', f0: 1000, f1: 300, gain: 0.15, q: 0.5 });
+    }
+  };
+
+  Y.audio.play = function (name) {
+    try {
+      if (!ctx || !master || !noiseBuf) return;
+      if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+      var fn = SOUNDS[name];
+      if (!fn) return;
+      fn(ctx.currentTime + 0.01);
+    } catch (e) { /* sessiz */ }
+  };
+})();
+
+/* == js/engine/state.js == */
+/* Yuvo — Motor: state, kalıcılık, ekonomi mutasyonları. Sahip: engine ajanı. */
+(function () {
+  var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  Yuvo.engine = Yuvo.engine || {};
+
+  var STORAGE_KEY = 'yuvo-proto-v1';
+  var EXTRA_EGG_COST = 120;
+  var EXTRA_EGG_MAX = 2;
+
+  // Kilometre taşları: ownedCount eşiği → { anahtar, Kabuk ödülü }
+  var MILESTONES = [
+    { at:10, key:'m10', kabuk:15 },
+    { at:20, key:'m20', kabuk:30 },
+    { at:27, key:'m27', kabuk:60 },
+    { at:30, key:'m30', kabuk:100 }
+  ];
+
+  function freshSeed () {
+    return ((Date.now() ^ (Math.random() * 0xFFFFFFFF)) >>> 0) || 1;
+  }
+
+  function defaults () {
+    return {
+      version: 1,
+      stardust: 40, kabuk: 0, day: 1,
+      eggsAvailable: 3, extraEggsBought: 0,   // günlük: 3 temel + en çok 2 ek (120⭐/adet)
+      eggCounter: 0, pityN: 0, pityD: 0, pityE: 0, copyStreak: 0,
+      owned: {},                              // pufiId -> adet
+      milestones: [],                         // ör. ['m10','m20','m27','m30']
+      weekCrafts: 0, rewardedPlaysToday: 0,
+      seed: freshSeed()                       // mulberry32 tohumu (gacha.js kullanır)
+    };
+  }
+
+  function refresh () { if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (e) {} } }
+  function commit () { Yuvo.engine.save(); refresh(); }
+
+  Yuvo.engine.state = defaults();
+
+  Yuvo.engine.load = function () {
+    var base = defaults();
+    try {
+      var raw = window.localStorage && window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var saved = JSON.parse(raw);
+        if (saved && typeof saved === 'object') {
+          for (var k in base) {
+            if (Object.prototype.hasOwnProperty.call(saved, k) && saved[k] !== null && saved[k] !== undefined) {
+              base[k] = saved[k];
+            }
+          }
+        }
+      }
+    } catch (e) { /* bozuk kayıt → temiz başlangıç */ }
+    if (!base.owned || typeof base.owned !== 'object') base.owned = {};
+    if (!Array.isArray(base.milestones)) base.milestones = [];
+    if (!base.seed) base.seed = freshSeed();
+    Yuvo.engine.state = base;
+    return base;
+  };
+
+  Yuvo.engine.save = function () {
+    try {
+      if (window.localStorage) window.localStorage.setItem(STORAGE_KEY, JSON.stringify(Yuvo.engine.state));
+    } catch (e) { /* depolama yoksa sessizce devam */ }
+  };
+
+  Yuvo.engine.reset = function (seed) {
+    var s = defaults();
+    if (seed !== undefined && seed !== null) s.seed = (seed >>> 0) || 1;
+    Yuvo.engine.state = s;
+    commit();
+    return s;
+  };
+
+  Yuvo.engine.newDay = function () {
+    var s = Yuvo.engine.state;
+    s.day += 1;
+    s.eggsAvailable = 3;
+    s.extraEggsBought = 0;
+    s.rewardedPlaysToday = 0;
+    if ((s.day - 1) % 7 === 0) s.weekCrafts = 0;  // yeni hafta → Atölye hakkı tazelenir
+    commit();
+  };
+
+  Yuvo.engine.addStardust = function (n) {
+    var s = Yuvo.engine.state;
+    s.stardust = Math.max(0, s.stardust + (n | 0));
+    commit();
+  };
+
+  Yuvo.engine.spendStardust = function (n) {
+    var s = Yuvo.engine.state;
+    n = n | 0;
+    if (n < 0 || s.stardust < n) return false;
+    s.stardust -= n;
+    commit();
+    return true;
+  };
+
+  Yuvo.engine.buyExtraEgg = function () {
+    var s = Yuvo.engine.state;
+    if (s.extraEggsBought >= EXTRA_EGG_MAX) return false;
+    if (s.stardust < EXTRA_EGG_COST) return false;
+    s.stardust -= EXTRA_EGG_COST;
+    s.extraEggsBought += 1;
+    s.eggsAvailable += 1;
+    commit();
+    return true;
+  };
+
+  // Gizli HARİÇ sahip olunan farklı parça sayısı (0-30).
+  Yuvo.engine.ownedCount = function () {
+    var s = Yuvo.engine.state, n = 0;
+    for (var id in s.owned) {
+      if (!s.owned[id]) continue;
+      var p = Yuvo.data.pufiById && Yuvo.data.pufiById(id);
+      if (p && p.rarity === 'gizli') continue;
+      n += 1;
+    }
+    return n;
+  };
+
+  // Kilometre taşı ödülleri — bir kez, state.milestones ile.
+  // Not: burada commit çağrılmaz; yeni parça kazandıran akış (openEgg/craft) zaten commit eder.
+  Yuvo.engine.checkMilestones = function () {
+    var s = Yuvo.engine.state;
+    var count = Yuvo.engine.ownedCount();
+    var granted = [];
+    for (var i = 0; i < MILESTONES.length; i++) {
+      var m = MILESTONES[i];
+      if (count >= m.at && s.milestones.indexOf(m.key) === -1) {
+        s.milestones.push(m.key);
+        s.kabuk += m.kabuk;
+        granted.push(m.key);
+      }
+    }
+    return granted;
+  };
+
+  // Atölye: Kabuk yeterliyse üret; gizli için ownedCount()==30 şartı.
+  Yuvo.engine.craft = function (pufiId) {
+    var s = Yuvo.engine.state;
+    var pufi = Yuvo.data.pufiById && Yuvo.data.pufiById(pufiId);
+    if (!pufi) return { ok:false, reason:'bilinmiyor' };
+    if (s.owned[pufiId]) return { ok:false, reason:'sahipli' };
+    if (pufi.rarity === 'gizli' && Yuvo.engine.ownedCount() !== 30) {
+      return { ok:false, reason:'gizli-kilitli' };
+    }
+    var cost = (Yuvo.data.RARITIES[pufi.rarity] || {}).uretim || 0;
+    if (s.kabuk < cost) return { ok:false, reason:'kabuk-yetersiz' };
+    s.kabuk -= cost;
+    s.owned[pufiId] = 1;
+    s.weekCrafts += 1;
+    Yuvo.engine.checkMilestones();
+    commit();
+    return { ok:true };
+  };
+
+  // Test kancaları (motor kısmı) — nesneyi toptan yazma: sahne kancaları korunur.
+  Yuvo.test = Yuvo.test || {};
+  Yuvo.test.state = function () { return Yuvo.engine.state; };
+  Yuvo.test.grantStardust = function (n) { Yuvo.engine.addStardust(n); };
+  Yuvo.test.grantEggs = function (n) {
+    var s = Yuvo.engine.state;
+    s.eggsAvailable += Math.max(0, n | 0);
+    commit();
+  };
+})();
+
+/* == js/engine/gacha.js == */
+/* Yuvo — Motor: düşüş algoritması (docs/v2/02 §2.2, proto sabitleriyle). Sahip: engine ajanı. */
+(function () {
+  var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  Yuvo.engine = Yuvo.engine || {};
+
+  // ---------- SABİTLER (Güneş Çayırı onboarding istisnası: E pity 35/50) ----------
+  var SOFT_PITY_E = 35;
+  var SOFT_ARTIS = 0.06;
+  var HARD_PITY_E = 50;
+  var PITY_DESTANSI = 40;   // 40 yumurtadır Destansı+ görmediyse
+  var PITY_NADIR = 15;      // 15 yumurtadır Nadir+ görmediyse
+  var ONBOARDING = 10;      // ilk 10 yumurta: hep eksik; 3.'sü Nadir+ garanti
+  var KOPYA_SERI_ESIGI = 6; // 6 ardışık kopya → sıradaki kesin eksik parça
+  var W_EKSIK = 4;          // akıllı düşüş: eksik parça ağırlığı
+  var W_EKSIK_SON3 = 12;    // ownedCount >= 27 iken eksik ağırlığı
+
+  var TIERS = ['yaygin', 'azbulunur', 'nadir', 'destansi', 'efsanevi', 'gizli'];
+  var RANK = { yaygin:0, azbulunur:1, nadir:2, destansi:3, efsanevi:4, gizli:5 };
+
+  // ---------- RNG: mulberry32, tohum state'te kalıcı ----------
+  function rand () {
+    var s = Yuvo.engine.state;
+    s.seed = (s.seed + 0x6D2B79F5) >>> 0;
+    var t = s.seed;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+
+  function weightedPick (keys, weights, r) {
+    var total = 0, i;
+    for (i = 0; i < keys.length; i++) total += weights[i];
+    var x = r * total;
+    for (i = 0; i < keys.length; i++) {
+      x -= weights[i];
+      if (x < 0) return keys[i];
+    }
+    // Kayan-nokta artığı: ağırlığı 0 olan anahtar asla dönmesin — geriye tara
+    for (i = keys.length - 1; i >= 0; i--) { if (weights[i] > 0) return keys[i]; }
+    return keys[keys.length - 1];
+  }
+
+  function poolOf (tier) {
+    var out = [], list = Yuvo.data.PUFIS || [];
+    for (var i = 0; i < list.length; i++) { if (list[i].rarity === tier) out.push(list[i]); }
+    return out;
+  }
+
+  function tierEksikVar (s, tier) {
+    var havuz = poolOf(tier);
+    for (var i = 0; i < havuz.length; i++) { if (!s.owned[havuz[i].id]) return true; }
+    return false;
+  }
+
+  // ---------- KADEME SEÇİMİ ----------
+  function pickTier (s, gizliHavuzda) {
+    if (s.pityE >= HARD_PITY_E - 1) return 'efsanevi'; // mutlak tavan
+
+    var base = Yuvo.data.RARITIES;
+    var w = {
+      yaygin: base.yaygin.oran, azbulunur: base.azbulunur.oran, nadir: base.nadir.oran,
+      destansi: base.destansi.oran, efsanevi: base.efsanevi.oran, gizli: base.gizli.oran
+    };
+    if (!gizliHavuzda) { w.yaygin += w.gizli; w.gizli = 0; } // gizli yalnız 30/30'da havuzda
+
+    if (s.pityE >= SOFT_PITY_E - 1) { // soft pity: Gizli oranına dokunmadan normalize
+      w.efsanevi = Math.min(0.95, base.efsanevi.oran + SOFT_ARTIS * (s.pityE - SOFT_PITY_E + 2));
+      var rest = 1 - w.efsanevi - w.gizli;
+      var restSum = w.yaygin + w.azbulunur + w.nadir + w.destansi;
+      if (restSum > 0 && rest > 0) {
+        var f = rest / restSum;
+        w.yaygin *= f; w.azbulunur *= f; w.nadir *= f; w.destansi *= f;
+      } else {
+        w.yaygin = Math.max(0, rest); w.azbulunur = 0; w.nadir = 0; w.destansi = 0;
+      }
+    }
+
+    var tier = weightedPick(TIERS, [w.yaygin, w.azbulunur, w.nadir, w.destansi, w.efsanevi, w.gizli], rand());
+
+    // Taban-yükseltme pity'leri
+    if (s.pityD >= PITY_DESTANSI - 1 && RANK[tier] < RANK.destansi) tier = 'destansi';
+    else if (s.pityN >= PITY_NADIR - 1 && RANK[tier] < RANK.nadir) tier = 'nadir';
+    // Onboarding garantisi: 3. yumurta Nadir+
+    if (s.eggCounter === 3 && RANK[tier] < RANK.nadir) tier = 'nadir';
+    return tier;
+  }
+
+  // ---------- PARÇA SEÇİMİ (akıllı düşüş) ----------
+  function pickPufi (s, tier, zorlaEksik) {
+    var havuz = poolOf(tier);
+    var eksik = [], i;
+    for (i = 0; i < havuz.length; i++) { if (!s.owned[havuz[i].id]) eksik.push(havuz[i]); }
+
+    if ((tier === 'efsanevi' || tier === 'gizli') && eksik.length) {
+      return eksik[Math.floor(rand() * eksik.length)]; // E/G hep eksik-öncelikli
+    }
+    if (zorlaEksik && eksik.length) {
+      return eksik[Math.floor(rand() * eksik.length)];
+    }
+    var wEksik = (Yuvo.engine.ownedCount() >= 27) ? W_EKSIK_SON3 : W_EKSIK;
+    var weights = [];
+    for (i = 0; i < havuz.length; i++) weights.push(s.owned[havuz[i].id] ? 1 : wEksik);
+    return weightedPick(havuz, weights, rand());
+  }
+
+  // ---------- YUMURTA AÇ ----------
+  Yuvo.engine.openEgg = function () {
+    var s = Yuvo.engine.state;
+    if (!s || s.eggsAvailable <= 0) return { error:'no-egg' };
+
+    s.eggsAvailable -= 1;
+    s.eggCounter += 1;
+
+    var zorlaEksik = (s.eggCounter <= ONBOARDING) || (s.copyStreak >= KOPYA_SERI_ESIGI);
+    var gizliHavuzda = Yuvo.engine.ownedCount() === 30;
+
+    var tier = pickTier(s, gizliHavuzda);
+
+    // Kesin-eksik garantisi kademeler ARASI da işler: çekilen kademenin havuzu tam
+    // sahipliyse, aynı-veya-üstü ranktan eksikli bir kademeye (oranları koruyarak)
+    // yükselt. Asla düşürme (pity tavanları bozulmaz); Gizli hariç — docs/v2/02 §2.1.4
+    // "Pity YOK (bilinçli)", zorlama onu fiilen pity'ye çevirirdi.
+    if (zorlaEksik && !tierEksikVar(s, tier)) {
+      var adaylar = [], aw = [], ti;
+      for (ti = 0; ti < TIERS.length; ti++) {
+        var t2 = TIERS[ti];
+        if (t2 === 'gizli' || RANK[t2] < RANK[tier]) continue;
+        if (!tierEksikVar(s, t2)) continue;
+        adaylar.push(t2); aw.push((Yuvo.data.RARITIES[t2] || {}).oran || 0);
+      }
+      if (adaylar.length === 1) tier = adaylar[0];
+      else if (adaylar.length > 1) tier = weightedPick(adaylar, aw, rand());
+      // adaylar boşsa kopya kaçınılmaz (ör. tek Efsanevi zaten sahipli) — olduğu gibi bırak
+    }
+
+    var pufi = pickPufi(s, tier, zorlaEksik);
+    var rarity = pufi.rarity; // = tier
+
+    var isNew, kabukGained = 0;
+    if (s.owned[pufi.id]) {
+      isNew = false;
+      s.owned[pufi.id] += 1;
+      kabukGained = (Yuvo.data.RARITIES[rarity] || {}).kabuk || 0;
+      s.kabuk += kabukGained;
+      s.copyStreak += 1;
+    } else {
+      isNew = true;
+      s.owned[pufi.id] = 1;
+      s.copyStreak = 0;
+      if (Yuvo.engine.checkMilestones) Yuvo.engine.checkMilestones();
+    }
+
+    // Sayaçlar — asla süreyle/paketle sıfırlanmaz, yalnız düşüşle
+    var r = RANK[rarity];
+    s.pityN = (r >= RANK.nadir) ? 0 : s.pityN + 1;
+    s.pityD = (r >= RANK.destansi) ? 0 : s.pityD + 1;
+    s.pityE = (r >= RANK.efsanevi) ? 0 : s.pityE + 1;
+
+    Yuvo.engine.save();
+    if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (e) {} }
+
+    var celebrationTier = (r >= RANK.efsanevi) ? 3 : (rarity === 'destansi') ? 2 : (rarity === 'nadir') ? 1 : 0;
+    return { pufi:pufi, rarity:rarity, isNew:isNew, kabukGained:kabukGained, celebrationTier:celebrationTier };
+  };
+
+  // Test kancası (motor kısmı)
+  Yuvo.test = Yuvo.test || {};
+  Yuvo.test.openEggRaw = function () { return Yuvo.engine.openEgg(); };
+})();
+
+/* == js/scenes/home.js == */
+/* Yuvo — Sahne: Yuva (çayır fonu, yuva sepeti, gezinen Pufiler, gün sonu).
+   Sahip: scenes-meta ajanı. Sözleşme: ARCHITECTURE.md */
+(function () {
+  var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  Yuvo.scenes = Yuvo.scenes || {};
+
+  var el = null;        // sahne kök konteyneri
+  var timers = [];
+  var onState = null;
+
+  /* ---------- yardımcılar (savunmacı) ---------- */
+  function st () { return (Yuvo.engine && Yuvo.engine.state) || {}; }
+  function play (n) { try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(n); } catch (e) {} }
+  function toast (t) { if (Yuvo.toast) Yuvo.toast(t); }
+  function later (fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+
+  function ownedCount () {
+    if (Yuvo.engine && Yuvo.engine.ownedCount) { try { return Yuvo.engine.ownedCount(); } catch (e) {} }
+    var s = st(), n = 0, owned = s.owned || {};
+    for (var id in owned) {
+      if (!owned[id]) continue;
+      var p = Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(id);
+      if (p && p.rarity === 'gizli') continue;
+      n += 1;
+    }
+    return n;
+  }
+
+  function eggArt () {
+    if (Yuvo.art && Yuvo.art.eggSVG) {
+      try { var s = Yuvo.art.eggSVG('yaygin', { crack:0 }); if (s) return s; } catch (e) {}
+    }
+    return '<span class="home-art-fallback">🥚</span>';
+  }
+
+  function pufiArt (p) {
+    if (Yuvo.art && Yuvo.art.pufiSVG) {
+      try { var s = Yuvo.art.pufiSVG(p, { mood:'happy' }); if (s) return s; } catch (e) {}
+    }
+    return '<span class="home-art-fallback">🐣</span>';
+  }
+
+  // Sahip olunan son 3-5 Pufi (ekleme sırasına göre sondakiler)
+  function lastOwnedPufis () {
+    var s = st(), owned = s.owned || {}, ids = [];
+    for (var id in owned) { if (owned[id]) ids.push(id); }
+    ids = ids.slice(-5);
+    var out = [];
+    for (var i = 0; i < ids.length; i++) {
+      var p = Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(ids[i]);
+      if (p) out.push(p);
+    }
+    return out;
+  }
+
+  /* ---------- çizim ---------- */
+  function render () {
+    if (!el) return;
+    var s = st();
+    var eggs = Math.max(0, s.eggsAvailable | 0);
+    var owned = ownedCount();
+    var pct = Math.max(0, Math.min(100, Math.round(owned / 30 * 100)));
+    var html = '';
+
+    // Gök dekoru: güneş + bulutlar
+    html += '<div class="home-sky" aria-hidden="true">' +
+              '<div class="home-sun"></div>' +
+              '<div class="home-cloud c1"></div>' +
+              '<div class="home-cloud c2"></div>' +
+            '</div>';
+
+    // Albüm ilerleme şeridi
+    html += '<button class="home-progress" data-act="album" aria-label="Albümü aç">' +
+              '<span class="home-progress-label">📔 Güneş Çayırı · <b>' + owned + '/30</b></span>' +
+              '<span class="home-progress-bar"><span class="home-progress-fill" style="width:' + pct + '%"></span></span>' +
+            '</button>';
+
+    // Yuva sepeti + yumurtalar
+    html += '<div class="home-nest-wrap">';
+    if (eggs > 0) {
+      html += '<p class="home-hint">Bir yumurta seç, birlikte çıtlatalım! 🐣</p>';
+    } else {
+      html += '<p class="home-hint">Bugünkü yumurtalar çıtlatıldı 🌙</p>';
+    }
+    html += '<div class="home-nest">';
+    html += '<div class="home-eggs">';
+    if (eggs > 0) {
+      var shown = Math.min(eggs, 5);
+      for (var i = 0; i < shown; i++) {
+        html += '<button class="home-egg" style="--i:' + i + '" data-act="egg" aria-label="Yumurtayı çıtlat">' +
+                  eggArt() + '</button>';
+      }
+      if (eggs > shown) html += '<span class="home-egg-more">+' + (eggs - shown) + '</span>';
+    } else {
+      html += '<span class="home-nest-empty" aria-hidden="true">💤</span>';
+    }
+    html += '</div>';
+    html += '<div class="home-basket" aria-hidden="true"></div>';
+    html += '</div></div>';
+
+    // Gün sonu paneli (yumurta bitince)
+    if (eggs === 0) {
+      var extraLeft = Math.max(0, 2 - (s.extraEggsBought | 0));
+      var canAfford = (s.stardust | 0) >= 120;
+      html += '<div class="home-dayend">';
+      if (extraLeft > 0) {
+        // İkon ağırlıklı: kalan hak iki nokta ile (dolu = kalan), ekonomi cümlesi yok
+        html += '<button class="btn btn-primary home-extra" data-act="extra"' + (canAfford ? '' : ' disabled') + '>' +
+                  '🥚 +1 · ⭐120 <small>' + (extraLeft === 2 ? '●●' : '●○') + '</small></button>';
+        if (!canAfford) {
+          html += '<p class="home-note">⭐ yetersiz — Eşle &amp; Bul oynayıp yıldız toplayabilirsin!</p>';
+        }
+      } else {
+        html += '<p class="home-note">Bugünlük ek yumurta hakkın doldu (2/2).</p>';
+      }
+      html += '<button class="btn btn-soft home-endday" data-act="endday">🌙 Günü Bitir</button>';
+      html += '</div>';
+    }
+
+    // Çayır: gezinen Pufiler
+    var roam = lastOwnedPufis();
+    html += '<div class="home-meadow">';
+    for (var j = 0; j < roam.length; j++) {
+      var left = 6 + ((j * 19) % 68);
+      var dur = (7 + (j % 3) * 2.5).toFixed(1);
+      var delay = (-(j * 1.7)).toFixed(1);
+      html += '<button class="home-roamer' + (j % 2 === 1 ? ' alt' : '') + '"' +
+                ' data-act="pufi" data-id="' + roam[j].id + '"' +
+                ' style="left:' + left + '%;animation-duration:' + dur + 's;animation-delay:' + delay + 's"' +
+                ' aria-label="' + roam[j].ad + '">' +
+                '<span class="home-roamer-body">' + pufiArt(roam[j]) + '</span>' +
+              '</button>';
+    }
+    if (roam.length === 0) {
+      html += '<p class="home-meadow-hint">Çayır henüz sessiz… İlk Pufi\'ni bekliyor 🌼</p>';
+    }
+    html += '<div class="home-grass" aria-hidden="true"></div>';
+    html += '</div>';
+
+    el.innerHTML = html;
+  }
+
+  /* ---------- etkileşim (delege tek dinleyici) ---------- */
+  function handleClick (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!b) return;
+    var act = b.getAttribute('data-act');
+
+    if (act === 'egg') {
+      play('tap');
+      if (Yuvo.go) Yuvo.go('ceremony');
+    } else if (act === 'album') {
+      play('page');
+      if (Yuvo.go) Yuvo.go('album');
+    } else if (act === 'pufi') {
+      play('pop');
+      var body = b.querySelector('.home-roamer-body');
+      if (body) {
+        body.classList.remove('jump');
+        void body.offsetWidth; // animasyonu baştan başlat
+        body.classList.add('jump');
+        later(function () { body.classList.remove('jump'); }, 700);
+      }
+    } else if (act === 'extra') {
+      var ok = !!(Yuvo.engine && Yuvo.engine.buyExtraEgg && Yuvo.engine.buyExtraEgg());
+      if (ok) {
+        play('star');
+        toast('🥚 Ek yumurta yuvaya kondu!');
+      } else {
+        var s = st();
+        if ((s.extraEggsBought | 0) >= 2) toast('Bugünlük ek yumurta hakkı doldu.');
+        else toast('⭐ yetersiz — 120⭐ gerekiyor.');
+      }
+      render();
+    } else if (act === 'endday') {
+      play('chime');
+      if (Yuvo.engine && Yuvo.engine.newDay) Yuvo.engine.newDay();
+      toast('🌞 Yeni gün! 3 taze yumurta yuvada.');
+      render();
+    }
+  }
+
+  /* ---------- sahne API ---------- */
+  Yuvo.scenes.home = {
+    mount: function (rootEl) {
+      el = document.createElement('div');
+      el.className = 'home-scene';
+      rootEl.appendChild(el);
+      el.addEventListener('click', handleClick);
+      onState = function () { render(); };
+      document.addEventListener('yuvo:state', onState);
+      render();
+    },
+    unmount: function () {
+      for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+      timers = [];
+      if (onState) { document.removeEventListener('yuvo:state', onState); onState = null; }
+      if (el) {
+        el.removeEventListener('click', handleClick);
+        if (el.parentNode) el.parentNode.removeChild(el);
+        el = null;
+      }
+    }
+  };
+})();
+
+/* == js/scenes/minigame.js == */
+/* Yuvo — Sahne: Eşle & Bul mini oyunu (6 kart, 3 çift; süre yok, kaybetme yok).
+   Sahip: scenes-meta ajanı. Sözleşme: ARCHITECTURE.md */
+(function () {
+  var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  Yuvo.scenes = Yuvo.scenes || {};
+
+  var el = null;
+  var timers = [];
+  var deck = [];        // [{ fid, svg, open, matched }]
+  var flippedIdx = [];  // açık bekleyen kart indeksleri (en çok 2)
+  var matchedPairs = 0;
+  var attempts = 0;     // çift deneme sayısı
+  var lock = false;
+  var finished = false;
+
+  /* ---------- yardımcılar (savunmacı) ---------- */
+  function st () { return (Yuvo.engine && Yuvo.engine.state) || {}; }
+  function play (n) { try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(n); } catch (e) {} }
+  function later (fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+
+  function shuffle (a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function pufiFace (p) {
+    if (Yuvo.art && Yuvo.art.pufiSVG) {
+      try { var s = Yuvo.art.pufiSVG(p, { mood:'happy' }); if (s) return s; } catch (e) {}
+    }
+    return '<span class="mg-art-fallback">🐣</span>';
+  }
+  function eggFace (r) {
+    if (Yuvo.art && Yuvo.art.eggSVG) {
+      try { var s = Yuvo.art.eggSVG(r, { crack:0 }); if (s) return s; } catch (e) {}
+    }
+    return '<span class="mg-art-fallback">🥚</span>';
+  }
+
+  /* ---------- deste kurulumu ---------- */
+  function buildDeck () {
+    var s = st(), owned = s.owned || {}, ids = [];
+    for (var id in owned) { if (owned[id]) ids.push(id); }
+    shuffle(ids);
+
+    var faces = [];
+    for (var i = 0; i < ids.length && faces.length < 3; i++) {
+      var p = Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(ids[i]);
+      if (p) faces.push({ fid:'pufi-' + p.id, svg:pufiFace(p) });
+    }
+    // Sahip olunan Pufi azsa: yumurta desenleriyle tamamla
+    var eggR = shuffle(['nadir', 'destansi', 'azbulunur', 'efsanevi', 'yaygin']);
+    var k = 0;
+    while (faces.length < 3 && k < eggR.length) {
+      faces.push({ fid:'egg-' + eggR[k], svg:eggFace(eggR[k]) });
+      k += 1;
+    }
+
+    deck = [];
+    for (var f = 0; f < faces.length; f++) {
+      deck.push({ fid:faces[f].fid, svg:faces[f].svg, open:false, matched:false });
+      deck.push({ fid:faces[f].fid, svg:faces[f].svg, open:false, matched:false });
+    }
+    shuffle(deck);
+  }
+
+  /* ---------- çizim ---------- */
+  function render () {
+    if (!el) return;
+    var s = st();
+    var plays = Math.min(5, s.rewardedPlaysToday | 0);
+    // Kalan ödüllü hak: sayı yerine yıldız ikonları (okuma öncesi yaş)
+    var hak = '';
+    for (var h = 0; h < 5; h++) hak += h < (5 - plays) ? '⭐' : '☆';
+    var html = '';
+    html += '<div class="mg-head center">' +
+              '<h2 class="mg-title">🌼 Eşini Bul</h2>' +
+              '<p class="mg-sub">Aynı iki dostu bul! · ' + hak + '</p>' +
+            '</div>';
+    html += '<div class="mg-grid">';
+    for (var i = 0; i < deck.length; i++) {
+      var c = deck[i];
+      html += '<button class="mg-card' + (c.open || c.matched ? ' flipped' : '') +
+                (c.matched ? ' matched' : '') + '" data-idx="' + i + '" aria-label="Kart ' + (i + 1) + '">' +
+                '<span class="mg-inner">' +
+                  '<span class="mg-face mg-front" aria-hidden="true">🌼</span>' +
+                  '<span class="mg-face mg-back">' + c.svg + '</span>' +
+                '</span>' +
+              '</button>';
+    }
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  function cardEl (idx) {
+    return el ? el.querySelector('.mg-card[data-idx="' + idx + '"]') : null;
+  }
+
+  /* ---------- oyun akışı ---------- */
+  function onCardTap (btn) {
+    if (lock || finished) return;
+    var idx = parseInt(btn.getAttribute('data-idx'), 10);
+    var c = deck[idx];
+    if (!c || c.open || c.matched) return;
+
+    c.open = true;
+    btn.classList.add('flipped');
+    play('tap');
+    flippedIdx.push(idx);
+    if (flippedIdx.length < 2) return;
+
+    attempts += 1;
+    lock = true;
+    var ia = flippedIdx[0], ib = flippedIdx[1];
+    var a = deck[ia], b = deck[ib];
+
+    if (a.fid === b.fid) {
+      later(function () {
+        a.matched = true; b.matched = true;
+        a.open = false; b.open = false;
+        var ea = cardEl(ia), eb = cardEl(ib);
+        if (ea) ea.classList.add('matched');
+        if (eb) eb.classList.add('matched');
+        play('chime');
+        matchedPairs += 1;
+        flippedIdx = [];
+        lock = false;
+        if (matchedPairs >= 3) later(finish, 650);
+      }, 380);
+    } else {
+      later(function () {
+        a.open = false; b.open = false;
+        var ea = cardEl(ia), eb = cardEl(ib);
+        if (ea) ea.classList.remove('flipped');
+        if (eb) eb.classList.remove('flipped');
+        flippedIdx = [];
+        lock = false;
+      }, 900);
+    }
+  }
+
+  function finish () {
+    if (finished || !el) return;
+    finished = true;
+
+    var stars = attempts <= 4 ? 3 : (attempts <= 6 ? 2 : 1);
+    var s = st();
+    var rested = (s.rewardedPlaysToday | 0) >= 5;
+    var reward = rested ? 5 : (stars === 3 ? 40 : (stars === 2 ? 30 : 20));
+
+    if (!rested) s.rewardedPlaysToday = (s.rewardedPlaysToday | 0) + 1;
+    if (Yuvo.engine && Yuvo.engine.addStardust) {
+      Yuvo.engine.addStardust(reward); // save + refresh motor tarafında
+    } else {
+      s.stardust = (s.stardust | 0) + reward;
+      if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (e) {} }
+    }
+    play(stars === 3 ? 'fanfare' : 'star');
+
+    var starsHtml = '';
+    for (var i = 0; i < 3; i++) {
+      starsHtml += '<span class="mg-star' + (i < stars ? ' on' : '') + '" style="--d:' + (i * 0.18) + 's">' +
+                     (i < stars ? '⭐' : '☆') + '</span>';
+    }
+    var panel = document.createElement('div');
+    panel.className = 'mg-result';
+    panel.innerHTML =
+      '<div class="mg-result-card center">' +
+        '<div class="mg-stars">' + starsHtml + '</div>' +
+        '<h3 class="mg-result-title">' +
+          (stars === 3 ? 'Muhteşem hafıza!' : (stars === 2 ? 'Çok iyi!' : 'Aferin sana!')) +
+        '</h3>' +
+        (rested
+          ? '<p class="mg-note">Pufiler dinleniyor 💤 Yarın yine oynayalım!</p>'
+          : '<p class="mg-note">Yıldız tozun hazır:</p>') +
+        '<p class="mg-reward">+' + reward + ' ⭐</p>' +
+        '<div class="mg-btns stack">' +
+          '<button class="btn btn-primary" data-mg="again">🔁 Tekrar</button>' +
+          '<button class="btn btn-soft" data-mg="home">🏡 Yuvaya Dön</button>' +
+        '</div>' +
+      '</div>';
+    el.appendChild(panel);
+  }
+
+  function start () {
+    for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+    timers = [];
+    flippedIdx = [];
+    matchedPairs = 0;
+    attempts = 0;
+    lock = false;
+    finished = false;
+    buildDeck();
+    render();
+  }
+
+  /* ---------- etkileşim ---------- */
+  function handleClick (e) {
+    var t = e.target;
+    var card = t && t.closest ? t.closest('.mg-card') : null;
+    if (card) { onCardTap(card); return; }
+    var b = t && t.closest ? t.closest('[data-mg]') : null;
+    if (!b) return;
+    var act = b.getAttribute('data-mg');
+    if (act === 'again') {
+      play('click');
+      start();
+    } else if (act === 'home') {
+      play('click');
+      if (Yuvo.go) Yuvo.go('home');
+    }
+  }
+
+  /* ---------- sahne API ---------- */
+  Yuvo.scenes.minigame = {
+    mount: function (rootEl) {
+      el = document.createElement('div');
+      el.className = 'mg-scene';
+      rootEl.appendChild(el);
+      el.addEventListener('click', handleClick);
+      start();
+    },
+    unmount: function () {
+      for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+      timers = [];
+      flippedIdx = [];
+      deck = [];
+      lock = false;
+      finished = false;
+      if (el) {
+        el.removeEventListener('click', handleClick);
+        if (el.parentNode) el.parentNode.removeChild(el);
+        el = null;
+      }
+    }
+  };
+})();
+
+/* == js/scenes/album.js == */
+/* Yuvo — Sahne: Albüm ("Güneş Çayırı" sayfası: 30 hücre + gizli, kilometre taşları, Atölye).
+   Sahip: scenes-meta ajanı. Sözleşme: ARCHITECTURE.md */
+(function () {
+  var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  Yuvo.scenes = Yuvo.scenes || {};
+
+  var el = null;
+  var timers = [];
+  var onState = null;
+
+  // Kilometre taşları — state.js'tekiyle aynı tablo (görsel amaçlı kopya)
+  var MILES = [
+    { at:10, key:'m10', odul:15 },
+    { at:20, key:'m20', odul:30 },
+    { at:27, key:'m27', odul:60 },
+    { at:30, key:'m30', odul:100 }
+  ];
+
+  /* ---------- yardımcılar (savunmacı) ---------- */
+  function st () { return (Yuvo.engine && Yuvo.engine.state) || {}; }
+  function play (n) { try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(n); } catch (e) {} }
+  function toast (t) { if (Yuvo.toast) Yuvo.toast(t); }
+  function later (fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+
+  function pufiList () { return (Yuvo.data && Yuvo.data.PUFIS) || []; }
+  function byId (id) { return (Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(id)) || null; }
+  function rarInfo (r) {
+    return (Yuvo.data && Yuvo.data.RARITIES && Yuvo.data.RARITIES[r]) ||
+           { ad:r || '?', renk:'#9AA5B1', uretim:0, kabuk:0 };
+  }
+
+  function ownedCount () {
+    if (Yuvo.engine && Yuvo.engine.ownedCount) { try { return Yuvo.engine.ownedCount(); } catch (e) {} }
+    var s = st(), n = 0, owned = s.owned || {};
+    for (var id in owned) {
+      if (!owned[id]) continue;
+      var p = byId(id);
+      if (p && p.rarity === 'gizli') continue;
+      n += 1;
+    }
+    return n;
+  }
+
+  function miniArt (p) {
+    if (Yuvo.art && Yuvo.art.pufiSVG) {
+      try { var s = Yuvo.art.pufiSVG(p, { mood:'happy' }); if (s) return s; } catch (e) {}
+    }
+    return '<span class="alb-art-fallback">🐣</span>';
+  }
+  function silArt (p) {
+    if (Yuvo.art && Yuvo.art.pufiSilhouetteSVG) {
+      try { var s = Yuvo.art.pufiSilhouetteSVG(p); if (s) return s; } catch (e) {}
+    }
+    return '<span class="alb-art-fallback dim">🐾</span>';
+  }
+  function toyArt (p) {
+    if (Yuvo.art && Yuvo.art.toyAssembledSVG) {
+      try { var s = Yuvo.art.toyAssembledSVG(p); if (s) return s; } catch (e) {}
+    }
+    return miniArt(p);
+  }
+
+  /* ---------- çizim ---------- */
+  function render () {
+    if (!el) return;
+    var s = st();
+    var owned = ownedCount();
+    var pct = Math.max(0, Math.min(100, Math.round(owned / 30 * 100)));
+    var ownedMap = s.owned || {};
+    var miles = s.milestones || [];
+    var html = '';
+
+    // Üst bilgi: başlık + Kabuk bakiyesi + ilerleme
+    html += '<div class="alb-head">' +
+              '<h2 class="alb-title">📔 Güneş Çayırı</h2>' +
+              '<span class="alb-shell">🐚 ' + (s.kabuk | 0) + '</span>' +
+            '</div>';
+    html += '<div class="alb-progress">' +
+              '<span class="alb-progress-num"><b>' + owned + '</b>/30</span>' +
+              '<span class="alb-progress-bar"><span class="alb-progress-fill" style="width:' + pct + '%"></span></span>' +
+            '</div>';
+
+    // Kilometre taşı çipleri
+    html += '<div class="alb-chips">';
+    for (var m = 0; m < MILES.length; m++) {
+      var mi = MILES[m];
+      var claimed = miles.indexOf(mi.key) !== -1;
+      var ready = !claimed && owned >= mi.at;
+      var cls = claimed ? 'done' : (ready ? 'ready' : 'locked');
+      html += '<button class="alb-chip ' + cls + '" data-act="mile" data-key="' + mi.key + '">' +
+                '<b>' + mi.at + '</b>' +
+                '<small>' + (claimed ? '✓ alındı' : '+' + mi.odul + ' 🐚') + '</small>' +
+              '</button>';
+    }
+    html += '</div>';
+
+    // 30 hücrelik ızgara (gizli hariç, PUFIS sırasıyla)
+    html += '<div class="alb-grid">';
+    var list = pufiList();
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
+      if (p.rarity === 'gizli') continue;
+      var n = ownedMap[p.id] | 0;
+      if (n > 0) {
+        html += '<button class="alb-cell rf rf-' + p.rarity + '" data-act="cell" data-id="' + p.id + '"' +
+                  ' aria-label="' + p.ad + '">' +
+                  miniArt(p) +
+                  (n > 1 ? '<span class="alb-copy">×' + n + '</span>' : '') +
+                '</button>';
+      } else {
+        html += '<button class="alb-cell missing rf rf-' + p.rarity + '" data-act="cell" data-id="' + p.id + '"' +
+                  ' aria-label="Bilinmeyen Pufi">' +
+                  silArt(p) +
+                  '<span class="alb-q">?</span>' +
+                '</button>';
+      }
+    }
+    html += '</div>';
+
+    // Ayrık gizli hücre
+    var gizli = null;
+    for (var g = 0; g < list.length; g++) { if (list[g].rarity === 'gizli') { gizli = list[g]; break; } }
+    if (gizli) {
+      var gn = ownedMap[gizli.id] | 0;
+      html += '<div class="alb-secret-row">' +
+                '<button class="alb-cell alb-secret rf rf-gizli' + (gn > 0 ? '' : ' missing') + '"' +
+                  ' data-act="cell" data-id="' + gizli.id + '" aria-label="Gizli Pufi">' +
+                  (gn > 0 ? miniArt(gizli) + (gn > 1 ? '<span class="alb-copy">×' + gn + '</span>' : '')
+                          : '<span class="alb-q big">???</span>') +
+                '</button>' +
+                '<span class="alb-secret-label">' +
+                  (gn > 0 ? gizli.ad + ' aramıza katıldı! 🌙' : 'Çayırda bir sır fısıldanıyor…') +
+                '</span>' +
+              '</div>';
+    }
+
+    el.innerHTML = html;
+  }
+
+  /* ---------- kilometre taşı ödülü ---------- */
+  function claimMilestones () {
+    var s = st();
+    var owned = ownedCount();
+    var miles = s.milestones = s.milestones || [];
+    var total = 0, i;
+
+    if (Yuvo.engine && Yuvo.engine.checkMilestones) {
+      var granted = [];
+      try { granted = Yuvo.engine.checkMilestones() || []; } catch (e) { granted = []; }
+      for (i = 0; i < MILES.length; i++) {
+        if (granted.indexOf(MILES[i].key) !== -1) total += MILES[i].odul;
+      }
+      if (granted.length) {
+        if (Yuvo.engine.save) { try { Yuvo.engine.save(); } catch (e2) {} }
+        if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (e3) {} }
+      }
+    } else {
+      // Motor yoksa yerel yedek: bir kez ver
+      for (i = 0; i < MILES.length; i++) {
+        var mi = MILES[i];
+        if (owned >= mi.at && miles.indexOf(mi.key) === -1) {
+          miles.push(mi.key);
+          s.kabuk = (s.kabuk | 0) + mi.odul;
+          total += mi.odul;
+        }
+      }
+      if (total > 0 && Yuvo.refresh) { try { Yuvo.refresh(); } catch (e4) {} }
+    }
+
+    if (total > 0) {
+      play('star');
+      toast('🐚 +' + total + ' Kabuk! Kilometre taşı ödülün.');
+    }
+    render();
+  }
+
+  /* ---------- detay modalı / Atölye ---------- */
+  function openDetail (id) {
+    var p = byId(id);
+    if (!p) return;
+    var s = st();
+    var n = (s.owned || {})[id] | 0;
+    var ri = rarInfo(p.rarity);
+
+    if (n > 0) {
+      // Sahipli: ad + nadirlik + bio + birleşmiş oyuncak
+      play('pop');
+      var htmlOwned =
+        '<div class="alb-modal center">' +
+          '<div class="alb-modal-art rf rf-' + p.rarity + '">' + toyArt(p) + '</div>' +
+          '<h3 class="alb-modal-name">' + p.ad + '</h3>' +
+          '<p class="alb-modal-tur">' + p.tur + '</p>' +
+          '<p class="alb-modal-tags">' +
+            '<span class="rarity-tag" style="background:' + ri.renk + '33;border-color:' + ri.renk + '">' +
+              (ri.simge ? ri.simge + ' ' : '') + ri.ad + '</span>' +
+            (n > 1 ? ' <span class="alb-copy-tag">×' + n + ' kopya</span>' : '') +
+          '</p>' +
+          '<p class="alb-bio">“' + p.bio + '”</p>' +
+        '</div>';
+      if (Yuvo.modal) Yuvo.modal(htmlOwned);
+      return;
+    }
+
+    // Eksik: Atölye
+    play('click');
+    var cost = ri.uretim | 0;
+    var wallet = s.kabuk | 0;
+    var gizliLocked = (p.rarity === 'gizli') && ownedCount() < 30;
+    var enough = wallet >= cost;
+    var body =
+      '<div class="alb-modal center">' +
+        '<div class="alb-modal-art rf rf-' + p.rarity + ' missing">' +
+          (p.rarity === 'gizli' && gizliLocked ? '<span class="alb-q big">???</span>' : silArt(p)) +
+        '</div>' +
+        '<h3 class="alb-modal-name">???</h3>' +
+        '<p class="alb-modal-tags"><span class="rarity-tag" style="background:' + ri.renk + '33;border-color:' + ri.renk + '">' +
+          (ri.simge ? ri.simge + ' ' : '') + ri.ad + '</span></p>' +
+        '<div class="alb-workshop">' +
+          '<p class="alb-workshop-note">🐢 Usta Kabuk atölyesinde bu dostun oyuncağını üretebilir.</p>' +
+          '<p class="alb-cost">Maliyet: <b>' + cost + ' 🐚</b> · Cüzdanın: <b>' + wallet + ' 🐚</b></p>';
+    if (gizliLocked) {
+      body += '<p class="alb-locked">🔒 Usta Kabuk fısıldar: “Önce 30 dostu yuvaya getir…” (' +
+                ownedCount() + '/30)</p>';
+    } else {
+      body += '<button class="btn btn-primary alb-craft-btn" id="alb-craft-btn"' + (enough ? '' : ' disabled') + '>' +
+                '🐢 Usta Kabuk\'a Ürettir</button>';
+      if (!enough) body += '<p class="alb-locked">🐚 Kabuk yetersiz — kopyalar Kabuk kazandırır!</p>';
+    }
+    body += '</div></div>';
+
+    var close = Yuvo.modal ? Yuvo.modal(body) : function () {};
+    var btn = document.getElementById('alb-craft-btn');
+    if (btn) {
+      btn.addEventListener('click', function () { doCraft(p, close); });
+    }
+  }
+
+  function doCraft (p, close) {
+    var r = (Yuvo.engine && Yuvo.engine.craft) ? Yuvo.engine.craft(p.id) : { ok:false, reason:'motor-yok' };
+    if (r && r.ok) {
+      play('fanfare');
+      // Minik üretim töreni: modal içinde parıltı + oyuncak
+      var box = document.querySelector('#overlay-root .modal');
+      if (box) {
+        box.innerHTML =
+          '<div class="alb-craft-anim center">' +
+            '<div class="alb-craft-spark" aria-hidden="true">✨</div>' +
+            '<div class="alb-modal-art rf rf-' + p.rarity + ' alb-pop">' + toyArt(p) + '</div>' +
+            '<h3 class="alb-modal-name">' + p.ad + '</h3>' +
+            '<p class="alb-workshop-note">Albüme işlendi! 📔</p>' +
+          '</div>';
+      }
+      later(function () {
+        try { close(); } catch (e) {}
+        render();
+      }, 1700);
+      toast('🎉 ' + p.ad + ' aileye katıldı!');
+    } else {
+      var reason = r && r.reason;
+      if (reason === 'kabuk-yetersiz') toast('🐚 Kabuk yetersiz — kopyalar Kabuk kazandırır!');
+      else if (reason === 'gizli-kilitli') toast('🔒 Önce 30 dostu yuvaya getirmelisin.');
+      else if (reason === 'sahipli') toast('Bu dost zaten albümde!');
+      else toast('Atölye şu an çalışmıyor.');
+    }
+  }
+
+  /* ---------- etkileşim ---------- */
+  function handleClick (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'cell') {
+      openDetail(b.getAttribute('data-id'));
+    } else if (act === 'mile') {
+      var key = b.getAttribute('data-key');
+      var mi = null;
+      for (var i = 0; i < MILES.length; i++) { if (MILES[i].key === key) { mi = MILES[i]; break; } }
+      if (!mi) return;
+      var s = st();
+      var claimed = (s.milestones || []).indexOf(key) !== -1;
+      var owned = ownedCount();
+      if (claimed) {
+        play('click');
+        toast('Bu ödül alındı ✓');
+      } else if (owned >= mi.at) {
+        claimMilestones();
+      } else {
+        play('click');
+        toast('Daha ' + (mi.at - owned) + ' dost gerek (' + owned + '/' + mi.at + ').');
+      }
+    }
+  }
+
+  /* ---------- sahne API ---------- */
+  Yuvo.scenes.album = {
+    mount: function (rootEl) {
+      el = document.createElement('div');
+      el.className = 'alb-scene';
+      rootEl.appendChild(el);
+      el.addEventListener('click', handleClick);
+      onState = function () { render(); };
+      document.addEventListener('yuvo:state', onState);
+      play('page');
+      render();
+    },
+    unmount: function () {
+      for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+      timers = [];
+      if (onState) { document.removeEventListener('yuvo:state', onState); onState = null; }
+      if (el) {
+        el.removeEventListener('click', handleClick);
+        if (el.parentNode) el.parentNode.removeChild(el);
+        el = null;
+      }
+    }
+  };
+})();
+
+/* == js/scenes/ceremony.js == */
+/* Yuvo — Sahne: Çıtlatma Töreni (docs/06 §2 + ARCHITECTURE.md 6 adım). Sahip: scenes-core ajanı. */
+(function () {
+  var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  Yuvo.scenes = Yuvo.scenes || {};
+  Yuvo.test = Yuvo.test || {};
+
+  // ---------- modül durumu ----------
+  var mounted = false;
+  var rootEl = null, stageEl = null, eggEl = null, eggWrapEl = null;
+  var warmthEl = null, ringsEl = null, fxEl = null, hintEl = null;
+  var result = null;           // openEgg() sonucu — mount'ta BİR KEZ çekilir, saklanır
+  var stage = 'idle';          // arrive | warm | rhythm | burst | card | noegg
+  var crack = 0;
+  var warmDist = 0, warmTaps = 0, rubbing = false, lastX = 0, lastY = 0;
+  var ringStep = 0;
+  var lastTap = 0;
+  var timers = [];
+
+  var WARM_DIST = 1400;        // px — dairesel ovalama (pointermove) birikimi eşiği
+  var WARM_TAPS = 5;           // dokunma fallback: 5 tap
+  var DBL_MS = 350;            // çift-tap hızlandırma eşiği
+
+  // ---------- yardımcılar ----------
+  function later (fn, ms) {
+    var id = setTimeout(function () { if (mounted) fn(); }, ms);
+    timers.push(id);
+    return id;
+  }
+  function clearTimers () {
+    for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+    timers = [];
+  }
+  function play (name) {
+    try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(name); } catch (e) {}
+  }
+  function vibrate (p) {
+    try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {}
+  }
+  function esc (s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function rarityInfo (key) {
+    return (Yuvo.data && Yuvo.data.RARITIES && Yuvo.data.RARITIES[key]) || { ad: key || '?', renk: '#9AA5B1' };
+  }
+
+  // Savunmacı sanat: art modülü henüz yoksa basit yedekler
+  function eggSVG () {
+    try {
+      if (Yuvo.art && Yuvo.art.eggSVG) {
+        var s = Yuvo.art.eggSVG(result.rarity, { crack: crack });
+        if (s) return s;
+      }
+    } catch (e) {}
+    var renk = rarityInfo(result.rarity).renk;
+    var cr = '';
+    if (crack >= 1) cr += '<path d="M45 40 l8 9 -6 7 9 8" stroke="#6d5c46" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    if (crack >= 2) cr += '<path d="M74 52 l-7 8 8 6 -5 9" stroke="#6d5c46" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    if (crack >= 3) cr += '<path d="M40 66 l10 5 -3 9 11 4 M80 42 l-4 10 8 5" stroke="#57452f" stroke-width="3.5" fill="none" stroke-linecap="round"/>';
+    return '<svg viewBox="0 0 120 120"><ellipse cx="60" cy="66" rx="34" ry="44" fill="' + renk + '"/>' +
+      '<ellipse cx="48" cy="48" rx="10" ry="14" fill="rgba(255,255,255,.5)"/>' + cr + '</svg>';
+  }
+  function pufiSVG (mood) {
+    try {
+      if (Yuvo.art && Yuvo.art.pufiSVG) {
+        var s = Yuvo.art.pufiSVG(result.pufi, { mood: mood || 'happy' });
+        if (s) return s;
+      }
+    } catch (e) {}
+    var renk = rarityInfo(result.rarity).renk;
+    return '<svg viewBox="0 0 120 120"><circle cx="60" cy="64" r="38" fill="' + renk + '"/>' +
+      '<circle cx="48" cy="56" r="5" fill="#3a2f22"/><circle cx="72" cy="56" r="5" fill="#3a2f22"/>' +
+      '<path d="M48 74 q12 10 24 0" stroke="#3a2f22" stroke-width="4" fill="none" stroke-linecap="round"/></svg>';
+  }
+
+  function renderEgg () { if (eggEl) eggEl.innerHTML = eggSVG(); }
+  function setHint (text) { if (hintEl) hintEl.textContent = text || ''; }
+
+  // ---------- aşama 0: yumurta yoksa nazik mesaj ----------
+  function showNoEgg () {
+    stage = 'noegg';
+    rootEl.innerHTML =
+      '<div class="cere-stage cere-noegg">' +
+        '<div class="cere-noegg-box card center">' +
+          '<div class="cere-noegg-ico">🌙</div>' +
+          '<h2>Bugünün yumurtaları bitti</h2>' +
+          '<p>Pufiler tatlı tatlı uyuyor… Yarın sepette yeni sürprizler olacak!</p>' +
+          '<button class="btn btn-primary" id="cere-home">Yuvaya Dön 🏡</button>' +
+        '</div>' +
+      '</div>';
+    var b = rootEl.querySelector('#cere-home');
+    if (b) b.addEventListener('click', function () { if (Yuvo.go) Yuvo.go('home'); });
+    later(function () { if (stage === 'noegg' && Yuvo.go) Yuvo.go('home'); }, 3000);
+  }
+
+  // ---------- sahne iskeleti ----------
+  function buildStage () {
+    rootEl.innerHTML =
+      '<div class="cere-stage" id="cere-stage">' +
+        '<div class="cere-basket" id="cere-basket">🧺</div>' +
+        '<div class="cere-egg-wrap arriving" id="cere-egg-wrap">' +
+          '<div class="cere-egg" id="cere-egg"></div>' +
+          '<div class="cere-warmth" id="cere-warmth"></div>' +
+          '<div class="cere-hand" aria-hidden="true">🖐️</div>' +
+        '</div>' +
+        '<div class="cere-rings" id="cere-rings"></div>' +
+        '<div class="cere-fx" id="cere-fx"></div>' +
+        '<p class="cere-hint" id="cere-hint"></p>' +
+      '</div>';
+    stageEl = rootEl.querySelector('#cere-stage');
+    eggWrapEl = rootEl.querySelector('#cere-egg-wrap');
+    eggEl = rootEl.querySelector('#cere-egg');
+    warmthEl = rootEl.querySelector('#cere-warmth');
+    ringsEl = rootEl.querySelector('#cere-rings');
+    fxEl = rootEl.querySelector('#cere-fx');
+    hintEl = rootEl.querySelector('#cere-hint');
+
+    stageEl.addEventListener('pointerdown', onPointerDown);
+    stageEl.addEventListener('pointermove', onPointerMove);
+    stageEl.addEventListener('pointerup', onPointerEnd);
+    stageEl.addEventListener('pointercancel', onPointerEnd);
+    renderEgg();
+  }
+
+  // ---------- işaretçi olayları ----------
+  function onPointerDown (e) {
+    var now = Date.now();
+    var isDbl = (now - lastTap) < DBL_MS;
+    lastTap = now;
+    if (isDbl) { accelerate(); return; }
+
+    if (stage === 'warm') {
+      rubbing = true;
+      lastX = e.clientX; lastY = e.clientY;
+      warmTaps += 1;
+      play('tap');
+      vibrate(8);
+      checkWarm();
+    } else if (stage === 'rhythm') {
+      onRingTap();
+    }
+  }
+  function onPointerMove (e) {
+    if (stage !== 'warm' || !rubbing) return;
+    var dx = e.clientX - lastX, dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    warmDist += Math.sqrt(dx * dx + dy * dy);
+    checkWarm();
+  }
+  function onPointerEnd () { rubbing = false; }
+
+  // Çift-tap: her aşamayı hızlandır
+  function accelerate () {
+    if (stage === 'arrive') { clearTimers(); startWarm(); }
+    else if (stage === 'warm') { finishWarm(); }
+    else if (stage === 'rhythm') {
+      clearTimers();
+      crack = 3; renderEgg();
+      play('crackBig'); vibrate([20, 30, 80]);
+      doBurst();
+    } else if (stage === 'burst') { clearTimers(); showCard(); }
+  }
+
+  // ---------- aşama 1: sepetten geliş ----------
+  function showArrive () {
+    stage = 'arrive';
+    setHint('Yumurta geliyor! 🥚');
+    play('pop');
+    later(function () { startWarm(); }, 950);
+  }
+
+  // ---------- aşama 2: ısıtma ----------
+  function startWarm () {
+    if (stage === 'warm') return;
+    stage = 'warm';
+    warmDist = 0; warmTaps = 0;
+    if (eggWrapEl) { eggWrapEl.classList.remove('arriving'); eggWrapEl.classList.add('warm'); }
+    var basket = rootEl && rootEl.querySelector('#cere-basket');
+    if (basket) basket.classList.add('gone');
+    // Jest gösterimi: yumurta üstünde daire çizen el animasyonu (.cere-hand) — metin kısa kalır
+    setHint('Ovala! 🖐️');
+  }
+  function checkWarm () {
+    if (stage !== 'warm') return;
+    var progress = Math.max(warmDist / WARM_DIST, warmTaps / WARM_TAPS);
+    if (warmthEl) warmthEl.style.opacity = String(Math.min(1, progress) * 0.65);
+    if (progress >= 1) finishWarm();
+  }
+  function finishWarm () {
+    if (stage !== 'warm') return;
+    stage = 'warming-done';
+    rubbing = false;
+    crack = 1;
+    renderEgg();
+    if (warmthEl) warmthEl.style.opacity = '0.65';
+    if (eggWrapEl) { eggWrapEl.classList.remove('warm'); eggWrapEl.classList.add('warmed'); }
+    play('crack1');
+    vibrate(40);
+    setHint('Çıtladı! ✨');
+    later(function () { startRhythm(); }, 500);
+  }
+
+  // ---------- aşama 3: ritim halkaları ----------
+  function startRhythm () {
+    stage = 'rhythm';
+    ringStep = 0;
+    setHint('Halkaya dokun! 👆');
+    showRing(0);
+  }
+  function showRing (i) {
+    ringStep = i;
+    if (ringsEl) {
+      ringsEl.innerHTML = '<div class="cere-ring ring-p' + i + '">' +
+        '<span class="cere-ring-finger" aria-hidden="true">👆</span></div>';
+    }
+  }
+  function onRingTap () {
+    if (stage !== 'rhythm') return;
+    if (ringStep === 0) {
+      crack = 2; renderEgg();
+      play('crack1'); vibrate(20);
+      showRing(1);
+    } else if (ringStep === 1) {
+      crack = 3; renderEgg();
+      play('crack2'); vibrate(30);
+      showRing(2);
+    } else {
+      play('crackBig'); vibrate([20, 30, 80]);
+      doBurst();
+    }
+  }
+
+  // ---------- aşama 4: patlama + kutlama ----------
+  function doBurst () {
+    if (stage === 'burst' || stage === 'card') return;
+    stage = 'burst';
+    setHint('');
+    if (ringsEl) ringsEl.innerHTML = '';
+    if (eggWrapEl) eggWrapEl.classList.add('burst');
+
+    var tier = (result && result.celebrationTier) || 0;
+    play('pop');
+    if (tier >= 3) { if (stageEl) stageEl.classList.add('tier3glow'); play('fanfareBig'); }
+    else if (tier === 2) play('fanfare');
+    else if (tier === 1) play('chime');
+
+    if (fxEl) {
+      fxEl.innerHTML = '<div class="cere-flash"></div>';
+      spawnConfetti([18, 26, 38, 60][tier] || 18);
+      if (tier >= 2) later(function () { spawnConfetti(24); }, 350);
+      var pw = document.createElement('div');
+      pw.className = 'cere-pufi';
+      pw.innerHTML = pufiSVG('happy');
+      fxEl.appendChild(pw);
+    }
+    vibrate(tier >= 3 ? [40, 60, 120] : 50);
+    later(function () { showCard(); }, tier >= 3 ? 1700 : 1050);
+  }
+  function spawnConfetti (n) {
+    if (!fxEl) return;
+    var colors = ['#FFD34D', '#FF8A5C', '#A8E06E', '#BDE8FF', '#B266E8', rarityInfo(result.rarity).renk];
+    var box = document.createElement('div');
+    box.className = 'cere-confetti';
+    for (var i = 0; i < n; i++) {
+      var a = Math.random() * Math.PI * 2;
+      var r = 90 + Math.random() * 190;
+      var p = document.createElement('i');
+      p.style.setProperty('--dx', Math.round(Math.cos(a) * r) + 'px');
+      p.style.setProperty('--dy', Math.round(Math.sin(a) * r - 50) + 'px');
+      p.style.setProperty('--rot', Math.round(Math.random() * 720 - 360) + 'deg');
+      p.style.background = colors[i % colors.length];
+      p.style.animationDelay = (Math.random() * 0.15) + 's';
+      box.appendChild(p);
+    }
+    fxEl.appendChild(box);
+    later(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 1600);
+  }
+
+  // ---------- aşama 5-6: sonuç kartı ----------
+  function showCard () {
+    if (stage === 'card' || !result) return;
+    stage = 'card';
+    clearTimers();
+    if (stageEl) stageEl.classList.add('show-card');
+    if (ringsEl) ringsEl.innerHTML = '';
+    setHint('');
+
+    var p = result.pufi;
+    var ri = rarityInfo(result.rarity);
+    var badge = result.isNew
+      ? '<span class="cere-badge cere-badge-new">Yeni! ✨</span>'
+      : '<span class="cere-badge cere-badge-copy">+' + (result.kabukGained || 0) + ' 🐚</span>';
+    var btn = result.isNew
+      ? '<button class="btn btn-primary" id="cere-next">Oyuncağını Birleştir! 🧸</button>'
+      : '<button class="btn btn-primary" id="cere-next">Devam ▶</button>';
+
+    if (fxEl) {
+      fxEl.innerHTML =
+        '<div class="cere-card card">' +
+          '<div class="cere-portrait rf rf-' + esc(result.rarity) + '">' + pufiSVG('happy') + '</div>' +
+          '<h2 class="cere-name">' + esc(p.ad) + '</h2>' +
+          '<div class="cere-tags">' +
+            '<span class="rarity-tag" style="background:' + esc(ri.renk) + '33;border-color:' + esc(ri.renk) + '">' +
+              esc((ri.simge ? ri.simge + ' ' : '') + ri.ad) + '</span>' +
+            badge +
+          '</div>' +
+          '<p class="cere-bio">' + esc(p.bio || '') + '</p>' +
+          btn +
+        '</div>';
+      play('chime');
+      var b = fxEl.querySelector('#cere-next');
+      if (b) {
+        b.addEventListener('click', function () {
+          play('click');
+          if (!Yuvo.go) return;
+          if (result.isNew) Yuvo.go('assembly', { pufiId: p.id });
+          else Yuvo.go('home');
+        });
+      }
+    }
+  }
+
+  // ---------- sahne API ----------
+  Yuvo.scenes.ceremony = {
+    mount: function (el) {
+      mounted = true;
+      rootEl = el;
+      result = null;
+      stage = 'idle';
+      crack = 0; warmDist = 0; warmTaps = 0; rubbing = false; ringStep = 0; lastTap = 0;
+
+      var res = null;
+      try {
+        if (Yuvo.engine && Yuvo.engine.openEgg) res = Yuvo.engine.openEgg();
+      } catch (e) { res = null; }
+
+      if (!res || res.error || !res.pufi) { showNoEgg(); return; }
+      result = res;
+      buildStage();
+      showArrive();
+    },
+    unmount: function () {
+      mounted = false;
+      clearTimers();
+      // stageEl üzerindeki dinleyiciler innerHTML temizliğiyle DOM'la birlikte gider;
+      // yine de referansları bırak.
+      rootEl = null; stageEl = null; eggEl = null; eggWrapEl = null;
+      warmthEl = null; ringsEl = null; fxEl = null; hintEl = null;
+      result = null; rubbing = false; stage = 'idle';
+    }
+  };
+
+  // ---------- test kancası ----------
+  // Töreni anında sonuç kartına sarar; sonucu döndürür (sahne açık değilse null).
+  Yuvo.test.ceremonySkip = function () {
+    if (!mounted) return null;
+    if (!result) { if (Yuvo.go) Yuvo.go('home'); return null; }
+    clearTimers();
+    crack = 3;
+    renderEgg();
+    showCard();
+    return result;
+  };
+})();
+
+/* == js/scenes/assembly.js == */
+/* Yuvo — Sahne: Birleştirme Masası (docs/06 §3). Sahip: scenes-core ajanı. */
+(function () {
+  var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+  Yuvo.scenes = Yuvo.scenes || {};
+  Yuvo.test = Yuvo.test || {};
+
+  // ---------- modül durumu ----------
+  var mounted = false, finished = false;
+  var rootEl = null, boardEl = null, shelfEl = null, stageEl = null;
+  var pufi = null, parts = [], placed = {}, placedCount = 0;
+  var drag = null;
+  var timers = [];
+  var docHandlers = [];
+
+  var SNAP = 64;        // px — bırakınca oturma eşiği
+  var MAGNET = 96;      // px — mıknatıs çekiminin başladığı mesafe
+  var PULL = 0.45;      // mıknatıs çekim gücü
+  var IDLE_MS = 12000;  // ms — bu kadar hareketsizlikte yardım modu bir parçayı uçurur
+  var FAIL_ESIK = 3;    // ardışık başarısız bırakma → yardım modu
+
+  var failCount = 0, idleId = null;
+
+  // ---------- yardımcılar ----------
+  function later (fn, ms) {
+    var id = setTimeout(function () { if (mounted) fn(); }, ms);
+    timers.push(id);
+    return id;
+  }
+  function clearTimers () {
+    for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+    timers = [];
+  }
+  function play (name) {
+    try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(name); } catch (e) {}
+  }
+  function vibrate (p) {
+    try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {}
+  }
+  function esc (s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  // Türkçe iyelik eki: büyük ünlü uyumuna göre -(n)ın/-(n)in/-(n)un/-(n)ün
+  // (Kıvrık'ın, Cikcik'in, Pamuş'un, Mölü'nün…)
+  function iyelik (ad) {
+    var s = String(ad == null ? '' : ad);
+    var lower = s.toLocaleLowerCase('tr');
+    var VOK = 'aeıioöuü';
+    var son = '';
+    for (var i = lower.length - 1; i >= 0; i--) {
+      if (VOK.indexOf(lower.charAt(i)) !== -1) { son = lower.charAt(i); break; }
+    }
+    var map = { a:'ı', 'ı':'ı', e:'i', i:'i', o:'u', u:'u', 'ö':'ü', 'ü':'ü' };
+    var v = map[son] || 'i';
+    var unluBitiyor = VOK.indexOf(lower.charAt(lower.length - 1)) !== -1;
+    return s + '’' + (unluBitiyor ? 'n' : '') + v + 'n';
+  }
+  function onDoc (type, fn) {
+    document.addEventListener(type, fn);
+    docHandlers.push([type, fn]);
+  }
+  function offDocs () {
+    for (var i = 0; i < docHandlers.length; i++) {
+      document.removeEventListener(docHandlers[i][0], docHandlers[i][1]);
+    }
+    docHandlers = [];
+  }
+  function rarityColor () {
+    var r = (pufi && Yuvo.data && Yuvo.data.RARITIES && Yuvo.data.RARITIES[pufi.rarity]) || null;
+    return (r && r.renk) || '#FFD34D';
+  }
+
+  function findPufi (id) {
+    if (!id) return null;
+    try {
+      if (Yuvo.data && Yuvo.data.pufiById) {
+        var p = Yuvo.data.pufiById(id);
+        if (p) return p;
+      }
+    } catch (e) {}
+    var list = (Yuvo.data && Yuvo.data.PUFIS) || [];
+    for (var i = 0; i < list.length; i++) { if (list[i].id === id) return list[i]; }
+    return null;
+  }
+
+  // Savunmacı sanat yedekleri (art modülü henüz yoksa)
+  function getParts () {
+    try {
+      if (Yuvo.art && Yuvo.art.toyParts) {
+        var arr = Yuvo.art.toyParts(pufi);
+        if (arr && arr.length) return arr;
+      }
+    } catch (e) {}
+    var renk = rarityColor();
+    return [
+      { id: 'govde', svg: '<svg viewBox="0 0 120 120"><rect x="28" y="26" width="64" height="70" rx="30" fill="' + renk + '"/><ellipse cx="48" cy="42" rx="10" ry="14" fill="rgba(255,255,255,.4)"/></svg>' },
+      { id: 'bas', svg: '<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="36" fill="' + renk + '"/><circle cx="48" cy="54" r="5" fill="#3a2f22"/><circle cx="72" cy="54" r="5" fill="#3a2f22"/><path d="M50 70 q10 8 20 0" stroke="#3a2f22" stroke-width="4" fill="none" stroke-linecap="round"/></svg>' },
+      { id: 'aksesuar', svg: '<svg viewBox="0 0 120 120"><path d="M60 24 l11 23 25 3 -18 18 4 25 -22 -12 -22 12 4 -25 -18 -18 25 -3 z" fill="#FFD34D" stroke="#F2A61B" stroke-width="3" stroke-linejoin="round"/></svg>' }
+    ];
+  }
+  function assembledSVG () {
+    try {
+      if (Yuvo.art && Yuvo.art.toyAssembledSVG) {
+        var s = Yuvo.art.toyAssembledSVG(pufi);
+        if (s) return s;
+      }
+    } catch (e) {}
+    var renk = rarityColor();
+    return '<svg viewBox="0 0 120 120"><rect x="34" y="52" width="52" height="54" rx="24" fill="' + renk + '"/>' +
+      '<circle cx="60" cy="42" r="26" fill="' + renk + '"/>' +
+      '<circle cx="51" cy="38" r="4" fill="#3a2f22"/><circle cx="69" cy="38" r="4" fill="#3a2f22"/>' +
+      '<path d="M53 50 q7 6 14 0" stroke="#3a2f22" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M60 12 l5 10 11 1 -8 8 2 11 -10 -5 -10 5 2 -11 -8 -8 11 -1 z" fill="#FFD34D"/></svg>';
+  }
+  function pufiHappySVG () {
+    try {
+      if (Yuvo.art && Yuvo.art.pufiSVG) {
+        var s = Yuvo.art.pufiSVG(pufi, { mood: 'happy' });
+        if (s) return s;
+      }
+    } catch (e) {}
+    var renk = rarityColor();
+    return '<svg viewBox="0 0 120 120"><circle cx="60" cy="64" r="38" fill="' + renk + '"/>' +
+      '<circle cx="48" cy="56" r="5" fill="#3a2f22"/><circle cx="72" cy="56" r="5" fill="#3a2f22"/>' +
+      '<path d="M46 72 q14 14 28 0" stroke="#3a2f22" stroke-width="4" fill="none" stroke-linecap="round"/></svg>';
+  }
+  function partSVG (partId) {
+    for (var i = 0; i < parts.length; i++) { if (parts[i].id === partId) return parts[i].svg; }
+    return '';
+  }
+
+  // ---------- çizim ----------
+  function render () {
+    var slotsHtml = '', i;
+    for (i = 0; i < parts.length; i++) {
+      slotsHtml +=
+        '<div class="asm-slot asm-slot-' + esc(parts[i].id) + '" data-part="' + esc(parts[i].id) + '">' +
+          '<div class="slot-ghost">' + parts[i].svg + '</div>' +
+        '</div>';
+    }
+    var order = parts.slice();
+    for (i = order.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+    }
+    var piecesHtml = '';
+    for (i = 0; i < order.length; i++) {
+      piecesHtml += '<div class="asm-piece" data-part="' + esc(order[i].id) + '">' + order[i].svg + '</div>';
+    }
+
+    rootEl.innerHTML =
+      '<div class="asm-stage" id="asm-stage">' +
+        '<button class="btn btn-soft asm-skip" id="asm-skip">Atla ▶</button>' +
+        '<h2 class="asm-title">' + esc(iyelik(pufi.ad)) + ' oyuncağını birleştir!</h2>' +
+        '<div class="asm-board" id="asm-board">' + slotsHtml + '</div>' +
+        '<p class="asm-hint">Parçaları yuvalarına sürükle ✨</p>' +
+        '<div class="asm-shelf" id="asm-shelf">' + piecesHtml + '</div>' +
+      '</div>';
+
+    stageEl = rootEl.querySelector('#asm-stage');
+    boardEl = rootEl.querySelector('#asm-board');
+    shelfEl = rootEl.querySelector('#asm-shelf');
+
+    var skipBtn = rootEl.querySelector('#asm-skip');
+    if (skipBtn) {
+      skipBtn.addEventListener('click', function () {
+        if (finished) return;
+        play('click');
+        for (var i = 0; i < parts.length; i++) {
+          if (!placed[parts[i].id]) placePart(parts[i].id);
+        }
+      });
+    }
+
+    shelfEl.addEventListener('pointerdown', onShelfDown);
+    onDoc('pointermove', onDocMove);
+    onDoc('pointerup', onDocUp);
+    onDoc('pointercancel', onDocCancel);
+    scheduleIdle();
+  }
+
+  // ---------- yardım modu (Bekletmeme / Ceza yok) ----------
+  // Uzun hareketsizlik ya da art arda başarısız bırakma sonrası bir parçayı
+  // yuvasına kendiliğinden uçurur; sürükleme beceremeyen çocuk takılı kalmaz.
+  function scheduleIdle () {
+    if (idleId) clearTimeout(idleId);
+    idleId = later(function () { assist(); scheduleIdle(); }, IDLE_MS);
+  }
+  function assist () {
+    if (!mounted || finished || drag) return;
+    var target = null;
+    for (var i = 0; i < parts.length; i++) {
+      if (!placed[parts[i].id]) { target = parts[i].id; break; }
+    }
+    if (!target) return;
+    failCount = 0;
+    var piece = shelfEl ? shelfEl.querySelector('.asm-piece[data-part="' + target + '"]') : null;
+    var slot = slotFor(target);
+    if (piece && slot) {
+      var sc = centerOf(slot), pc = centerOf(piece);
+      piece.classList.remove('returning');
+      piece.style.pointerEvents = 'none';
+      piece.style.transition = 'transform .55s ease';
+      piece.style.transform = 'translate(' + (sc.x - pc.x) + 'px,' + (sc.y - pc.y) + 'px) scale(1.05)';
+      play('tap');
+      (function (pid, el2) {
+        later(function () {
+          el2.style.transition = '';
+          placePart(pid, el2);
+        }, 560);
+      })(target, piece);
+    } else {
+      placePart(target, piece);
+    }
+  }
+
+  // ---------- sürükle-bırak ----------
+  function slotFor (partId) {
+    return boardEl ? boardEl.querySelector('.asm-slot[data-part="' + partId + '"]') : null;
+  }
+  function centerOf (el) {
+    var r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+
+  function onShelfDown (e) {
+    if (finished || drag) return;
+    var piece = e.target && e.target.closest ? e.target.closest('.asm-piece') : null;
+    if (!piece || piece.classList.contains('placed')) return;
+    e.preventDefault();
+    piece.classList.remove('returning');
+    piece.style.transition = 'none';
+    var c = centerOf(piece);
+    drag = {
+      el: piece,
+      part: piece.getAttribute('data-part'),
+      sx: e.clientX, sy: e.clientY,
+      cx: c.x, cy: c.y,       // parçanın başlangıç merkezi (ekran koordinatı)
+      dx: 0, dy: 0
+    };
+    piece.classList.add('dragging');
+    play('tap');
+    scheduleIdle();
+  }
+
+  function onDocMove (e) {
+    if (!drag) return;
+    drag.dx = e.clientX - drag.sx;
+    drag.dy = e.clientY - drag.sy;
+
+    var slot = slotFor(drag.part);
+    if (slot) {
+      var sc = centerOf(slot);
+      var px = drag.cx + drag.dx, py = drag.cy + drag.dy;
+      var dist = Math.sqrt((sc.x - px) * (sc.x - px) + (sc.y - py) * (sc.y - py));
+      if (dist < MAGNET && !placed[drag.part]) {
+        drag.dx += (sc.x - px) * PULL;   // mıknatıs çekimi
+        drag.dy += (sc.y - py) * PULL;
+        slot.classList.add('near');
+      } else {
+        slot.classList.remove('near');
+      }
+    }
+    drag.el.style.transform = 'translate(' + drag.dx + 'px,' + drag.dy + 'px) scale(1.1)';
+  }
+
+  function onDocUp () {
+    if (!drag) return;
+    var d = drag; drag = null;
+    var slot = slotFor(d.part);
+    var ok = false;
+    if (slot && !placed[d.part]) {
+      var sc = centerOf(slot);
+      var pc = centerOf(d.el);
+      var dist = Math.sqrt((sc.x - pc.x) * (sc.x - pc.x) + (sc.y - pc.y) * (sc.y - pc.y));
+      ok = dist < SNAP;
+    }
+    d.el.classList.remove('dragging');
+    if (ok) {
+      failCount = 0;
+      placePart(d.part, d.el);
+    } else {
+      // Ceza yok: nazikçe rafa geri süzülür
+      if (slot) slot.classList.remove('near');
+      d.el.style.transition = '';
+      d.el.classList.add('returning');
+      d.el.style.transform = '';
+      (function (el) {
+        later(function () { el.classList.remove('returning'); }, 500);
+      })(d.el);
+      failCount += 1;
+      if (failCount >= FAIL_ESIK) later(function () { assist(); }, 550);
+    }
+    scheduleIdle();
+  }
+  function onDocCancel () { onDocUp(); }
+
+  // ---------- oturtma + bitiş ----------
+  function placePart (partId, pieceEl) {
+    if (placed[partId] || finished) return;
+    placed[partId] = true;
+    placedCount += 1;
+
+    var slot = slotFor(partId);
+    if (slot) {
+      slot.classList.remove('near');
+      slot.classList.add('filled');
+      slot.innerHTML = '<div class="slot-fill">' + partSVG(partId) + '</div><i class="asm-spark"></i>';
+    }
+    var piece = pieceEl || (shelfEl ? shelfEl.querySelector('.asm-piece[data-part="' + partId + '"]') : null);
+    if (piece) {
+      piece.classList.add('placed');
+      piece.style.transform = '';
+    }
+    play('snap');
+    vibrate(20);
+
+    if (placedCount >= parts.length) later(function () { finish(); }, 350);
+  }
+
+  function finish () {
+    if (finished || !mounted) return;
+    finished = true;
+    drag = null;
+    play('fanfare');
+    vibrate([20, 40, 60]);
+    if (stageEl) {
+      stageEl.innerHTML =
+        '<div class="asm-done">' +
+          '<div class="asm-toy">' + assembledSVG() + '</div>' +
+          '<div class="asm-dance">' + pufiHappySVG() + '</div>' +
+          '<div class="asm-banner">Albüme İşlendi 📔</div>' +
+        '</div>';
+    }
+    later(function () { if (Yuvo.go) Yuvo.go('album'); }, 1000);
+  }
+
+  // ---------- sahne API ----------
+  Yuvo.scenes.assembly = {
+    mount: function (el, params) {
+      mounted = true;
+      finished = false;
+      rootEl = el;
+      placed = {}; placedCount = 0; drag = null;
+      failCount = 0; idleId = null;
+
+      pufi = findPufi(params && params.pufiId);
+      if (!pufi) {
+        // Savunmacı: parametre yoksa eldeki ilk Pufi ile devam et, o da yoksa eve dön
+        var list = (Yuvo.data && Yuvo.data.PUFIS) || [];
+        pufi = list[0] || null;
+      }
+      if (!pufi) {
+        if (Yuvo.toast) Yuvo.toast('Birleştirilecek oyuncak bulunamadı');
+        if (Yuvo.go) Yuvo.go('home');
+        return;
+      }
+      parts = getParts();
+      render();
+    },
+    unmount: function () {
+      mounted = false;
+      clearTimers();
+      offDocs();
+      drag = null;
+      failCount = 0; idleId = null;
+      rootEl = null; boardEl = null; shelfEl = null; stageEl = null;
+      pufi = null; parts = []; placed = {}; placedCount = 0; finished = false;
+    }
+  };
+
+  // ---------- test kancası ----------
+  // Tüm parçaları anında oturtur ve bitirir; başarı durumunu döndürür.
+  Yuvo.test.assemble = function () {
+    if (!mounted || finished) return false;
+    clearTimers(); // bekleyen 350ms bitiş zamanlayıcıları yerine doğrudan bitir
+    for (var i = 0; i < parts.length; i++) {
+      if (!placed[parts[i].id]) placePart(parts[i].id);
+    }
+    finish();
+    return true;
+  };
+})();
+
+/* == js/main.js == */
+/* Yuvo Prototip — çekirdek kabuk: router, HUD, nav, modal, toast (SÖZLEŞME: değiştirme) */
+(function () {
+  window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
+
+  var app = document.getElementById('app');
+  var hud = document.getElementById('hud');
+  var sceneRoot = document.getElementById('scene-root');
+  var nav = document.getElementById('bottom-nav');
+  var overlayRoot = document.getElementById('overlay-root');
+  var toastRoot = document.getElementById('toast-root');
+
+  var FULLSCREEN = { ceremony:true, assembly:true };
+  var current = null, currentName = null;
+
+  Yuvo.go = function (name, params) {
+    if (name === currentName && !params) return; // aynı sekmeye çift dokunuş oyunu sıfırlamasın
+    if (current && current.unmount) { try { current.unmount(); } catch (e) { console.error(e); } }
+    sceneRoot.innerHTML = '';
+    overlayRoot.innerHTML = ''; // sahne değişince açık modal kalmasın
+    sceneRoot.scrollTop = 0;
+    currentName = name;
+    current = Yuvo.scenes[name];
+    if (!current) { console.error('Sahne yok: ' + name); return; }
+    app.classList.toggle('fullscreen', !!FULLSCREEN[name]);
+    renderNav();
+    current.mount(sceneRoot, params || {});
+  };
+
+  // Arka plana tıklayınca kapatma: kalıcı overlayRoot'a BİR KEZ bağlanır (dinleyici birikmez)
+  overlayRoot.addEventListener('click', function (e) {
+    if (e.target === overlayRoot) overlayRoot.innerHTML = '';
+  });
+
+  Yuvo.modal = function (html) {
+    var wrap = document.createElement('div');
+    wrap.className = 'modal';
+    wrap.innerHTML = '<button class="modal-close" aria-label="Kapat">✕</button>' + html;
+    overlayRoot.innerHTML = '';
+    overlayRoot.appendChild(wrap);
+    function close () { overlayRoot.innerHTML = ''; }
+    wrap.querySelector('.modal-close').addEventListener('click', close);
+    return close;
+  };
+
+  Yuvo.toast = function (text) {
+    var t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = text;
+    toastRoot.appendChild(t);
+    setTimeout(function () { t.remove(); }, 2200);
+  };
+
+  Yuvo.refresh = function () {
+    renderHud();
+    document.dispatchEvent(new CustomEvent('yuvo:state'));
+  };
+
+  function renderHud () {
+    var s = (Yuvo.engine && Yuvo.engine.state) || {};
+    hud.innerHTML =
+      '<span class="pill">⭐ ' + (s.stardust || 0) + '</span>' +
+      '<span class="pill">🐚 ' + (s.kabuk || 0) + '</span>' +
+      '<span class="pill">🥚 ' + (s.eggsAvailable || 0) + ' <small>bugün</small></span>';
+  }
+
+  var NAV = [
+    { id:'home', ico:'🏡', ad:'Yuva' },
+    { id:'album', ico:'📔', ad:'Albüm' },
+    { id:'minigame', ico:'🎮', ad:'Oyna' }
+  ];
+  function renderNav () {
+    nav.innerHTML = NAV.map(function (n) {
+      return '<button data-go="' + n.id + '" class="' + (currentName === n.id ? 'active' : '') + '">' +
+        '<span class="ico">' + n.ico + '</span>' + n.ad + '</button>';
+    }).join('');
+  }
+  nav.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-go]');
+    if (b) { if (Yuvo.audio.play) Yuvo.audio.play('click'); Yuvo.go(b.getAttribute('data-go')); }
+  });
+
+  var unlocked = false;
+  document.addEventListener('pointerdown', function () {
+    if (!unlocked && Yuvo.audio && Yuvo.audio.unlock) { unlocked = true; Yuvo.audio.unlock(); }
+  }, { passive:true });
+
+  // Başlat
+  document.addEventListener('DOMContentLoaded', function () {
+    if (Yuvo.engine.load) Yuvo.engine.load();
+    Yuvo.refresh();
+    Yuvo.go('home');
+  });
+})();
+
+
+</script>
+</body>
+</html>
