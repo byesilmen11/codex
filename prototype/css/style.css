@@ -1,0 +1,100 @@
+/* Yuvo Prototip — temel stil ve tasarım tokenları (docs/10 görsel dili) */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg:#FFF6E3; --bg2:#FFEFD0; --card:#FFFFFF; --ink:#4A3B2A; --ink-soft:#8A7A64;
+  --meadow:#A8E06E; --meadow-deep:#7BC94C; --sky:#BDE8FF; --sun:#FFD34D;
+  --accent:#FF8A5C; --accent-deep:#F0703E;
+  --r-yaygin:#9AA5B1; --r-azbulunur:#58B368; --r-nadir:#4FB8D8;
+  --r-destansi:#B266E8; --r-efsanevi:#F2A61B; --r-gizli:#5C4A9E;
+  --radius:22px; --radius-sm:14px;
+  --shadow:0 4px 14px rgba(74,59,42,.14);
+}
+html, body { height:100%; }
+body {
+  background:var(--bg); color:var(--ink);
+  font-family:"Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  overscroll-behavior:none; touch-action:manipulation;
+  -webkit-user-select:none; user-select:none;
+}
+#app { height:100dvh; display:flex; flex-direction:column; max-width:560px; margin:0 auto;
+  position:relative; overflow:hidden; }
+#scene-root { flex:1; overflow-y:auto; overflow-x:hidden; position:relative; }
+
+/* HUD */
+#hud { display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:calc(8px + env(safe-area-inset-top)) 12px 8px; background:var(--bg2);
+  border-bottom:2px solid rgba(74,59,42,.08); z-index:5; }
+#hud .pill { background:var(--card); border-radius:999px; padding:7px 14px; font-weight:bold;
+  font-size:16px; box-shadow:var(--shadow); display:inline-flex; align-items:center; gap:6px;
+  min-height:38px; }
+#hud .pill small { font-weight:normal; color:var(--ink-soft); }
+
+/* Alt gezinme */
+#bottom-nav { display:flex; gap:8px; padding:8px 10px calc(10px + env(safe-area-inset-bottom));
+  background:var(--bg2); border-top:2px solid rgba(74,59,42,.08); z-index:5; }
+#bottom-nav button { flex:1; min-height:60px; border:none; border-radius:var(--radius-sm);
+  background:var(--card); color:var(--ink); font-size:14px; font-weight:bold;
+  box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:2px; cursor:pointer; }
+#bottom-nav button .ico { font-size:24px; line-height:1; }
+#bottom-nav button.active { background:var(--sun); }
+#bottom-nav button:active { transform:scale(.96); }
+
+/* Tam ekran sahne modu (tören/birleştirme) */
+#app.fullscreen #hud, #app.fullscreen #bottom-nav { display:none; }
+
+/* Ortak bileşenler */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:56px; padding:12px 22px; border:none; border-radius:var(--radius);
+  font-size:18px; font-weight:bold; font-family:inherit; cursor:pointer;
+  background:var(--card); color:var(--ink); box-shadow:var(--shadow); }
+.btn:active { transform:scale(.96); }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-primary:active { background:var(--accent-deep); }
+.btn-soft { background:var(--bg2); }
+.btn[disabled] { opacity:.45; pointer-events:none; }
+
+.card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+  padding:16px; }
+
+/* Modal */
+#overlay-root:empty { display:none; }
+#overlay-root { position:absolute; inset:0; z-index:50; display:flex; align-items:center;
+  justify-content:center; background:rgba(74,59,42,.45); padding:20px; }
+.modal { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+  width:100%; max-width:420px; max-height:82dvh; overflow-y:auto; padding:20px;
+  position:relative; animation:pop-in .25s ease; }
+.modal .modal-close { position:absolute; top:10px; right:10px; width:44px; height:44px;
+  border:none; border-radius:50%; background:var(--bg2); font-size:20px; cursor:pointer; }
+@keyframes pop-in { from { transform:scale(.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+
+/* Toast */
+#toast-root { position:absolute; left:0; right:0; bottom:110px; display:flex;
+  flex-direction:column; align-items:center; gap:8px; z-index:60; pointer-events:none; }
+.toast { background:var(--ink); color:#fff; border-radius:999px; padding:10px 20px;
+  font-size:15px; font-weight:bold; box-shadow:var(--shadow); animation:toast-in .25s ease;
+  max-width:90%; text-align:center; }
+@keyframes toast-in { from { transform:translateY(12px); opacity:0; } to { transform:none; opacity:1; } }
+
+/* Nadirlik çerçeveleri (albüm + kartlar) */
+.rf { border:3px solid var(--r-yaygin); }
+.rf-yaygin { border-color:var(--r-yaygin); }
+.rf-azbulunur { border-color:var(--r-azbulunur); }
+.rf-nadir { border-color:var(--r-nadir); box-shadow:0 0 10px rgba(79,184,216,.4); }
+.rf-destansi { border-color:var(--r-destansi); box-shadow:0 0 12px rgba(178,102,232,.45); }
+.rf-efsanevi { border-color:var(--r-efsanevi); box-shadow:0 0 16px rgba(242,166,27,.55);
+  animation:glow 1.6s ease-in-out infinite alternate; }
+.rf-gizli { border-color:var(--r-gizli); box-shadow:0 0 14px rgba(92,74,158,.55); }
+@keyframes glow { from { box-shadow:0 0 8px rgba(242,166,27,.35); }
+  to { box-shadow:0 0 20px rgba(242,166,27,.75); } }
+
+.rarity-tag { display:inline-block; padding:4px 12px; border-radius:999px; color:#fff;
+  font-size:13px; font-weight:bold; }
+
+/* Yardımcılar */
+.center { text-align:center; }
+.stack { display:flex; flex-direction:column; gap:12px; }
+.row { display:flex; align-items:center; gap:10px; }
+.grow { flex:1; }
+.hidden { display:none !important; }
+img, svg { max-width:100%; display:block; }
