@@ -16,6 +16,7 @@
 | 03 | [Hikâye & Karakterler](03-hikaye-ve-karakterler.md) | 3 dünya senaryosu (Ovalya / Tıkırtı Fabrikası / Rüzgâr Postası) + karşılaştırma + karar; 12 haftalık story bible, ilişki haritası, karakter replikleri, 3 sahne senaryosu, Sezon 2-3 tohumları |
 | 04 | [Oyun Akışı & Zorluk](04-oyun-akisi-ve-zorluk.md) | Dakika dakika ilk oturum (ilk çıtlama <60 sn), ilk 7 gün planı, hafta 2-12 etkinlik takvimi, yaş modları ve DDA, geç oyun döngüsü, 11 sahnelik Altın Yumurta Töreni storyboard'u |
 | 05 | [Mağaza & Yumurta Paketleri](05-magaza-ve-yumurta-paketleri.md) | 6 kademeli paket merdiveni, Kiler mekaniği, Dilek Kavanozu, Şeffaflık Kartı, hediye kanalı (bayram/karne), harcama limiti UX, 100K DAU gelir projeksiyonu, ters whale alarmı |
+| 06 | [Gerçek Yumurta Ritüeli](06-gercek-yumurta-ritueli.md) | Sürpriz yumurta simülasyonu: 6 aşamalı ritüel (vitrin+salla-dinle → folyo yırtma → çikolata/kumbara → Tomurcuk Kapsülü + 4 açma yöntemi → birleştirme → Ambalaj Defteri), Altın Folyo (FOMO'suz Wonka), tempo merdiveni (tam/hızlı/sepet akışı), araç kozmetikleri + sponsorlu seri gelir mimarisi, prototip uygulama planı |
 | — | [`tools/economy-sim/collection_sim.py`](../../tools/economy-sim/collection_sim.py) | 02'deki tüm eğrileri üreten Monte Carlo simülatörü (çalıştırılabilir) |
 
 ## Kanonik Kararlar (ajanlar arası uyumlaştırma)
