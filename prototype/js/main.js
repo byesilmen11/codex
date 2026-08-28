@@ -1,4 +1,7 @@
-/* Yuvo Prototip — çekirdek kabuk: router, HUD, nav, modal, toast (SÖZLEŞME: değiştirme) */
+/* Yuvo Prototip — çekirdek kabuk: router, HUD, nav, modal, toast (SÖZLEŞME: davranış sabit).
+   Marka geçişi (BRAND.md): yalnız render markup'ı değişti — HUD artık logo + ikonlu haplar,
+   nav Yuvo.icons ile çizilir; Yuvo.go guard'ı, overlay temizliği, modal API'si ve
+   tek-seferlik dinleyiciler AYNEN korunur. */
 (function () {
   window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
 
@@ -34,7 +37,7 @@
   Yuvo.modal = function (html) {
     var wrap = document.createElement('div');
     wrap.className = 'modal';
-    wrap.innerHTML = '<button class="modal-close" aria-label="Kapat">✕</button>' + html;
+    wrap.innerHTML = '<button class="modal-close" aria-label="Kapat">' + ico('close', '✕') + '</button>' + html;
     overlayRoot.innerHTML = '';
     overlayRoot.appendChild(wrap);
     function close () { overlayRoot.innerHTML = ''; }
@@ -55,23 +58,43 @@
     document.dispatchEvent(new CustomEvent('yuvo:state'));
   };
 
+  // Yuvo.icons güvenli erişim: ikon yoksa emoji fallback (BRAND.md §4)
+  function ico (name, fallback) {
+    try {
+      if (Yuvo.icons && Yuvo.icons[name]) {
+        var s = Yuvo.icons[name]();
+        if (s) return s;
+      }
+    } catch (e) {}
+    return '<span class="ico-fallback">' + fallback + '</span>';
+  }
+
   function renderHud () {
     var s = (Yuvo.engine && Yuvo.engine.state) || {};
     hud.innerHTML =
-      '<span class="pill">⭐ ' + (s.stardust || 0) + '</span>' +
-      '<span class="pill">🐚 ' + (s.kabuk || 0) + '</span>' +
-      '<span class="pill">🥚 ' + (s.eggsAvailable || 0) + ' <small>bugün</small></span>';
+      '<span class="hud-logo">' + ico('logo', 'Yuvo') + '</span>' +
+      '<span class="hud-pills">' +
+        '<span class="pill pill-star" aria-label="Yıldız Tozu">' +
+          '<span class="pill-ico">' + ico('star', '⭐') + '</span><b>' + (s.stardust || 0) + '</b></span>' +
+        '<span class="pill pill-shell" aria-label="Kabuk">' +
+          '<span class="pill-ico">' + ico('shell', '🐚') + '</span><b>' + (s.kabuk || 0) + '</b></span>' +
+        '<span class="pill pill-egg" aria-label="Bugünkü yumurta hakkı">' +
+          '<span class="pill-ico">' + ico('egg', '🥚') + '</span><b>' + (s.eggsAvailable || 0) + '</b>' +
+          ' <small>bugün</small></span>' +
+      '</span>';
   }
 
   var NAV = [
-    { id:'home', ico:'🏡', ad:'Yuva' },
-    { id:'album', ico:'📔', ad:'Albüm' },
-    { id:'minigame', ico:'🎮', ad:'Oyna' }
+    { id:'home', icon:'yuva', emoji:'🏡', ad:'Yuva' },
+    { id:'album', icon:'album', emoji:'📔', ad:'Albüm' },
+    { id:'minigame', icon:'oyna', emoji:'🎮', ad:'Oyna' }
   ];
   function renderNav () {
     nav.innerHTML = NAV.map(function (n) {
-      return '<button data-go="' + n.id + '" class="' + (currentName === n.id ? 'active' : '') + '">' +
-        '<span class="ico">' + n.ico + '</span>' + n.ad + '</button>';
+      return '<button data-go="' + n.id + '" class="' + (currentName === n.id ? 'active' : '') + '"' +
+        ' aria-label="' + n.ad + '">' +
+        '<span class="ico">' + ico(n.icon, n.emoji) + '</span>' +
+        '<span class="nav-label">' + n.ad + '</span></button>';
     }).join('');
   }
   nav.addEventListener('click', function (e) {
