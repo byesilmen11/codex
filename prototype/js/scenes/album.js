@@ -9,6 +9,7 @@
   var el = null;
   var timers = [];
   var onState = null;
+  var viewBiome = 'cayir';   // albümde bakılan sayfa ('cayir'|'orman')
 
   // Kilometre taşları — state.js'tekiyle aynı tablo (görsel amaçlı kopya)
   var MILES = [
@@ -63,13 +64,14 @@
            { ad:r || '?', renk:'#9AA5B1', uretim:0, kabuk:0 };
   }
 
-  function ownedCount () {
-    if (Yuvo.engine && Yuvo.engine.ownedCount) { try { return Yuvo.engine.ownedCount(); } catch (e) {} }
+  function ownedCount (biome) {
+    if (Yuvo.engine && Yuvo.engine.ownedCount) { try { return Yuvo.engine.ownedCount(biome); } catch (e) {} }
     var s = st(), n = 0, owned = s.owned || {};
     for (var id in owned) {
       if (!owned[id]) continue;
       var p = byId(id);
       if (p && p.rarity === 'gizli') continue;
+      if (biome && p && (p.biome || 'cayir') !== biome) continue;
       n += 1;
     }
     return n;
@@ -98,7 +100,11 @@
   function render () {
     if (!el) return;
     var s = st();
-    var owned = ownedCount();
+    if (viewBiome === 'orman' && !s.ormanAcik) viewBiome = 'cayir';
+    var BIO = (Yuvo.data && Yuvo.data.BIOMES) || {};
+    var bioAd = (BIO[viewBiome] && BIO[viewBiome].ad) ||
+                (viewBiome === 'orman' ? 'Fısıltı Ormanı' : 'Güneş Çayırı');
+    var owned = ownedCount(viewBiome);
     var pct = Math.max(0, Math.min(100, Math.round(owned / 30 * 100)));
     var ownedMap = s.owned || {};
     var miles = s.milestones || [];
@@ -111,12 +117,29 @@
     html += '<div class="alb-head">' +
               '<span class="alb-ribbon">' +
                 '<span class="alb-ribbon-ico" aria-hidden="true">' + ico('album', '📔') + '</span>' +
-                '<h2 class="alb-title">Güneş Çayırı</h2>' +
+                '<h2 class="alb-title">' + bioAd + '</h2>' +
               '</span>' +
               '<span class="alb-shell" aria-label="Kabuk bakiyesi">' +
                 ic('shell', '🐚') + '<b>' + (s.kabuk | 0) + '</b>' +
               '</span>' +
             '</div>';
+
+    // Biyom sekmeleri — orman açılana dek kilitli görünür (fiyat/mağaza dili YOK)
+    var ormanVar = false, bi;
+    var tumListe = pufiList();
+    for (bi = 0; bi < tumListe.length; bi++) {
+      if ((tumListe[bi].biome || 'cayir') === 'orman') { ormanVar = true; break; }
+    }
+    if (ormanVar) {
+      html += '<div class="alb-biomes">' +
+                '<button class="alb-biome-tab' + (viewBiome === 'cayir' ? ' active' : '') + '"' +
+                  ' data-act="biome" data-biome="cayir">🌻 Çayır</button>' +
+                (s.ormanAcik
+                  ? '<button class="alb-biome-tab' + (viewBiome === 'orman' ? ' active' : '') + '"' +
+                      ' data-act="biome" data-biome="orman">🌲 Orman</button>'
+                  : '<button class="alb-biome-tab locked" data-act="biome-locked">🌫 ???</button>') +
+              '</div>';
+    }
     html += '<div class="alb-progress">' +
               '<span class="alb-progress-num"><b>' + owned + '</b>/30</span>' +
               '<span class="alb-progress-bar">' +
@@ -124,30 +147,42 @@
               '</span>' +
             '</div>';
 
-    // Kilometre taşı çipleri — ödül satırı Kabuk ikonlu
-    html += '<div class="alb-chips">';
-    for (var m = 0; m < MILES.length; m++) {
-      var mi = MILES[m];
-      var claimed = miles.indexOf(mi.key) !== -1;
-      var ready = !claimed && owned >= mi.at;
-      var cls = claimed ? 'done' : (ready ? 'ready' : 'locked');
-      html += '<button class="alb-chip ' + cls + '" data-act="mile" data-key="' + mi.key + '">' +
-                '<b>' + mi.at + '</b>' +
-                (claimed
-                  ? '<small>' + ic('check', '✓') + 'alındı</small>'
-                  : '<small>+' + mi.odul + ' ' + ic('shell', '🐚') + '</small>') +
-              '</button>';
+    // Kilometre taşı çipleri — Çayır Sezon-1 rozetleri (orman sayfasında gösterilmez)
+    if (viewBiome === 'cayir') {
+      html += '<div class="alb-chips">';
+      for (var m = 0; m < MILES.length; m++) {
+        var mi = MILES[m];
+        var claimed = miles.indexOf(mi.key) !== -1;
+        var ready = !claimed && owned >= mi.at;
+        var cls = claimed ? 'done' : (ready ? 'ready' : 'locked');
+        html += '<button class="alb-chip ' + cls + '" data-act="mile" data-key="' + mi.key + '">' +
+                  '<b>' + mi.at + '</b>' +
+                  (claimed
+                    ? '<small>' + ic('check', '✓') + 'alındı</small>'
+                    : '<small>+' + mi.odul + ' ' + ic('shell', '🐚') + '</small>') +
+                '</button>';
+      }
+      html += '</div>';
     }
-    html += '</div>';
 
-    // 30 hücrelik ızgara (gizli hariç, PUFIS sırasıyla)
+    // 30 hücrelik ızgara (gizli hariç, bakılan biyomun ailesi, PUFIS sırasıyla)
     html += '<div class="alb-grid">';
-    var list = pufiList();
+    var list = [];
+    for (var li = 0; li < tumListe.length; li++) {
+      if ((tumListe[li].biome || 'cayir') === viewBiome) list.push(tumListe[li]);
+    }
     for (var i = 0; i < list.length; i++) {
       var p = list[i];
       if (p.rarity === 'gizli') continue;
       var n = ownedMap[p.id] | 0;
-      if (n > 0) {
+      if (n > 0 && s.sakoHidden === p.id) {
+        // Şako sakladı: parça yok olmaz, iz bırakır (tüy) — Saklambaç'la geri gelir
+        html += '<button class="alb-cell sako-izi rf rf-' + p.rarity + '" data-act="sako-izi"' +
+                  ' data-id="' + p.id + '" aria-label="Şako sakladı — Saklambaç oyna">' +
+                  silArt(p) +
+                  '<span class="alb-feather" aria-hidden="true">🪶</span>' +
+                '</button>';
+      } else if (n > 0) {
         html += '<button class="alb-cell rf rf-' + p.rarity + '" data-act="cell" data-id="' + p.id + '"' +
                   ' aria-label="' + p.ad + '">' +
                   miniArt(p) +
@@ -250,12 +285,19 @@
       return;
     }
 
-    // Eksik: Atölye
+    // Eksik: Atölye + Dilek Kavanozu (fiyat dili YOK — v2·05 §3)
     play('click');
     var cost = ri.uretim | 0;
     var wallet = s.kabuk | 0;
-    var gizliLocked = (p.rarity === 'gizli') && ownedCount() < 30;
+    var pBiome = p.biome || 'cayir';
+    var gizliLocked = (p.rarity === 'gizli') && ownedCount(pBiome) < 30;
     var enough = wallet >= cost;
+    var dilekte = false;
+    if (Array.isArray(s.wishes)) {
+      for (var wi = 0; wi < s.wishes.length; wi++) {
+        if (s.wishes[wi] && s.wishes[wi].pufiId === p.id) { dilekte = true; break; }
+      }
+    }
     var body =
       '<div class="alb-modal center">' +
         '<div class="alb-modal-art rf rf-' + p.rarity + ' missing">' +
@@ -273,11 +315,21 @@
           '</p>';
     if (gizliLocked) {
       body += '<p class="alb-locked">Usta Kabuk fısıldar: “Önce 30 dostu yuvaya getir…” (' +
-                ownedCount() + '/30)</p>';
+                ownedCount(pBiome) + '/30)</p>';
     } else {
       body += '<button class="btn btn-primary alb-craft-btn" id="alb-craft-btn"' + (enough ? '' : ' disabled') + '>' +
                 ic('shell', '🐢') + 'Usta Kabuk\'a Ürettir</button>';
       if (!enough) body += '<p class="alb-locked">Kabuk yetersiz — kopyalar Kabuk kazandırır!</p>';
+    }
+    // Dilek Kavanozu: çocuk yalnız "dilek fısıldar" — fiyat/mağaza dili YOK
+    if (p.rarity !== 'gizli') {
+      if (dilekte) {
+        body += '<p class="alb-wish-note">' + ic('star', '💫') +
+                '<span>Bu dilek kavanozda bekliyor…</span></p>';
+      } else {
+        body += '<button class="btn btn-soft alb-wish-btn" id="alb-wish-btn">' +
+                  ic('star', '💫') + 'Dilek Kavanozu\'na Fısılda</button>';
+      }
     }
     body += '</div></div>';
 
@@ -285,6 +337,19 @@
     var btn = document.getElementById('alb-craft-btn');
     if (btn) {
       btn.addEventListener('click', function () { doCraft(p, close); });
+    }
+    var wbtn = document.getElementById('alb-wish-btn');
+    if (wbtn) {
+      wbtn.addEventListener('click', function () {
+        var ok = !!(Yuvo.engine && Yuvo.engine.addWish && Yuvo.engine.addWish(p.id));
+        if (ok) {
+          play('star');
+          toast('Dileğin kavanoza fısıldandı 💫');
+          try { close(); } catch (e) {}
+        } else {
+          toast('Kavanoz dolu — bir dilek gerçekleşince yenisi sığar.');
+        }
+      });
     }
   }
 
@@ -324,6 +389,15 @@
     var act = b.getAttribute('data-act');
     if (act === 'cell') {
       openDetail(b.getAttribute('data-id'));
+    } else if (act === 'biome') {
+      var nb = b.getAttribute('data-biome');
+      if (nb && nb !== viewBiome) { viewBiome = nb; play('page'); render(); }
+    } else if (act === 'biome-locked') {
+      play('click');
+      toast('Sisin ardında bir yer var… Çayırda 10 dost topla!');
+    } else if (act === 'sako-izi') {
+      play('click');
+      toast('Şako bu dostu saklamış! Saklambaç\'ta bul, geri gelsin.');
     } else if (act === 'mile') {
       var key = b.getAttribute('data-key');
       var mi = null;
@@ -354,7 +428,19 @@
       onState = function () { render(); };
       document.addEventListener('yuvo:state', onState);
       play('page');
+      var s = st();
+      viewBiome = (s.activeBiome === 'orman' && s.ormanAcik) ? 'orman' : 'cayir';
       render();
+      // Kiki'nin albüm hediyesi — FTUE sonrası İLK albüm ziyaretinde bir kez (v2·04 §1 5:30)
+      if (s.introDone && !s.introGiftShown && Yuvo.dialog && Yuvo.data && Yuvo.data.DIALOG) {
+        s.introGiftShown = true;
+        if (Yuvo.engine && Yuvo.engine.save) { try { Yuvo.engine.save(); } catch (e) {} }
+        var K = Yuvo.data.DIALOG.kiki || {};
+        var hediye = K.albumHediye || [];
+        for (var hi = 0; hi < hediye.length; hi++) {
+          Yuvo.dialog.say({ kim: 'kiki', metin: hediye[hi] });
+        }
+      }
     },
     unmount: function () {
       for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);

@@ -66,13 +66,14 @@
     return out;
   }
 
-  function ownedCount () {
-    if (Yuvo.engine && Yuvo.engine.ownedCount) { try { return Yuvo.engine.ownedCount(); } catch (e) {} }
+  function ownedCount (biome) {
+    if (Yuvo.engine && Yuvo.engine.ownedCount) { try { return Yuvo.engine.ownedCount(biome); } catch (e) {} }
     var s = st(), n = 0, owned = s.owned || {};
     for (var id in owned) {
       if (!owned[id]) continue;
       var p = Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(id);
       if (p && p.rarity === 'gizli') continue;
+      if (biome && p && (p.biome || 'cayir') !== biome) continue;
       n += 1;
     }
     return n;
@@ -100,17 +101,16 @@
     return '<span class="home-art-fallback">🐣</span>';
   }
 
-  // Sahip olunan son 3-5 Pufi (ekleme sırasına göre sondakiler)
+  // Sahip olunan son 3-5 Pufi (ekleme sırasına göre sondakiler; aktif biyomdan)
   function lastOwnedPufis () {
-    var s = st(), owned = s.owned || {}, ids = [];
-    for (var id in owned) { if (owned[id]) ids.push(id); }
-    ids = ids.slice(-5);
+    var s = st(), owned = s.owned || {}, biome = s.activeBiome === 'orman' ? 'orman' : 'cayir';
     var out = [];
-    for (var i = 0; i < ids.length; i++) {
-      var p = Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(ids[i]);
-      if (p) out.push(p);
+    for (var id in owned) {
+      if (!owned[id]) continue;
+      var p = Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(id);
+      if (p && (p.biome || 'cayir') === biome) out.push(p);
     }
-    return out;
+    return out.slice(-5);
   }
 
   /* ---------- dekor SVG'leri (düz dolgu; id yalnız gradyan/clip gerekince) ---------- */
@@ -359,11 +359,19 @@
     var eggs = list.length;
     if (heldIdx !== null && (heldIdx < 0 || heldIdx >= eggs)) heldIdx = null;
     var holding = heldIdx !== null;
-    var owned = ownedCount();
+    var biome = s.activeBiome === 'orman' ? 'orman' : 'cayir';
+    el.classList.toggle('orman', biome === 'orman');
+    var BIO = (Yuvo.data && Yuvo.data.BIOMES) || {};
+    var bioAd = (BIO[biome] && BIO[biome].ad) || 'Güneş Çayırı';
+    var owned = ownedCount(biome);
     var pct = Math.max(0, Math.min(100, Math.round(owned / 30 * 100)));
     var R = ritual();
     var choc = Math.max(0, s.chocolates | 0);
     var jarReady = choc >= R.ESIK && (s.kumbaraToday | 0) < R.GUNLUK;
+    // Kiler: bekleyen sürpriz + günlük hak (çocuk dili — fiyat/mağaza dili YOK)
+    var kilerTavan = ((Yuvo.data.STORE_LIMITS && Yuvo.data.STORE_LIMITS.kilerGunluk) || 5) +
+      (s.parent && s.parent.clubActive ? ((Yuvo.data.CLUB && Yuvo.data.CLUB.kilerEk) || 1) : 0);
+    var kilerHak = s.kiler && (s.kiler.adet | 0) > 0 && (s.kiler.bugunAcilan | 0) < kilerTavan;
     var html = '';
 
     // Manzara katmanı: gök + tepeler + güneş + sticker bulutlar (tamamı dekor;
@@ -374,17 +382,36 @@
               '<div class="home-cloud c2">' + cloudSVG() + '</div>' +
             '</div>';
 
-    // Albüm ilerleme şeridi — sticker çip
+    // Albüm ilerleme şeridi — sticker çip (aktif biyomun sayacı)
     html += '<button class="home-progress" data-act="album"' +
-              ' aria-label="Albümü aç — Güneş Çayırı ' + owned + '/30">' +
+              ' aria-label="Albümü aç — ' + bioAd + ' ' + owned + '/30">' +
               ic('album', '📔', 'home-progress-ico') +
               '<span class="home-progress-main">' +
-                '<span class="home-progress-label">Güneş Çayırı <b>' + owned + '/30</b></span>' +
+                '<span class="home-progress-label">' + bioAd + ' <b>' + owned + '/30</b></span>' +
                 '<span class="home-progress-bar">' +
                   '<span class="home-progress-fill" style="width:' + pct + '%"></span>' +
                 '</span>' +
               '</span>' +
             '</button>';
+
+    // Kenar düğmeleri: Ebeveyn (gri, göze batmaz) + biyom kapısı + Şako Saklambaç
+    html += '<div class="home-side">';
+    html += '<button class="home-side-btn home-parent-btn" data-act="parent"' +
+              ' aria-label="Ebeveyn paneli"><span aria-hidden="true">👨‍👩‍👧</span>' +
+              '<small>Ebeveyn</small></button>';
+    if (s.ormanAcik) {
+      var hedefAd = biome === 'orman' ? 'Güneş Çayırı' : 'Fısıltı Ormanı';
+      html += '<button class="home-side-btn home-biome-btn" data-act="biome"' +
+                ' aria-label="' + hedefAd + '\'na geç">' +
+                '<span aria-hidden="true">' + (biome === 'orman' ? '🌻' : '🌲') + '</span>' +
+                '<small>' + (biome === 'orman' ? 'Çayır' : 'Orman') + '</small></button>';
+      if (biome === 'orman') {
+        html += '<button class="home-side-btn home-sako-btn' + (s.sakoHidden ? ' alert' : '') + '"' +
+                  ' data-act="sako" aria-label="Şako Saklambaç">' +
+                  '<span aria-hidden="true">🪶</span><small>Şako</small></button>';
+      }
+    }
+    html += '</div>';
 
     // Balon Postanesi tezgâhı + ambalajlı yumurtalar + kumbara
     html += '<div class="home-nest-wrap">';
@@ -426,6 +453,12 @@
               jarSVG(choc / R.ESIK) +
               '<b class="home-jar-count">' + choc + '/' + R.ESIK + '</b>' +
             '</button>';
+    // Kiler sürprizi — çocuk dilinde "posta" (fiyat/mağaza dili YOK; v2·04 kural d)
+    if (kilerHak) {
+      html += '<button class="home-kiler" data-act="kiler"' +
+                ' aria-label="Sürpriz yumurtayı sepete al">' +
+                ic('egg', '🥚') + '<span>Sürpriz posta!</span></button>';
+    }
     // Eldeyken: Salla! (basılı-tut jestinin tap fallback'i) + Geri Koy
     if (holding) {
       html += '<div class="home-held-actions">' +
@@ -620,9 +653,43 @@
     } else if (act === 'endday') {
       putBack(true);
       play('chime');
-      if (Yuvo.engine && Yuvo.engine.newDay) Yuvo.engine.newDay();
-      toast('Yeni gün! Rüzgâr Postası 3 yumurta bıraktı.');
+      var yeniGun = function () {
+        if (Yuvo.engine && Yuvo.engine.newDay) Yuvo.engine.newDay();
+        toast('Yeni gün! Rüzgâr Postası 3 yumurta bıraktı.');
+        render();
+      };
+      // Luna'nın günbatımı ritüeli (docs/v2/04 §1 14:30) — yoksa doğrudan yeni gün
+      if (Yuvo.scenes.intro && Yuvo.scenes.intro.playDusk) Yuvo.scenes.intro.playDusk(yeniGun);
+      else yeniGun();
+    } else if (act === 'kiler') {
+      putBack(true);
+      var okK = !!(Yuvo.engine && Yuvo.engine.drawFromKiler && Yuvo.engine.drawFromKiler());
+      if (okK) {
+        play('pop');
+        dropNew = true;
+        toast('Sepete bir sürpriz yumurta düştü!');
+      } else {
+        toast('Bugünlük sürprizler tamam — yarın devam!');
+      }
       render();
+    } else if (act === 'parent') {
+      putBack(true);
+      play('click');
+      if (Yuvo.go) Yuvo.go('parent');
+    } else if (act === 'biome') {
+      putBack(true);
+      var s4 = st();
+      var hedef = (s4.activeBiome === 'orman') ? 'cayir' : 'orman';
+      if (Yuvo.engine && Yuvo.engine.setBiome && Yuvo.engine.setBiome(hedef)) {
+        play('page');
+        var B2 = (Yuvo.data && Yuvo.data.BIOMES) || {};
+        toast(((B2[hedef] && B2[hedef].ad) || hedef) + '\'na hoş geldin!');
+      }
+      render();
+    } else if (act === 'sako') {
+      putBack(true);
+      play('click');
+      if (Yuvo.go) Yuvo.go('sako');
     }
   }
 

@@ -43,23 +43,57 @@ const browser = await chromium.launch({
   args: ['--no-sandbox', '--disable-dev-shm-usage'],
 });
 
-try {
+async function newPage () {
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
     hasTouch: true,
   });
   const page = await context.newPage();
-
   // Headless ortamda dış font isteklerini kes (fonksiyonel akışı etkilemez; fallback yığını devrede)
   await page.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
-
   page.on('console', (msg) => {
     if (msg.type() === 'error') noteError('console', msg.text());
   });
   page.on('pageerror', (err) => noteError('pageerror', String(err && err.message || err)));
-
   await page.goto(distUrl, { waitUntil: 'load' });
+  return { context, page };
+}
+
+try {
+  /* ================= BÖLÜM A — FTUE açılışı (temiz state → intro → tören) ================= */
+  {
+    const { context, page } = await newPage();
+    await page.waitForSelector('.intro-scene', { timeout: 10000 });
+    step('A· temiz state intro ile açıldı (karanlıkta ışıyan yumurta)');
+    await page.waitForSelector('.intro-star', { timeout: 8000 }); // kalp atışı ~2,2 sn sonra yıldız
+    await page.waitForTimeout(1500); // düşüş animasyonu otursun
+    await page.screenshot({ path: join(shotDir, '09-intro.png') });
+    step('A· 09-intro.png kaydedildi (yıldız çocuğun dokunuşunu bekliyor)');
+    await page.click('.intro-star', { force: true });
+    await page.waitForSelector('.dlg-bubble', { timeout: 5000 });
+    step('A· anlatıcı konuştu (balon açık)');
+    await page.click('.dlg-bubble'); // 1. cümle
+    await page.waitForTimeout(250);
+    await page.click('.dlg-bubble'); // 2. cümle → ısıtma aşaması
+    await page.waitForSelector('.intro-egg', { timeout: 5000 });
+    step('A· ısıtma aşaması açıldı (üşüyen yumurta)');
+    for (let i = 0; i < 3; i++) {
+      await page.click('.intro-egg', { force: true });
+      await page.waitForTimeout(220);
+    }
+    await page.waitForSelector('#cere-stage', { timeout: 6000 });
+    const introDone = await page.evaluate(() => window.Yuvo.test.state().introDone === true);
+    if (!introDone) fail('intro tamamlandı ama introDone bayrağı yazılmadı');
+    step('A· 3 ovalama → tören devraldı (introDone=true)');
+    await context.close();
+  }
+
+  /* ================= BÖLÜM B — çekirdek ritüel akışı (mevcut 22 adım) ================= */
+  const { context, page } = await newPage();
+  // FTUE bölüm A'da doğrulandı — çekirdek akış için atla (mevcut adımlar birebir korunur)
+  await page.waitForSelector('.intro-scene', { timeout: 10000 });
+  await page.evaluate(() => window.Yuvo.test.skipIntro());
 
   // 1) HUD + vitrin gelmeli (temiz state: newDay dili 3 ambalajlı yumurta koyar)
   await page.waitForSelector('#hud .pill', { timeout: 10000 });
@@ -197,6 +231,135 @@ try {
   step(`Ambalaj Defteri açıldı — 6 sekme, işli pul: ${fbStats.owned} (state kaydı: ${fbStats.recs})`);
   await page.screenshot({ path: join(shotDir, '08-foilbook.png') });
   step('08-foilbook.png kaydedildi');
+
+  /* ---- 11) Albümden Dilek Kavanozu'na fısılda (çocuk fiyat GÖRMEZ) ---- */
+  await page.evaluate(() => { while (window.Yuvo.test.dialogNext()) {} }); // açık balon varsa kapat
+  await page.click('#bottom-nav button[data-go="album"]');
+  await page.waitForSelector('.alb-grid', { timeout: 5000 });
+  await page.evaluate(() => { while (window.Yuvo.test.dialogNext()) {} }); // Kiki hediyesi oynadıysa kapat
+  await page.click('.alb-cell.missing', { timeout: 5000 });
+  await page.waitForSelector('#alb-wish-btn', { timeout: 5000 });
+  const modalText = await page.evaluate(() =>
+    (document.querySelector('#overlay-root .modal') || {}).textContent || '');
+  if (/₺|TL|fiyat|satın/i.test(modalText)) fail('ÇOCUK ARAYÜZÜ İHLALİ: albüm modalında fiyat/mağaza dili var');
+  await page.click('#alb-wish-btn');
+  const wishCount = await page.evaluate(() => window.Yuvo.test.state().wishes.length);
+  if (wishCount !== 1) fail('dilek kaydedilmedi (beklenen 1, ölçülen ' + wishCount + ')');
+  step('dilek kavanoza fısıldandı (fiyat dili yok, wishes=1)');
+
+  /* ---- 12) Ebeveyn paneli: PIN kapısı → panel ---- */
+  await page.click('#bottom-nav button[data-go="home"]');
+  await page.waitForSelector('.home-parent-btn', { timeout: 5000 });
+  await page.click('.home-parent-btn');
+  await page.waitForSelector('.par-gate', { timeout: 5000 });
+  step('ebeveyn PIN kapısı açıldı (panel kilitli başlar)');
+  for (const k of ['1', '2', '3', '4']) {
+    await page.click('.par-keypad [data-key="' + k + '"]');
+    await page.waitForTimeout(90);
+  }
+  // 4. haneden sonra bazı akışlar otomatik onaylar — onay tuşuna yalnız kapı hâlâ açıksa bas
+  await page.waitForTimeout(400);
+  if (!(await page.$('.par-tabs'))) {
+    try { await page.click('.par-keypad [data-key="ok"]', { timeout: 2000 }); } catch (e) {}
+  }
+  await page.waitForSelector('.par-tabs', { timeout: 5000 });
+  const packCount = await page.$$eval('.par-pack', (els) => els.length);
+  if (packCount !== 6) fail('panelde 6 paket kartı beklenirdi, ölçülen ' + packCount);
+  const panelText = await page.evaluate(() => document.body.textContent || '');
+  if (!/DEMO/.test(panelText)) fail('panelde DEMO uyarısı görünmüyor');
+  step('PIN 1234 → panel açıldı (6 paket + DEMO uyarısı + dilek listesi)');
+  await page.waitForTimeout(350);
+  await page.screenshot({ path: join(shotDir, '10-parent.png') });
+  step('10-parent.png kaydedildi');
+
+  /* ---- 13) Satın alma simülasyonu: özet + Şeffaflık → onay → Kiler ---- */
+  await page.click('.par-pack[data-pack="haftalik"] .par-pack-buy');
+  await page.waitForSelector('.par-modal', { timeout: 5000 });
+  const buyText = await page.evaluate(() =>
+    (document.querySelector('.par-modal') || {}).textContent || '');
+  if (!/satılmaz|SATILMAZ/.test(buyText)) fail('satın alma özetinde "Efsanevi satılmaz" satırı yok');
+  if (!/DEMO/.test(buyText)) fail('satın alma özetinde DEMO uyarısı yok');
+  step('satın alma özeti: oran tablosu + Efsanevi-satılmaz + DEMO görünür');
+  await page.screenshot({ path: join(shotDir, '11-store.png') });
+  step('11-store.png kaydedildi');
+  await page.click('.par-modal-foot button:has-text("Onayla")');
+  await page.waitForTimeout(400);
+  const alim = await page.evaluate(() => {
+    const s = window.Yuvo.test.state();
+    return { kiler: s.kiler.adet, spent: s.parent.spentTL, vitrin: s.todayEggs.length };
+  });
+  if (alim.kiler !== 10) fail('haftalık paket kilere 10 yumurta eklemeliydi, ölçülen ' + alim.kiler);
+  if (Math.abs(alim.spent - 39.99) > 0.001) fail('harcama ₺39,99 olmalıydı, ölçülen ' + alim.spent);
+  if (alim.vitrin !== 2) fail('satın alma vitrine DOKUNMAMALI (beklenen 2, ölçülen ' + alim.vitrin + ')');
+  step('onay → Kiler 10 yumurta, harcama ₺39,99, vitrin dokunulmadı');
+
+  /* ---- 14) Oyuna dön → Kiler sürprizi vitrine düşer ---- */
+  await page.click('.par-gate-back, .par-btn-ghost');
+  await page.waitForSelector('.home-kiler', { timeout: 5000 });
+  step('yuvada "Sürpriz posta!" çipi belirdi (kilerde yumurta var)');
+  await page.click('.home-kiler', { force: true }); // sonsuz sallanma animasyonu: stabilite bekleme
+  await page.waitForTimeout(300);
+  const sonKiler = await page.evaluate(() => {
+    const s = window.Yuvo.test.state();
+    return { kiler: s.kiler.adet, vitrin: s.todayEggs.length, sayac: s.eggsAvailable };
+  });
+  if (sonKiler.vitrin !== 3 || sonKiler.sayac !== 3) fail('kiler çekimi vitrine düşmedi (' + JSON.stringify(sonKiler) + ')');
+  if (sonKiler.kiler !== 9) fail('kiler 9 kalmalıydı, ölçülen ' + sonKiler.kiler);
+  step('kilerden 1 yumurta sepete düştü (vitrin 3, kiler 9)');
+
+  /* ---- 15) Fısıltı Ormanı: kilit → açılış → biyom geçişi → Şako Saklambaç ---- */
+  await page.evaluate(() => {
+    const Y = window.Yuvo, s = Y.test.state();
+    const cayir = Y.data.PUFIS.filter((p) => (p.biome || 'cayir') === 'cayir' && p.rarity !== 'gizli');
+    for (let i = 0; i < 10; i++) s.owned[cayir[i].id] = s.owned[cayir[i].id] || 1;
+    Y.engine.checkOrmanUnlock();
+    Y.engine.save();
+    Y.engine.setBiome('orman');
+    Y.refresh();
+  });
+  await page.click('#bottom-nav button[data-go="home"]');
+  await page.waitForSelector('.home-sako-btn', { timeout: 5000 });
+  const ormanDurum = await page.evaluate(() => {
+    const s = window.Yuvo.test.state();
+    return { acik: s.ormanAcik, biyom: s.activeBiome };
+  });
+  if (!ormanDurum.acik || ormanDurum.biyom !== 'orman') fail('orman açılmadı: ' + JSON.stringify(ormanDurum));
+  step('Fısıltı Ormanı açıldı ve biyom geçişi yapıldı (yuva orman teninde)');
+  await page.waitForTimeout(350);
+  await page.screenshot({ path: join(shotDir, '12-forest.png') });
+  step('12-forest.png kaydedildi');
+
+  // Albümde orman sekmesi
+  await page.click('#bottom-nav button[data-go="album"]');
+  await page.waitForSelector('.alb-biome-tab', { timeout: 5000 });
+  const tabSayisi = await page.$$eval('.alb-biomes .alb-biome-tab', (els) => els.length);
+  if (tabSayisi !== 2) fail('albümde 2 biyom sekmesi beklenirdi, ölçülen ' + tabSayisi);
+  const ormanHucre = await page.evaluate(() => {
+    const tabs = document.querySelectorAll('.alb-biomes .alb-biome-tab');
+    tabs[1].click();
+    return document.querySelectorAll('.alb-grid .alb-cell').length;
+  });
+  if (ormanHucre !== 30) fail('orman albüm sayfasında 30 hücre beklenirdi, ölçülen ' + ormanHucre);
+  step('albüm orman sayfası: 30 hücre (gizli ayrık)');
+  await page.screenshot({ path: join(shotDir, '13-forest-album.png') });
+  step('13-forest-album.png kaydedildi');
+
+  // Şako Saklambaç: karıştırma biter → test kancasıyla kazan → ödül
+  await page.click('#bottom-nav button[data-go="home"]');
+  await page.waitForSelector('.home-sako-btn', { timeout: 5000 });
+  await page.click('.home-sako-btn');
+  await page.waitForSelector('.sk-scene', { timeout: 5000 });
+  step('Şako Saklambaç açıldı');
+  await page.waitForSelector('.sk-hint', { timeout: 8000 }); // goster+karistir bitti → seçim
+  await page.screenshot({ path: join(shotDir, '14-sako.png') });
+  step('14-sako.png kaydedildi (seçim aşaması)');
+  const starOnce = await page.evaluate(() => window.Yuvo.test.state().stardust);
+  const kazandi = await page.evaluate(() => window.Yuvo.test.sakoWin());
+  if (!kazandi) fail('sakoWin kancası seçim aşamasında çalışmadı');
+  await page.waitForTimeout(300);
+  const starSonra = await page.evaluate(() => window.Yuvo.test.state().stardust);
+  if (starSonra !== starOnce + 10) fail('Saklambaç ödülü +10⭐ olmalıydı (' + starOnce + '→' + starSonra + ')');
+  step('Saklambaç kazanıldı (+10⭐) — "Bir Daha!" görünür');
 
   await context.close();
 } finally {

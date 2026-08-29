@@ -12,7 +12,7 @@
   var overlayRoot = document.getElementById('overlay-root');
   var toastRoot = document.getElementById('toast-root');
 
-  var FULLSCREEN = { ceremony:true, assembly:true };
+  var FULLSCREEN = { ceremony:true, assembly:true, intro:true, parent:true, sako:true };
   var current = null, currentName = null;
 
   Yuvo.go = function (name, params) {
@@ -108,10 +108,11 @@
     if (!unlocked && Yuvo.audio && Yuvo.audio.unlock) { unlocked = true; Yuvo.audio.unlock(); }
   }, { passive:true });
 
-  // Başlat
+  // Başlat — ilk açılış FTUE'ye (intro), sonrası yuvaya (docs/v2/04 §1)
   document.addEventListener('DOMContentLoaded', function () {
     if (Yuvo.engine.load) Yuvo.engine.load();
     Yuvo.refresh();
-    Yuvo.go('home');
+    var s = (Yuvo.engine && Yuvo.engine.state) || {};
+    Yuvo.go((!s.introDone && Yuvo.scenes.intro) ? 'intro' : 'home');
   });
 })();

@@ -196,3 +196,36 @@ albüm sayfasına kısa geçiş (`Yuvo.go('album')`). Test kancası: `Yuvo.test.
 
 `node tools/build-proto.mjs` → `prototype/dist/index.html` (tam sayfa, yerel test) ve
 `prototype/dist/artifact.html` (yalnız içerik: title+style+markup+script; artifact yayını için).
+
+## v3 katmanı — hikâye/FTUE + ebeveyn paneli + Fısıltı Ormanı (bu sürümde eklendi)
+
+**Yeni dosyalar:** `js/data/store.js` (paket merdiveni/CLUB/ODDS/limitler/DEMO_UYARI),
+`js/data/dialogue.js` (Yuvo.data.DIALOG replik havuzları), `js/data/pufis-forest.js`
+(Fısıltı Ormanı 31 Pufi — biome:'orman'; çayır kayıtları geriye dönük biome:'cayir' damgalanır),
+`js/ui-dialog.js` (Yuvo.dialog.say/clear/busy — sticker konuşma balonu kuyruğu, #dialog-root),
+`js/art/story-svg.js` (Yuvo.art.story.{pofu,kiki,ustakabuk,luna,sako,portre}),
+`js/art/pufi-kinds-4/5/6.js` (31 orman kind'i), `js/scenes/intro.js` (FTUE + playDusk),
+`js/scenes/parent.js` + `css/parent.css` (PIN kapılı DEMO paneli), `js/scenes/sako.js`
+(Şako Saklambaç), `css/story.css` (dlg-/intro-/dusk-/sk-/alb-biome-/home-side stilleri).
+
+**State v3 alanları:** `parent{pin,limitTL,spentTL,ay,clubActive,limitRaiseTs}`,
+`kiler{adet,bugunAcilan}`, `wishes[]`, `purchases[]`, `introDone`, `introGiftShown`,
+`activeBiome('cayir'|'orman')`, `ormanAcik`, `sakoHidden`. Migrasyon v1/v2→v3 kayıpsız,
+bozuk ebeveyn verisi varsayılana onarılır.
+
+**Motor API'leri:** `buyPack(id)` (aylık limit; YALNIZ kiler'e ekler — vitrine asla),
+`drawFromKiler()` (günlük tavan 5, Club +1), `addWish/clearWish` (7 gün/5 dilek/kopyasız),
+`setLimit` (artırımda 24 sa soğuma bilgisi), `setPin`, `toggleClub`, `spendReport()`,
+`setBiome(b)`, `checkOrmanUnlock()` (çayır 10/30'da bir kez), `sakoRecover()`.
+`ownedCount(biome?)` biyom filtresi aldı; gacha havuzu (`poolOf`) aktif biyoma filtrelenir,
+pity sayaçları biyomlar arasında ORTAKtır (satın alma/biyom şansı sıfırlamaz).
+
+**İlke sözleşmesi (değişmez):** çocuk arayüzü fiyat/mağaza GÖRMEZ (yalnız "Dilek Kavanozu"
+ve "Sürpriz posta!"); mağaza ebeveyn-PIN arkasında DEMO simülasyondur ("DEMO — gerçek ödeme
+alınmaz" her satın alma özetinde); Efsanevi vaat olarak SATILMAZ; satın alınan yumurta kilere
+düşer, çocuk tarafında sıradan yumurtadan ayırt edilemez.
+
+**Yeni test kancaları:** `skipIntro/replayIntro/introWarm`, `dialogNext`, `parentUnlock(tab)`,
+`sakoWin`. Duman testi 3 bölüm/43 adım: A) FTUE yürüyüşü (temiz state → intro → tören),
+B) çekirdek ritüel (eski 22 adım aynen) + dilek→PIN→satın alma→kiler akışı,
+C) orman kilidi + biyom albümü + Şako Saklambaç. Ekranlar: 01-14.

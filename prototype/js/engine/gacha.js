@@ -50,9 +50,20 @@
     return keys[keys.length - 1];
   }
 
+  // Aktif biyom ('cayir'|'orman') — havuz yalnız o biyomun ailesinden çekilir.
+  // biome alanı olmayan eski kayıtlar çayır sayılır (geriye uyumlu).
+  function activeBiome () {
+    var s = Yuvo.engine.state;
+    return (s && s.activeBiome) || 'cayir';
+  }
+
   function poolOf (tier) {
-    var out = [], list = Yuvo.data.PUFIS || [];
-    for (var i = 0; i < list.length; i++) { if (list[i].rarity === tier) out.push(list[i]); }
+    var out = [], list = Yuvo.data.PUFIS || [], b = activeBiome();
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].rarity !== tier) continue;
+      if ((list[i].biome || 'cayir') !== b) continue;
+      out.push(list[i]);
+    }
     return out;
   }
 
@@ -107,7 +118,7 @@
     if (zorlaEksik && eksik.length) {
       return eksik[Math.floor(rand() * eksik.length)];
     }
-    var wEksik = (Yuvo.engine.ownedCount() >= 27) ? W_EKSIK_SON3 : W_EKSIK;
+    var wEksik = (Yuvo.engine.ownedCount(activeBiome()) >= 27) ? W_EKSIK_SON3 : W_EKSIK;
     var weights = [];
     for (i = 0; i < havuz.length; i++) weights.push(s.owned[havuz[i].id] ? 1 : wEksik);
     return weightedPick(havuz, weights, rand());
@@ -136,7 +147,7 @@
     s.eggCounter += 1;
 
     var zorlaEksik = (s.eggCounter <= ONBOARDING) || (s.copyStreak >= KOPYA_SERI_ESIGI);
-    var gizliHavuzda = Yuvo.engine.ownedCount() === 30;
+    var gizliHavuzda = Yuvo.engine.ownedCount(activeBiome()) === 30; // gizli, KENDİ biyomu 30/30 olunca
 
     var tier = pickTier(s, gizliHavuzda);
 
@@ -160,7 +171,7 @@
     var pufi = pickPufi(s, tier, zorlaEksik);
     var rarity = pufi.rarity; // = tier
 
-    var isNew, kabukGained = 0;
+    var isNew, kabukGained = 0, ormanUnlocked = false;
     if (s.owned[pufi.id]) {
       isNew = false;
       s.owned[pufi.id] += 1;
@@ -172,6 +183,7 @@
       s.owned[pufi.id] = 1;
       s.copyStreak = 0;
       if (Yuvo.engine.checkMilestones) Yuvo.engine.checkMilestones();
+      if (Yuvo.engine.checkOrmanUnlock) ormanUnlocked = Yuvo.engine.checkOrmanUnlock();
     }
 
     // Sayaçlar — asla süreyle/paketle sıfırlanmaz, yalnız düşüşle
@@ -203,7 +215,8 @@
     return {
       pufi:pufi, rarity:rarity, isNew:isNew, kabukGained:kabukGained, celebrationTier:celebrationTier,
       wrapper:{ seri:seri, variant:variant, golden:golden },  // tören görselleri buradan beslenir
-      chocolate:1                                             // her ambalajlı yumurtadan 1 çikolata
+      chocolate:1,                                            // her ambalajlı yumurtadan 1 çikolata
+      ormanUnlocked:ormanUnlocked                             // bu açılış Fısıltı Ormanı'nı açtıysa true
     };
   };
 

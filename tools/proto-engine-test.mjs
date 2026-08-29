@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'prototype');
-const FILES = ['js/data/pufis.js', 'js/data/wrappers.js', 'js/engine/state.js', 'js/engine/gacha.js'];
+const FILES = ['js/data/pufis.js', 'js/data/pufis-forest.js', 'js/data/wrappers.js', 'js/data/store.js', 'js/engine/state.js', 'js/engine/gacha.js'];
 
 let failures = 0;
 function assert (cond, msg) {
@@ -42,13 +42,17 @@ const oranToplam = Object.values(R).reduce((a, r) => a + r.oran, 0);
 assert(Math.abs(oranToplam - 1) < 1e-9, `oran toplamı 1 (ölçülen ${oranToplam})`);
 
 const PUFIS = Yuvo.data.PUFIS;
-assert(PUFIS.length === 31, `31 Pufi kaydı (ölçülen ${PUFIS.length})`);
-const dagilim = {};
-for (const p of PUFIS) dagilim[p.rarity] = (dagilim[p.rarity] || 0) + 1;
-assert(dagilim.yaygin === 12 && dagilim.azbulunur === 9 && dagilim.nadir === 6 &&
-  dagilim.destansi === 2 && dagilim.efsanevi === 1 && dagilim.gizli === 1,
-  `nadirlik dağılımı 12/9/6/2/1/1 (ölçülen ${JSON.stringify(dagilim)})`);
-assert(new Set(PUFIS.map((p) => p.id)).size === 31, 'id\'ler benzersiz');
+assert(PUFIS.length === 62, `62 Pufi kaydı — Çayır 31 + Orman 31 (ölçülen ${PUFIS.length})`);
+for (const biyom of ['cayir', 'orman']) {
+  const alt = PUFIS.filter((p) => (p.biome || 'cayir') === biyom);
+  const dagilim = {};
+  for (const p of alt) dagilim[p.rarity] = (dagilim[p.rarity] || 0) + 1;
+  assert(alt.length === 31 && dagilim.yaygin === 12 && dagilim.azbulunur === 9 && dagilim.nadir === 6 &&
+    dagilim.destansi === 2 && dagilim.efsanevi === 1 && dagilim.gizli === 1,
+    `${biyom}: 31 kayıt, dağılım 12/9/6/2/1/1 (ölçülen ${JSON.stringify(dagilim)})`);
+}
+assert(new Set(PUFIS.map((p) => p.id)).size === 62, 'id\'ler benzersiz (62)');
+assert(new Set(PUFIS.map((p) => p.kind)).size === 62, 'kind\'ler benzersiz (62)');
 assert(PUFIS.every((p) => p.id && p.ad && p.tur && p.kind && p.bio && R[p.rarity]), 'her kayıtta id/ad/tur/kind/bio/rarity dolu');
 
 console.log('# Ambalaj / ritüel verisi (docs/v2/06 §5.2)');
@@ -179,6 +183,7 @@ function enYuksekEksikRank (s) {
   let mx = -1;
   for (const p of PUFIS) {
     if (p.rarity === 'gizli') continue;
+    if ((p.biome || 'cayir') !== 'cayir') continue; // havuz biyom-filtreli (gacha poolOf)
     if (!s.owned[p.id]) mx = Math.max(mx, RANK[p.rarity]);
   }
   return mx;
@@ -273,8 +278,8 @@ console.log('# Ritüel: forceGoldenNext + setTool');
     'setTool: sahipsiz araç reddedildi, seçim değişmedi');
 }
 
-// ---------- Ritüel: v1 → v2 localStorage migrasyonu ----------
-console.log('# Ritüel: v1 → v2 migrasyonu');
+// ---------- Ritüel: v1 → v3 localStorage migrasyonu ----------
+console.log('# Ritüel: v1 → v3 migrasyonu');
 {
   const v1 = JSON.stringify({
     version: 1, stardust: 77, kabuk: 5, day: 4,
@@ -285,7 +290,7 @@ console.log('# Ritüel: v1 → v2 migrasyonu');
   });
   const Y2 = makeSandbox({ 'yuvo-proto-v1': v1 });
   const m = Y2.engine.load();
-  assert(m.version === 2 && m.stardust === 77 && m.day === 4 && m.eggCounter === 12 && m.pityE === 20,
+  assert(m.version === 3 && m.stardust === 77 && m.day === 4 && m.eggCounter === 12 && m.pityE === 20,
     'migrasyon: eski alanlar aynen korundu');
   assert(Array.isArray(m.todayEggs) && m.todayEggs.length === 2 && m.eggsAvailable === 2 &&
     m.todayEggs.every((e) => Y2.data.WRAPPER_SERIES[e.seri] && e.golden === null),
@@ -294,7 +299,204 @@ console.log('# Ritüel: v1 → v2 migrasyonu');
     m.firstRitualDoneToday === false && m.lastChocolateChoice === 'ye' &&
     typeof m.foilBook === 'object' && Array.isArray(m.tools) &&
     ['burgu', 'cekic', 'firlat'].every((t) => m.tools.includes(t)) && m.activeTool === 'burgu',
-    'migrasyon: yeni alanlar varsayılanla dolduruldu');
+    'migrasyon: v2 alanları varsayılanla dolduruldu');
+  assert(m.parent && m.parent.pin === '1234' && m.parent.limitTL === 400 && m.parent.spentTL === 0 &&
+    m.parent.clubActive === false && m.kiler.adet === 0 && m.kiler.bugunAcilan === 0 &&
+    Array.isArray(m.wishes) && m.wishes.length === 0 &&
+    Array.isArray(m.purchases) && m.purchases.length === 0,
+    'migrasyon: v3 alanları (parent/kiler/wishes/purchases) varsayılanla dolduruldu');
+}
+
+// ---------- v3: v2 → v3 migrasyonu (bozuk ebeveyn verisi onarımı) ----------
+console.log('# v3: v2 → v3 migrasyonu (bozuk veri onarımı)');
+{
+  const v2kayit = JSON.stringify({
+    version: 2, stardust: 10, kabuk: 1, day: 2, eggsAvailable: 1,
+    todayEggs: [{ seri: 'gunes', variant: 2, golden: null }],
+    owned: { cikcik: 1 }, milestones: [],
+    parent: { pin: '12', limitTL: -5, spentTL: -3, clubActive: 'evet' },
+    kiler: { adet: -4, bugunAcilan: 2 },
+    wishes: [{ pufiId: 'cikcik', ts: Date.now() }, { hatali: true }, 'çöp'],
+    purchases: 'bozuk'
+  });
+  const Y3 = makeSandbox({ 'yuvo-proto-v1': v2kayit });
+  const m = Y3.engine.load();
+  assert(m.version === 3 && m.stardust === 10 && m.todayEggs.length === 1 && m.eggsAvailable === 1,
+    'v2 kayıt v3\'e taşındı, vitrin/sayaç kayıpsız');
+  assert(m.parent.pin === '1234' && m.parent.limitTL === 400 && m.parent.spentTL === 0 &&
+    m.parent.clubActive === false,
+    'bozuk parent alanları varsayılana onarıldı (PIN/limit/harcama/Club)');
+  assert(m.kiler.adet === 0 && m.kiler.bugunAcilan === 2,
+    'kiler: negatif adet 0\'a çekildi, geçerli sayaç korundu');
+  assert(m.wishes.length === 1 && m.wishes[0].pufiId === 'cikcik' && Array.isArray(m.purchases) &&
+    m.purchases.length === 0,
+    'çöp dilek girdileri süzüldü, bozuk purchases boş diziye onarıldı');
+}
+
+// ---------- v3: mağaza verisi (store.js) ----------
+console.log('# v3: mağaza verisi (docs/v2/05 §1-§2)');
+{
+  const P = Yuvo.data.PACKS;
+  assert(Array.isArray(P) && P.length === 6, `6 paket kademesi (ölçülen ${P ? P.length : 0})`);
+  let mono = true;
+  for (let i = 1; i < P.length; i++) {
+    if (P[i].tl / P[i].adet > P[i - 1].tl / P[i - 1].adet + 1e-9) mono = false;
+  }
+  assert(mono, 'birim fiyat merdiveni tekdüze iniyor (₺9,99 → ₺2,00)');
+  assert(P.every((p) => p.id && p.ad && p.adet > 0 && p.tl > 0 && p.garanti), 'her pakette id/ad/adet/tl/garanti dolu');
+  const efs = (Yuvo.data.ODDS || []).find((o) => o.satilmaz);
+  assert(!!efs && efs.garanti.indexOf('SATILMAZ') >= 0, 'ODDS: Efsanevi "vaat olarak SATILMAZ" satırı işaretli');
+  assert(typeof Yuvo.data.DEMO_UYARI === 'string' && Yuvo.data.DEMO_UYARI.indexOf('DEMO') === 0,
+    'DEMO uyarı metni var (gerçek ödeme alınmaz)');
+  assert(Yuvo.data.tlYaz(9.99) === '₺9,99' && Yuvo.data.clubBonusAdet(10) === 1 && Yuvo.data.clubBonusAdet(25) === 3,
+    'tlYaz/clubBonusAdet yardımcıları (bonus yukarı yuvarlanır: 10→1, 25→3)');
+}
+
+// ---------- v3: buyPack limiti + kiler yolu ----------
+console.log('# v3: buyPack — aylık limit + satın alma vitrine DOKUNMAZ');
+{
+  Yuvo.engine.reset(4242);
+  const s = Yuvo.engine.state;
+  assert(s.parent && s.parent.pin === '1234' && s.parent.limitTL === 400 && s.parent.spentTL === 0 &&
+    s.kiler.adet === 0 && Array.isArray(s.wishes) && Array.isArray(s.purchases),
+    'v3 varsayılan state (PIN 1234, limit ₺400, boş kiler/dilek/kayıt)');
+  const rx = Yuvo.engine.buyPack('yok-boyle-paket');
+  assert(rx.ok === false && rx.reason === 'bilinmiyor', 'bilinmeyen paket reddedildi');
+  const eggs0 = s.todayEggs.length;
+  const r1 = Yuvo.engine.buyPack('tekli');
+  assert(r1.ok === true && r1.adet === 1 && r1.tutar === 9.99, 'tekli paket alındı (₺9,99 → 1 yumurta)');
+  assert(s.kiler.adet === 1 && s.todayEggs.length === eggs0 && s.eggsAvailable === eggs0,
+    'satın alma YALNIZ Kiler\'e düştü — vitrin/eggsAvailable dokunulmadı');
+  assert(s.parent.spentTL === 9.99 && s.purchases.length === 1, 'harcama ve makbuz kaydedildi');
+  const r2 = Yuvo.engine.buyPack('kumbara');
+  assert(r2.ok === true && s.parent.spentTL === 209.98, 'ikinci paket: toplam ₺209,98');
+  const r3 = Yuvo.engine.buyPack('kumbara');
+  assert(r3.ok === false && r3.reason === 'limit' && s.parent.spentTL === 209.98 && s.kiler.adet === 101,
+    'aylık limit ₺400 aşımı ENGELLENDİ; harcama/kiler değişmedi');
+  assert(Yuvo.engine.toggleClub() === true, 'Club açıldı');
+  const r4 = Yuvo.engine.buyPack('haftalik');
+  assert(r4.ok === true && r4.adet === 11, `Club bonusu yukarı yuvarlanır (10 → ${r4.adet})`);
+  s.parent.ay = '2000-01';
+  const rep = Yuvo.engine.spendReport();
+  assert(rep.spentTL === 0 && rep.ay !== '2000-01' && rep.paketAdet === 3 && rep.kiler === 112,
+    'ay devri: harcama sayacı sıfırlandı, makbuz geçmişi ve kiler korundu');
+  assert(Yuvo.engine.buyPack('kumbara').ok === true && s.parent.spentTL === 199.99,
+    'yeni ayda limit tazelendi');
+}
+
+// ---------- v3: kiler günlük tavanı (binge freni) ----------
+console.log('# v3: drawFromKiler — günlük tavan 5 (+1 Club)');
+{
+  Yuvo.engine.reset(4343);
+  let s = Yuvo.engine.state;
+  assert(Yuvo.engine.drawFromKiler() === false, 'boş kilerden çekim reddedildi');
+  s.kiler.adet = 20;
+  const eggs0 = s.todayEggs.length;
+  let cekim = 0;
+  for (let i = 0; i < 7; i++) { if (Yuvo.engine.drawFromKiler()) cekim += 1; }
+  assert(cekim === 5 && s.kiler.bugunAcilan === 5 && s.kiler.adet === 15,
+    `günlük tavan 5: 7 denemede ${cekim} çekim`);
+  assert(s.todayEggs.length === eggs0 + 5 && s.eggsAvailable === s.todayEggs.length &&
+    s.todayEggs.every((e) => WS[e.seri] && e.golden === null),
+    'çekilen yumurtalar AMBALAJLI vitrine düştü, sayaç senkron');
+  assert(Yuvo.engine.toggleClub() === true && Yuvo.engine.drawFromKiler() === true &&
+    Yuvo.engine.drawFromKiler() === false,
+    'Club: tavan +1 (6. çekim kabul, 7. ret)');
+  Yuvo.engine.newDay();
+  s = Yuvo.engine.state;
+  assert(s.kiler.bugunAcilan === 0 && s.kiler.adet === 14, 'newDay → kiler hakkı tazelendi, stok korundu');
+  assert(s.todayEggs.length === 4 && s.eggsAvailable === 4,
+    'newDay + Club: vitrin 3 günlük + 1 Club yumurtası');
+  assert(Yuvo.engine.drawFromKiler() === true, 'yeni gün → kilerden çekim yeniden açık');
+}
+
+// ---------- v3: Dilek Kavanozu ----------
+console.log('# v3: addWish — 7 gün / 5 dilek / kopyasız');
+{
+  Yuvo.engine.reset(4444);
+  const s = Yuvo.engine.state;
+  const ids = PUFIS.slice(0, 6).map((p) => p.id);
+  assert(Yuvo.engine.addWish(ids[0]) === true, 'ilk dilek eklendi');
+  assert(Yuvo.engine.addWish(ids[0]) === false, 'aynı dilek ikinci kez reddedildi');
+  for (let i = 1; i < 5; i++) Yuvo.engine.addWish(ids[i]);
+  assert(s.wishes.length === 5 && Yuvo.engine.addWish(ids[5]) === false, '5 dilek tavanı korunur');
+  assert(Yuvo.engine.clearWish(ids[0]) === true && s.wishes.length === 4, 'dilek kaldırıldı');
+  assert(Yuvo.engine.clearWish(ids[0]) === false, 'olmayan dilek kaldırılamaz (false)');
+  s.wishes[0].ts -= 8 * 24 * 3600 * 1000;
+  assert(Yuvo.engine.addWish(ids[5]) === true && s.wishes.length === 4 &&
+    s.wishes.every((w) => w.pufiId !== ids[1]),
+    '7 günden eski dilek kendiliğinden düştü, yenisi eklendi');
+}
+
+// ---------- v3: setLimit soğuması + setPin ----------
+console.log('# v3: setLimit / setPin');
+{
+  Yuvo.engine.reset(4545);
+  const s = Yuvo.engine.state;
+  const art = Yuvo.engine.setLimit(750);
+  assert(art.ok === true && art.soguma === true && art.sogumaSaat === 24 && s.parent.limitTL === 750,
+    'limit ARTIRIMI: 24 saat soğuma bilgisiyle kabul');
+  const ind = Yuvo.engine.setLimit(100);
+  assert(ind.ok === true && ind.soguma === false && s.parent.limitTL === 100,
+    'limit İNDİRİMİ: soğumasız, anında');
+  assert(Yuvo.engine.setPin('12ab') === false && Yuvo.engine.setPin('123') === false &&
+    s.parent.pin === '1234', 'geçersiz PIN reddedildi (4 hane şartı)');
+  assert(Yuvo.engine.setPin('9876') === true && s.parent.pin === '9876', 'geçerli PIN değişti');
+}
+
+// ---------- Biyom: Fısıltı Ormanı kilidi + havuz filtresi + Şako ----------
+console.log('# Biyom: orman kilidi / havuz filtresi / gizli / Şako');
+{
+  Yuvo.engine.reset(6161);
+  const s = Yuvo.engine.state;
+  assert(s.activeBiome === 'cayir' && s.ormanAcik === false && s.sakoHidden === null,
+    'varsayılan: çayır aktif, orman kilitli, Şako boş');
+  assert(Yuvo.engine.setBiome('orman') === false && s.activeBiome === 'cayir',
+    'kilitliyken ormana geçilemez');
+  // Çayırdan 10 parça → kilit açılır (checkOrmanUnlock bir kez true döner)
+  const cayirlar = PUFIS.filter((p) => (p.biome || 'cayir') === 'cayir' && p.rarity !== 'gizli');
+  for (let i = 0; i < 10; i++) s.owned[cayirlar[i].id] = 1;
+  assert(Yuvo.engine.checkOrmanUnlock() === true && s.ormanAcik === true,
+    'Çayır 10/30 → Fısıltı Ormanı açıldı');
+  assert(Yuvo.engine.checkOrmanUnlock() === false, 'kilit açılışı bir kez bildirilir');
+  assert(Yuvo.engine.setBiome('orman') === true && s.activeBiome === 'orman', 'ormana geçildi');
+
+  // Havuz filtresi: orman aktifken TÜM düşüşler orman ailesinden
+  Yuvo.test.grantEggs(600);
+  let yanlisBiyom = 0, ormanGizliErken = 0;
+  for (let i = 0; i < 600; i++) {
+    const pre = Yuvo.engine.ownedCount('orman');
+    const res = Yuvo.test.openEggRaw();
+    if (res.error) { assert(false, 'orman açılışında hata: ' + res.error); break; }
+    if ((res.pufi.biome || 'cayir') !== 'orman') yanlisBiyom += 1;
+    if (res.rarity === 'gizli' && pre < 30) ormanGizliErken += 1;
+  }
+  assert(yanlisBiyom === 0, `orman havuzu sızdırmaz: 600 açılışta ${yanlisBiyom} yabancı düşüş`);
+  assert(ormanGizliErken === 0, 'orman gizlisi (Kütük) 30/30\'dan önce düşmez');
+  assert(Yuvo.engine.ownedCount('orman') === 30, `orman 600 yumurtada tamamlandı (${Yuvo.engine.ownedCount('orman')}/30)`);
+  // Kilometre taşları Çayır rozetidir: orman parçaları m20/m27/m30 tetiklemez
+  assert(s.milestones.indexOf('m20') === -1,
+    'kilometre taşları çayıra bağlı — orman 30/30 iken bile m20 yok (çayır 10)');
+
+  // Şako: newDay orman parçalarından birini saklar; Saklambaç kazanınca geri döner
+  Yuvo.engine.newDay();
+  assert(typeof s.sakoHidden === 'string' && s.sakoHidden.length > 0 &&
+    (Yuvo.data.pufiById(s.sakoHidden) || {}).biome === 'orman',
+    `Şako bir orman parçası sakladı (${s.sakoHidden})`);
+  const saklanan = s.sakoHidden;
+  assert(s.owned[saklanan] > 0, 'saklanan parça YOK OLMAZ — sahiplik durur (iz bırakır)');
+  assert(Yuvo.engine.sakoRecover() === true && s.sakoHidden === null, 'Saklambaç kazanımı: parça geri döndü');
+  assert(Yuvo.engine.sakoRecover() === false, 'saklı parça yokken sakoRecover false');
+
+  // Çayıra dönüş + çayır havuzu hâlâ temiz
+  assert(Yuvo.engine.setBiome('cayir') === true && s.activeBiome === 'cayir', 'çayıra dönüldü');
+  Yuvo.test.grantEggs(50);
+  let ormanKacak = 0;
+  for (let i = 0; i < 50; i++) {
+    const r2 = Yuvo.test.openEggRaw();
+    if (!r2.error && (r2.pufi.biome || 'cayir') !== 'cayir') ormanKacak += 1;
+  }
+  assert(ormanKacak === 0, 'çayır havuzu da sızdırmaz (50 açılış)');
 }
 
 // ---------- sonuç ----------
