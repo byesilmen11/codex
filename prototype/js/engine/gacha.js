@@ -208,6 +208,12 @@
     var variant = egg.variant | 0;
     if (Yuvo.engine.registerFoil) Yuvo.engine.registerFoil(seri, variant, golden);
 
+    // Oturum döngüsü: kapanış özeti + görev zinciri (bonus grantEgg kendi commit'ini yapar)
+    if (!Array.isArray(s.bugunAcilanlar)) s.bugunAcilanlar = [];
+    s.bugunAcilanlar.push(pufi.id);
+    var gorevBonus = false;
+    if (Yuvo.engine.gorevIlerle) gorevBonus = Yuvo.engine.gorevIlerle('ac') === true;
+
     Yuvo.engine.save();
     if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (e) {} }
 
@@ -216,7 +222,8 @@
       pufi:pufi, rarity:rarity, isNew:isNew, kabukGained:kabukGained, celebrationTier:celebrationTier,
       wrapper:{ seri:seri, variant:variant, golden:golden },  // tören görselleri buradan beslenir
       chocolate:1,                                            // her ambalajlı yumurtadan 1 çikolata
-      ormanUnlocked:ormanUnlocked                             // bu açılış Fısıltı Ormanı'nı açtıysa true
+      ormanUnlocked:ormanUnlocked,                            // bu açılış Fısıltı Ormanı'nı açtıysa true
+      gorevBonus:gorevBonus                                   // bu açılış görev zincirini tamamladıysa true
     };
   };
 

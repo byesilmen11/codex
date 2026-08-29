@@ -2458,6 +2458,189 @@ img, svg { max-width:100%; display:block; }
   animation: sako-wob 1.8s ease-in-out infinite;
 }
 
+/* =====================================================================
+   REVEAL SAHNELEMESİ (araştırma: unboxing duraklaması + ipucu merdiveni)
+   ===================================================================== */
+
+/* "Ne çıkacak?" anı: POP'tan önce 420ms — vinyet + hafif zoom + tam sessizlik */
+.rit-stage.hush::after {
+  content: '';
+  position: absolute; inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 46%,
+    transparent 26%, rgba(30, 18, 10, 0.28) 62%, rgba(30, 18, 10, 0.5) 100%);
+  animation: hush-in 0.42s ease forwards;
+}
+.rit-stage.hush .cere-egg-wrap {
+  animation: hush-zoom 0.42s ease forwards;
+}
+@keyframes hush-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hush-zoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.07); }
+}
+
+/* Nadirlik SPLASH'i — renk + simge + büyük yazı (okuma bilmeyene simge/renk yeter) */
+.rit-rarity-splash {
+  position: absolute;
+  left: 50%; top: 20%;
+  transform: translateX(-50%);
+  z-index: 7;
+  pointer-events: none;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 30px;
+  letter-spacing: 0.03em;
+  color: var(--rc, #4FB8D8);
+  background: #FFFDF6;
+  border: 3px solid var(--rc, #4FB8D8);
+  border-radius: 999px;
+  padding: 8px 26px;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.9), 0 6px 0 rgba(62, 42, 28, 0.22),
+    0 0 28px var(--rc, #4FB8D8);
+  animation: splash-pop 2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  white-space: nowrap;
+}
+.rit-rarity-splash.t3 { font-size: 34px; }
+@keyframes splash-pop {
+  0%   { transform: translateX(-50%) scale(0.2) rotate(-8deg); opacity: 0; }
+  14%  { transform: translateX(-50%) scale(1.18) rotate(2deg); opacity: 1; }
+  22%  { transform: translateX(-50%) scale(1) rotate(0deg); }
+  82%  { transform: translateX(-50%) scale(1); opacity: 1; }
+  100% { transform: translateX(-50%) scale(0.92) translateY(-14px); opacity: 0; }
+}
+
+/* Sonuç kartı cilası: flip girişi + arkada dönen güneş huzmesi + seri numarası */
+.cere-card {
+  position: relative;
+  overflow: hidden;
+  animation: card-flip-in 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both !important;
+}
+@keyframes card-flip-in {
+  0%   { transform: perspective(700px) rotateY(88deg) scale(0.9); opacity: 0; }
+  55%  { transform: perspective(700px) rotateY(-8deg) scale(1.02); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+.cere-card-rays {
+  position: absolute;
+  left: 50%; top: 86px;
+  width: 430px; height: 430px;
+  margin: -215px 0 0 -215px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: repeating-conic-gradient(rgba(255, 199, 52, 0.2) 0deg 11deg,
+    rgba(255, 199, 52, 0) 11deg 30deg);
+  animation: card-rays-spin 16s linear infinite;
+}
+@keyframes card-rays-spin { to { transform: rotate(360deg); } }
+.cere-card > *:not(.cere-card-rays) { position: relative; z-index: 1; }
+.cere-serino {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #8A6B4F;
+  margin-top: -4px;
+}
+
+/* Salla = olabilirlik karuseli: eldeki yumurtanın üstünde 3 eksik-dost silüeti */
+.home-shake-hints {
+  position: absolute;
+  left: 50%; top: -66px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  z-index: 9;
+}
+.home-shake-hints .hint-p {
+  width: 52px; height: 52px;
+  background: #FFFDF6;
+  border: 2.5px solid #3E2A1C;
+  border-radius: 50%;
+  padding: 4px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.85), 0 3px 0 rgba(62, 42, 28, 0.22);
+  animation: hint-pop 1.9s ease both;
+  animation-delay: var(--d, 0s);
+  opacity: 0;
+}
+.home-shake-hints .hint-p svg { width: 100%; height: 100%; opacity: 0.55; }
+.home-shake-hints .hint-q {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 26px;
+  color: #FFFDF6;
+  text-shadow: 0 2px 0 rgba(62, 42, 28, 0.5);
+  animation: hint-pop 1.9s ease 0.66s both;
+  opacity: 0;
+}
+@keyframes hint-pop {
+  0%   { transform: translateY(8px) scale(0.4); opacity: 0; }
+  16%  { transform: translateY(-4px) scale(1.1); opacity: 1; }
+  26%  { transform: none; opacity: 1; }
+  80%  { transform: none; opacity: 1; }
+  100% { transform: translateY(-8px) scale(0.8); opacity: 0; }
+}
+
+/* ---------- Albüm: oyuncak sandığı + yaklaşma vurgusu ---------- */
+.alb-cell.cell-jump {
+  animation: cell-jump 0.6s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes cell-jump {
+  0%   { transform: translateY(0) scale(1); }
+  30%  { transform: translateY(-8px) scale(1.08); }
+  60%  { transform: translateY(0) scale(0.96); }
+  100% { transform: none; }
+}
+.alb-progress-bar.yakin .alb-progress-fill {
+  animation: bar-glow 1.1s ease-in-out infinite alternate;
+}
+@keyframes bar-glow {
+  from { box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5); }
+  to   { box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 0 14px rgba(255, 124, 51, 0.9); }
+}
+.alb-yakin {
+  position: relative; z-index: 1;
+  text-align: center;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: #E85C1E;
+  margin: -4px 0 10px;
+  animation: yakin-bob 1.4s ease-in-out infinite;
+}
+@keyframes yakin-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.alb-gold-teaser {
+  position: relative; z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 9px 14px;
+  border: 2.5px dashed rgba(201, 138, 0, 0.75);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #FFF8E4, #FFF1CE);
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #8A6B4F;
+  text-align: left;
+  cursor: pointer;
+}
+.alb-gold-teaser b { color: #C98A00; }
+.alb-gold-teaser .agt-ico { font-size: 22px; }
+.alb-gold-teaser.ready {
+  border-style: solid;
+  border-color: #F2A61B;
+  animation: glow 1.6s ease-in-out infinite alternate;
+}
+.alb-hedef-btn { width: 100%; }
+
 /* ---------- Şako Saklambaç sahnesi ---------- */
 .sk-scene { position: absolute; inset: 0; }
 .sk-stage {
@@ -2559,6 +2742,594 @@ img, svg { max-width:100%; display:block; }
   gap: 10px;
   margin: 6px 0 12px;
 }
+
+/* ======================================================================
+   P3 — Oturum döngüsü: görev çipleri, hedef çipi, kuluçka, kapanış ritüeli
+   (araştırma: randevu = ekranda DURAN kanca; geri sayım/baskı dili YOK)
+   ====================================================================== */
+
+/* Günlük görev zinciri çipleri (ilerleme şeridinin hemen altında) */
+.home-gorev {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 14px 0;
+  width: fit-content;
+  padding: 5px 10px;
+  background: rgba(255, 251, 240, 0.92);
+  border: 2.5px solid #3E2A1C;
+  border-radius: 999px;
+  box-shadow: 0 3px 0 rgba(62, 42, 28, 0.2);
+}
+.gorev-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border: 2px solid #E5D5BC;
+  border-radius: 999px;
+  background: #FFF;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  color: #7A6A54;
+  cursor: pointer;
+}
+button.gorev-chip { -webkit-tap-highlight-color: transparent; }
+.gorev-chip b { font-size: 12px; }
+.gorev-chip.ok {
+  border-color: #55B944;
+  background: #EAF9E2;
+  color: #2E7D22;
+}
+.gorev-odul {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  color: #B08A4F;
+}
+.gorev-odul.ok { color: #2E7D22; }
+.home-gorev.done { border-color: #55B944; }
+
+/* Hedef çipi — "Arıyorum: <dost>" (çocuğun kendi hedefi; fiyat dili yok) */
+.home-hedef {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 6px 14px 0;
+  width: fit-content;
+  padding: 6px 12px;
+  background: rgba(255, 244, 214, 0.95);
+  border: 2.5px solid #F2A400;
+  border-radius: 999px;
+  box-shadow: 0 3px 0 rgba(62, 42, 28, 0.2);
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: #6E4520;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.home-hedef .hedef-sil { width: 26px; height: 26px; display: inline-flex; }
+.home-hedef .hedef-sil svg { width: 100%; height: 100%; }
+.home-hedef.found {
+  border-color: #55B944;
+  background: #EAF9E2;
+  color: #2E7D22;
+  animation: hedef-found-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.home-hedef .hedef-star { animation: hedef-star-spin 1.4s ease-in-out infinite; }
+@keyframes hedef-found-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes hedef-star-spin {
+  0%, 100% { transform: rotate(-12deg) scale(1); }
+  50% { transform: rotate(12deg) scale(1.2); }
+}
+
+/* Kuluçka yumurtası — vitrinde "Hazır!" rozeti + sıcak ışıma */
+.home-egg { position: relative; }  /* rozet + salla ipuçları bu kapsayıcıya demirler */
+.home-egg.kulucka .home-egg-art {
+  filter: drop-shadow(0 0 10px rgba(255, 199, 52, 0.85));
+  animation: kulucka-glow 1.6s ease-in-out infinite;
+}
+@keyframes kulucka-glow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.home-egg-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  background: #FFC734;
+  border: 2px solid #3E2A1C;
+  border-radius: 999px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  color: #3E2A1C;
+  white-space: nowrap;
+  animation: badge-bob 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes badge-bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-3px); }
+}
+
+/* Şako gece uçuşu — tam ekran gece katmanı (2.3 sn, dekor) */
+.home-sako-flyby {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  background: linear-gradient(180deg, #141B38 0%, #23305C 55%, #37457B 100%);
+  overflow: hidden;
+  animation: flyby-fade 2.3s ease-in-out both;
+  pointer-events: none;
+}
+@keyframes flyby-fade {
+  0% { opacity: 0; }
+  12%, 86% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.home-sako-flyby .flyby-kus {
+  position: absolute;
+  top: 26%;
+  left: -140px;
+  width: 120px;
+  height: 70px;
+  animation: flyby-kus 2.1s ease-in-out 0.1s both;
+}
+.home-sako-flyby .flyby-kus svg { width: 100%; height: 100%; }
+@keyframes flyby-kus {
+  0% { transform: translateX(0) translateY(0); }
+  45% { transform: translateX(58vw) translateY(26px); }
+  100% { transform: translateX(120vw) translateY(-10px); }
+}
+.home-sako-flyby .flyby-egg {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  font-size: 40px;
+  transform: translateX(-50%);
+  animation: flyby-egg 1.5s cubic-bezier(0.3, 0, 0.6, 1) 0.75s both;
+}
+.home-sako-flyby .flyby-egg i {
+  position: absolute;
+  right: -12px;
+  top: -8px;
+  font-size: 20px;
+  font-style: normal;
+}
+@keyframes flyby-egg {
+  0% { transform: translateX(-50%) translateY(-30px) scale(0.5); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translateX(-50%) translateY(34vh) scale(1); opacity: 1; }
+}
+.home-sako-flyby .flyby-metin {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18%;
+  margin: 0;
+  text-align: center;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: #FFF6E3;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  animation: flyby-metin 2.3s ease-in-out both;
+}
+@keyframes flyby-metin {
+  0%, 30% { opacity: 0; transform: translateY(8px); }
+  55%, 88% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; }
+}
+
+/* Kapanış ritüeli — gün sonu paneli ekleri */
+.dayend-baslik {
+  display: block;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 12.5px;
+  letter-spacing: 0.4px;
+  color: #7A6A54;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.dayend-dostlar {
+  margin: 2px 0 8px;
+  text-align: center;
+}
+.dayend-dost-row {
+  display: inline-flex;
+  gap: 6px;
+  justify-content: center;
+}
+.dayend-dost {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  background: rgba(255, 251, 240, 0.9);
+  border: 2.5px solid #3E2A1C;
+  border-radius: 50%;
+  padding: 4px;
+  animation: dost-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: var(--d, 0s);
+}
+.dayend-dost svg { width: 100%; height: 100%; }
+@keyframes dost-pop {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+.dayend-yarin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+  padding: 7px 12px;
+  background: rgba(40, 53, 107, 0.1);
+  border: 2px dashed #28356B;
+  border-radius: 14px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #28356B;
+}
+.dayend-yarin-egg {
+  width: 30px;
+  height: 38px;
+  display: inline-flex;
+  filter: grayscale(0.55) brightness(0.75) opacity(0.85); /* silüet vaadi — içerik sızmaz */
+  animation: badge-bob 2s ease-in-out infinite;
+}
+.dayend-yarin-egg svg { width: 100%; height: 100%; }
+.dayend-takvim {
+  margin: 2px 0 10px;
+  text-align: center;
+}
+.takvim-stars { display: inline-flex; gap: 4px; }
+.takvim-star {
+  font-style: normal;
+  font-size: 19px;
+  color: rgba(62, 42, 28, 0.22);
+  -webkit-text-stroke: 1px rgba(62, 42, 28, 0.3);
+}
+.takvim-star.on { color: #FFC734; -webkit-text-stroke: 1px #3E2A1C; }
+.takvim-star.today {
+  color: #FFE9A8;
+  -webkit-text-stroke: 1px #B08A4F;
+  animation: takvim-today 1.2s ease-in-out infinite;
+}
+@keyframes takvim-today {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+.dayend-takvim small {
+  display: block;
+  margin-top: 2px;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #7A6A54;
+}
+
+/* ======================================================================
+   P4 — İlk 60 saniye & yuva canlılığı & sahne geçişi
+   ====================================================================== */
+
+/* Yumuşak sahne girişi: mount senkron, yalnız görsel giriş 180ms */
+#scene-root.scene-fade > * { animation: scene-fade-in 0.18s ease-out; }
+@keyframes scene-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Intro: yıldız serpintili gök */
+.intro-starfield { position: absolute; inset: 0; pointer-events: none; }
+.if-star {
+  position: absolute;
+  color: #FFE9A8;
+  opacity: 0.5;
+  animation: if-twinkle 2.2s ease-in-out infinite;
+}
+@keyframes if-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 0.95; transform: scale(1.15); }
+}
+
+/* Intro: kuyruklu yıldız izi (düşüş sırasında görünür, sonra söner) */
+.intro-star-tail {
+  position: absolute;
+  left: 50%; top: -6px;
+  width: 10px; height: 64vh;
+  margin-left: -5px;
+  transform-origin: top center;
+  transform: rotate(24deg);
+  background: linear-gradient(180deg, rgba(255, 223, 130, 0) 0%,
+    rgba(255, 223, 130, 0.55) 70%, rgba(255, 223, 130, 0.9) 100%);
+  border-radius: 999px;
+  filter: blur(2px);
+  animation: tail-fade 1.7s ease-out both;
+  pointer-events: none;
+}
+@keyframes tail-fade {
+  0% { opacity: 1; }
+  75% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* Yuva çağrısı: periyodik hop + parıltı */
+.home-egg-art.hop { animation: egg-hop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes egg-hop {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-14px) rotate(-3deg); }
+  70% { transform: translateY(0) scale(1.04, 0.94); }
+}
+.home-egg-spark {
+  position: absolute;
+  top: -6px; right: -4px;
+  font-size: 17px;
+  animation: spark-float 0.95s ease-out both;
+  pointer-events: none;
+}
+@keyframes spark-float {
+  0% { opacity: 0; transform: translateY(6px) scale(0.6); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-16px) scale(1.15) rotate(24deg); }
+}
+
+/* İlk oturum el ipucu: yumurtaların üstünde dokunuş jesti */
+.home-hand {
+  position: absolute;
+  bottom: -34px;
+  left: 50%;
+  font-size: 32px;
+  z-index: 4;
+  animation: hand-tap 1.5s ease-in-out infinite;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 0 rgba(62, 42, 28, 0.4));
+}
+@keyframes hand-tap {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.95; }
+  45% { transform: translateX(-50%) translateY(-16px) scale(0.94); }
+  60% { transform: translateX(-50%) translateY(-4px); }
+}
+
+/* Gezinen Pufi selam balonu */
+.home-roamer { overflow: visible; }
+.roamer-bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  background: #FFFBF0;
+  border: 2.5px solid #3E2A1C;
+  border-radius: 12px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 12.5px;
+  color: #3E2A1C;
+  white-space: nowrap;
+  box-shadow: 0 3px 0 rgba(62, 42, 28, 0.2);
+  animation: bubble-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  pointer-events: none;
+  z-index: 5;
+}
+.roamer-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border: 5px solid transparent;
+  border-top-color: #3E2A1C;
+}
+@keyframes bubble-pop {
+  0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+/* ======================================================================
+   P5 — Ebeveyn paneli güven kancaları + kargo balonu
+   ====================================================================== */
+
+/* Güven şeridi — panelin ilk cümlesi 4 ilke */
+.par-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+.par-trust span {
+  padding: 5px 10px;
+  background: #EFF6EE;
+  border: 1.5px solid #BFDCC0;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2E5C33;
+}
+
+/* Üst şerit dilek rozeti */
+.par-strip-wish {
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: #FFF4D6;
+  border: 1.5px solid #E8C56B;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #6E4520;
+  cursor: pointer;
+  width: fit-content;
+}
+
+/* Dilek Kartı+ */
+.par-wish-eta {
+  display: block;
+  font-size: 11.5px;
+  color: #6B7280;
+  margin-top: 2px;
+}
+.par-wish-chip {
+  display: inline-block;
+  padding: 1px 7px;
+  background: #FDE7EF;
+  border: 1px solid #F2B8CD;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #9D3B63;
+  vertical-align: 1px;
+}
+.par-wish-chip.par-chip-mute {
+  background: #F3F4F6;
+  border-color: #D1D5DB;
+  color: #6B7280;
+}
+.par-wish-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+  max-width: 46%;
+}
+.par-wish-act { font-size: 11.5px; padding: 4px 8px; }
+.par-wish-row.is-later { opacity: 0.62; }
+
+/* Hoş Geldin Sepeti — geri sayımsız tek seferlik karşılama */
+.par-welcome {
+  border: 2px solid #E8C56B;
+  background: linear-gradient(180deg, #FFFDF5 0%, #FFF6DF 100%);
+}
+.par-welcome-price {
+  font-size: 22px;
+  font-weight: 800;
+  color: #6E4520;
+  margin: 4px 0 2px;
+}
+
+/* Yayılım önizlemesi satırı */
+.par-buy-yayilim {
+  margin: 6px 0;
+  padding: 8px 10px;
+  background: #EFF6FE;
+  border: 1.5px solid #BBD7F2;
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: #29517A;
+}
+
+/* Kargo balonu teslimatı (home) */
+.home-kargo {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+.home-kargo .kargo-balon {
+  position: absolute;
+  left: 50%;
+  top: -120px;
+  width: 84px;
+  height: 118px;
+  margin-left: -42px;
+  animation: kargo-in 1.6s cubic-bezier(0.3, 0, 0.45, 1) both;
+}
+.home-kargo .kargo-balon svg { width: 100%; height: 100%; }
+@keyframes kargo-in {
+  0% { transform: translateY(0) rotate(-4deg); }
+  60% { transform: translateY(46vh) rotate(3deg); }
+  100% { transform: translateY(52vh) rotate(0deg); opacity: 0.15; }
+}
+.home-kargo .kargo-egg {
+  position: absolute;
+  left: 50%;
+  top: -34px;
+  font-size: 26px;
+  margin-left: -13px;
+  animation: kargo-egg 1.6s cubic-bezier(0.3, 0, 0.45, 1) both;
+}
+@keyframes kargo-egg {
+  0% { transform: translateY(0); opacity: 0; }
+  25% { opacity: 1; }
+  60% { transform: translateY(48vh); }
+  100% { transform: translateY(56vh) scale(0.85); opacity: 0; }
+}
+
+/* ======================================================================
+   P6 — Çıt Çıt Köşesi (ödülsüz ASMR kabuk çıtlatma)
+   ====================================================================== */
+.mg-citcit-btn {
+  margin-top: 8px;
+  padding: 6px 14px;
+  background: #FFF4D6;
+  border: 2.5px solid #3E2A1C;
+  border-radius: 999px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: #6E4520;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(62, 42, 28, 0.25);
+  -webkit-tap-highlight-color: transparent;
+}
+.mg-citcit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 0 30px;
+}
+.mg-cc-egg {
+  width: 190px;
+  height: 220px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 6px 6px rgba(74, 59, 42, 0.3));
+  -webkit-tap-highlight-color: transparent;
+}
+.mg-cc-egg svg { width: 100%; height: 100%; }
+.mg-cc-egg:active { transform: translateY(3px) scale(0.98); }
+.mg-cc-egg.c1 svg, .mg-cc-egg.c2 svg { animation: cc-jolt 0.22s ease; }
+.mg-cc-egg.c3 svg {
+  animation: cc-jolt 0.22s ease;
+  filter: drop-shadow(0 0 18px rgba(255, 226, 140, 0.9));
+}
+@keyframes cc-jolt {
+  30% { transform: rotate(-3deg) scale(1.04); }
+  70% { transform: rotate(2.4deg); }
+}
+.mg-cc-hint {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: #7A6A54;
+  margin: 0;
+}
+
+/* Dilek Kartı+ eylemleri: metin değil, dokunulabilir mini haplar */
+.par-wish-acts .par-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  line-height: 1.2;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 999px;
+  background: #FFFFFF;
+}
+.par-wish-acts .par-wish-rm { border-color: #F2B8B8; color: #9D3B3B; }
 
 /* == css/parent.css == */
 /* Yuvo — Ebeveyn Paneli stilleri (parent.css)
@@ -3474,7 +4245,13 @@ img, svg { max-width:100%; display:block; }
       persona:'Doğum günü hediyesi' },
     { id:'kumbara', ad:'Sezon Kumbarası', adet:100, tl:199.99, usd:8.99,
       garanti:'1 seçmeli parça + 2 Destansı + 10 Nadir', garantiKisa:'Seçmeli parça',
-      persona:'Bayram / büyük hediye' }
+      persona:'Bayram / büyük hediye' },
+    // Hoş Geldin Sepeti (v2·05 §1.6): TEK SEFERLİK, GERİ SAYIMSIZ — "süresi dolmaz,
+    // hep burada durur" dili. Normal paket ızgarasında GÖRÜNMEZ (tekSeferlik bayrağı);
+    // ebeveyn paneli ayrı kartta, yalnız hiç kullanılmamışsa gösterir.
+    { id:'hosgeldin', ad:'Hoş Geldin Sepeti', adet:5, tl:14.99, usd:0.69,
+      garanti:'En az 1 Nadir', garantiKisa:'1 Nadir',
+      persona:'Tek seferlik başlangıç — acele ettirmez, süresi yok', tekSeferlik:true }
   ];
 
   Y.data.CLUB = {
@@ -3603,7 +4380,17 @@ img, svg { max-width:100%; display:block; }
       kaybetti: [
         'Buldun demek. Şans. Kesinlikle şans. …Bir daha oynayalım mı?'
       ]
-    }
+    },
+
+    // Çayırda gezinen Pufi'lere dokununca çıkan minik selamlar (home.js roamer balonu)
+    pufiSelam: [
+      'Merhaba!',
+      'Cik cik!',
+      'Bugün ne güzel!',
+      'Beraber oynayalım mı?',
+      'Seni görünce sevindim!',
+      'Hihi, gıdıklandım!'
+    ]
   };
 })();
 
@@ -10856,6 +11643,19 @@ img, svg { max-width:100%; display:block; }
     tone(t + 0.6, 0.85, 2093, { gain: 0.055, att: 0.015 });
     burst(t + 0.56, 0.7, { ftype: 'highpass', f0: 5500, gain: 0.045, att: 0.06, q: 0.7 });
   };
+  SOUNDS.pufiChirp = function (t, o) { // her Pufi'nin KENDİ cıvıltısı: id-hash imzalı
+    var s = String((o && o.id) || 'pufi'), h = 2166136261 >>> 0, i;
+    for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    var base = 520 + (h % 700);                       // 520–1220 Hz taban perdesi
+    var step = 0.08 + ((h >>> 4) % 40) / 1000;        // nota aralığı 80–120 ms
+    var type = ((h >>> 8) % 2) ? 'triangle' : 'sine';
+    var SEQ2 = [[1, 1.25, 1.5], [1, 1.5, 1.2], [1.2, 1, 1.4], [1, 1.33, 1, 1.6]];
+    var seq = SEQ2[h % 4];
+    for (i = 0; i < seq.length; i++) {
+      tone(t + i * step, 0.14, base * seq[i],
+        { type: type, glide: base * seq[i] * 1.07, glideT: 0.6, gain: 0.09, att: 0.008 });
+    }
+  };
   SOUNDS.stampSlap = function (t) { // defter "şlap"
     burst(t, 0.06, { ftype: 'lowpass', f0: 900, f1: 250, gain: 0.28, q: 0.6 });
     burst(t, 0.03, { f0: 1800, f1: 900, gain: 0.13 });
@@ -10931,7 +11731,11 @@ img, svg { max-width:100%; display:block; }
 
   var ADLAR = { kiki:'Kiki', luna:'Luna', ustakabuk:'Usta Kabuk', sako:'Şako', pofu:'Pofu' };
   var queue = [];
-  var root = null, open = false;
+  var root = null, open = false, autoTimer = null;
+
+  function clearAuto () {
+    if (autoTimer !== null) { clearTimeout(autoTimer); autoTimer = null; }
+  }
 
   function play (n) { try { if (Y.audio && Y.audio.play) Y.audio.play(n); } catch (e) {} }
 
@@ -10974,9 +11778,13 @@ img, svg { max-width:100%; display:block; }
     bub.addEventListener('click', advance);
     open = true;
     play('pop');
+    // sure verildiyse balon kendiliğinden akar (tören kutlamaları / selamlar)
+    clearAuto();
+    if (item.sure > 0) autoTimer = setTimeout(advance, item.sure);
   }
 
   function advance () {
+    clearAuto();
     var done = queue.shift();
     if (done && typeof done.cb === 'function') { try { done.cb(); } catch (e) {} }
     if (queue.length) { render(queue[0]); }
@@ -10984,6 +11792,7 @@ img, svg { max-width:100%; display:block; }
   }
 
   function close () {
+    clearAuto();
     open = false;
     if (root) root.innerHTML = '';
   }
@@ -10991,7 +11800,8 @@ img, svg { max-width:100%; display:block; }
   Y.dialog = {
     say: function (opts) {
       if (!opts || !opts.metin) return;
-      queue.push({ kim: opts.kim || null, metin: opts.metin, mood: opts.mood, cb: opts.cb });
+      queue.push({ kim: opts.kim || null, metin: opts.metin, mood: opts.mood, cb: opts.cb,
+                   sure: (opts.sure > 0) ? (opts.sure | 0) : 0 });
       if (!open) render(queue[0]);
     },
     clear: function () { queue = []; close(); },
@@ -11013,6 +11823,11 @@ img, svg { max-width:100%; display:block; }
   var EXTRA_EGG_COST = 120;
   var EXTRA_EGG_MAX = 2;
   var DAILY_EGGS = 3;                       // newDay(): vitrine 3 ambalajlı yumurta
+  var EGG_STACK_MAX = 9;                    // haklar BİRİKİR (kaçıran çocuk cezalanmaz) — tavan 9
+  var STREAK_GOAL = 7;                      // Bekçi Takvimi: 7 yıldız → rozet + Kabuk
+  var STREAK_KABUK = 25;
+  var GOREV_AC_HEDEF = 3;                   // günlük görev zinciri: 3 yumurta aç · 1 oyun · albüme bak
+  var GOREV_OYUN_HEDEF = 1;
   var FREE_TOOLS = ['burgu', 'cekic', 'firlat'];
 
   // Kilometre taşları: ownedCount eşiği → { anahtar, Kabuk ödülü }
@@ -11113,6 +11928,13 @@ img, svg { max-width:100%; display:block; }
       activeBiome: 'cayir',                   // 'cayir' | 'orman' — gacha havuzu bunu okur
       ormanAcik: false,                       // Fısıltı Ormanı kilidi (Çayır 10/30'da açılır)
       sakoHidden: null,                       // Şako'nun sakladığı orman parçası (pufiId|null)
+      hedefPufi: null,                        // çocuğun kendi seçtiği hedef parça ("Arıyorum!" — fiyat dili yok)
+      // --- oturum döngüsü kancaları (araştırma: randevu = ekranda duran kanca, sayaç değil) ---
+      kulucka: null,                          // {seri} — Şako'nun bıraktığı "yarın sürprizi"; newDay'de özel yumurta olur
+      bugunAcilanlar: [],                     // bugün açılan pufiId'ler (kapanış özeti için)
+      gorevler: { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false }, // günlük görev zinciri
+      gorevBonusYeni: false,                  // görev bonusu düştü — yuva bir kez kutlar
+      streak: { yildiz: 0, rozet: 0 },        // Bekçi Takvimi — CEZASIZ: kaçan gün zinciri kırmaz
       seed: freshSeed()                       // mulberry32 tohumu (gacha.js kullanır)
     };
     fillTodayEggs(s, DAILY_EGGS);
@@ -11199,6 +12021,7 @@ img, svg { max-width:100%; display:block; }
         if (keys.indexOf(e.seri) === -1) e.seri = daySeries(base.day);
         e.variant = Math.max(0, Math.min(variantCount() - 1, e.variant | 0));
         if (e.golden !== true) e.golden = null;
+        if (e.kulucka !== true) delete e.kulucka;
         temiz.push(e);
       }
       base.todayEggs = temiz;
@@ -11234,11 +12057,33 @@ img, svg { max-width:100%; display:block; }
     for (i = 0; i < base.wishes.length; i++) {
       var w = base.wishes[i];
       if (w && typeof w === 'object' && typeof w.pufiId === 'string') {
-        temizW.push({ pufiId: w.pufiId, ts: Math.max(0, w.ts | 0) });
+        var tw = { pufiId: w.pufiId, ts: Math.max(0, w.ts | 0) };
+        if (w.not === 'dogumgunu') tw.not = 'dogumgunu';   // ebeveyn notu (panel)
+        if (w.durum === 'sonra') tw.durum = 'sonra';        // "şimdi değil" işareti
+        temizW.push(tw);
       }
     }
     base.wishes = temizW;
     if (!Array.isArray(base.purchases)) base.purchases = [];
+
+    // --- oturum döngüsü alanları (tip onarımı — eski kayıt varsayılanla açılır) ---
+    if (!base.kulucka || typeof base.kulucka !== 'object' || typeof base.kulucka.seri !== 'string') {
+      base.kulucka = null;
+    }
+    if (!Array.isArray(base.bugunAcilanlar)) base.bugunAcilanlar = [];
+    if (!base.gorevler || typeof base.gorevler !== 'object' || Array.isArray(base.gorevler)) {
+      base.gorevler = { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false };
+    }
+    base.gorevler.ac = Math.max(0, base.gorevler.ac | 0);
+    base.gorevler.oyun = Math.max(0, base.gorevler.oyun | 0);
+    base.gorevler.albumZiyaret = base.gorevler.albumZiyaret === true;
+    base.gorevler.bonusVerildi = base.gorevler.bonusVerildi === true;
+    base.gorevBonusYeni = base.gorevBonusYeni === true;
+    if (!base.streak || typeof base.streak !== 'object' || Array.isArray(base.streak)) {
+      base.streak = { yildiz: 0, rozet: 0 };
+    }
+    base.streak.yildiz = Math.max(0, base.streak.yildiz | 0);
+    base.streak.rozet = Math.max(0, base.streak.rozet | 0);
 
     base.version = 3;
     base.eggsAvailable = base.todayEggs.length;  // ZORUNLU senkron (main.js HUD / home bunu okur)
@@ -11263,14 +12108,46 @@ img, svg { max-width:100%; display:block; }
 
   Yuvo.engine.newDay = function () {
     var s = Yuvo.engine.state;
+    // Bekçi Takvimi: dün en az 1 yumurta açıldıysa 1 yıldız. CEZASIZ — oynanmayan gün
+    // zinciri KIRMAZ, yıldızlar birikmeye devam eder; "kaybettin" dili hiçbir yerde yok.
+    if (s.gorevler && (s.gorevler.ac | 0) > 0) {
+      s.streak.yildiz = (s.streak.yildiz | 0) + 1;
+      if (s.streak.yildiz >= STREAK_GOAL) {
+        s.streak.yildiz = 0;
+        s.streak.rozet = (s.streak.rozet | 0) + 1;
+        s.kabuk += STREAK_KABUK;
+      }
+    }
     s.day += 1;
-    fillTodayEggs(s, DAILY_EGGS);           // aktif seriden 3 ambalajlı yumurta + senkron
+    // Haklar BİRİKİR: vitrin sıfırlanmaz — kalan + 3 yeni, tavan 9 (TCG Pocket stack modeli).
+    var kalan = Array.isArray(s.todayEggs) ? s.todayEggs.slice(0, EGG_STACK_MAX) : [];
+    var eklenecek = Math.min(DAILY_EGGS, Math.max(0, EGG_STACK_MAX - kalan.length));
+    for (var ne = 0; ne < eklenecek; ne++) kalan.push(makeEgg(s.day));
+    s.todayEggs = kalan;
+    if (s.parent.clubActive) {              // Club: her gün 1 bonus yumurta (tavanı aşmaz)
+      var cAdet = clubInfo().gunlukYumurta | 0, ci;
+      for (ci = 0; ci < cAdet; ci++) {
+        if (s.todayEggs.length < EGG_STACK_MAX) s.todayEggs.push(makeEgg(s.day));
+      }
+    }
+    // Kuluçka: Şako'nun dün akşam bıraktığı yumurta sabah "hazır!" olur — vitrinin İLK
+    // sırasına düşer ve tavana SAYILMAZ (bekletilen sürpriz asla yanmaz).
+    if (s.kulucka && typeof s.kulucka === 'object') {
+      var kEgg = makeEgg(s.day, s.kulucka.seri);
+      kEgg.kulucka = true;
+      s.todayEggs.unshift(kEgg);
+      s.kulucka = null;
+    }
+    s.eggsAvailable = s.todayEggs.length;   // ZORUNLU senkron
     s.extraEggsBought = 0;
     s.rewardedPlaysToday = 0;
     s.firstRitualDoneToday = false;         // günün ilk yumurtası yine tam ritüel
     s.chocolateStarsToday = 0;
     s.kumbaraToday = 0;
     s.kiler.bugunAcilan = 0;                // kilerden günlük açma hakkı tazelenir
+    s.gorevler = { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false };
+    s.gorevBonusYeni = false;
+    s.bugunAcilanlar = [];
     syncMonth(s);                           // ay döndüyse ebeveyn harcaması sıfırlanır
     // Şako: orman açıkken sahipli bir orman parçasını "saklar" (yok olmaz, iz bırakır)
     if (s.ormanAcik && !s.sakoHidden) {
@@ -11281,11 +12158,6 @@ img, svg { max-width:100%; display:block; }
         if (op && op.biome === 'orman' && op.rarity !== 'gizli') ormanIds.push(oid);
       }
       if (ormanIds.length >= 2) s.sakoHidden = ormanIds[Math.floor(Math.random() * ormanIds.length)];
-    }
-    if (s.parent.clubActive) {              // Club: her gün 1 bonus yumurta doğrudan vitrine
-      var cAdet = clubInfo().gunlukYumurta | 0, ci;
-      for (ci = 0; ci < cAdet; ci++) { s.todayEggs.push(makeEgg(s.day)); }
-      s.eggsAvailable = s.todayEggs.length;
     }
     if ((s.day - 1) % 7 === 0) s.weekCrafts = 0;  // yeni hafta → Atölye hakkı tazelenir
     commit();
@@ -11433,6 +12305,59 @@ img, svg { max-width:100%; display:block; }
     Yuvo.engine.checkMilestones();
     commit();
     return { ok:true };
+  };
+
+  /* ======================================================================
+     Oturum döngüsü: görev zinciri + kuluçka (araştırma: "yarın sebebi" =
+     ekranda fiziksel duran kanca; geri sayım sayacı YOK — hikâye kapısı)
+     ====================================================================== */
+
+  // Günlük görev zinciri ilerletir: 'ac' | 'oyun' | 'album'. Üçü de tamamlanınca
+  // BİR KEZ +1 bonus yumurta düşer ve true döner (yuva kutlar). Baskı dili yok.
+  Yuvo.engine.gorevIlerle = function (tip) {
+    var s = Yuvo.engine.state, g = s.gorevler;
+    if (!g || typeof g !== 'object') {
+      g = s.gorevler = { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false };
+    }
+    if (tip === 'ac') g.ac = (g.ac | 0) + 1;
+    else if (tip === 'oyun') g.oyun = (g.oyun | 0) + 1;
+    else if (tip === 'album') g.albumZiyaret = true;
+    else return false;
+    if (!g.bonusVerildi && (g.ac | 0) >= GOREV_AC_HEDEF &&
+        (g.oyun | 0) >= GOREV_OYUN_HEDEF && g.albumZiyaret === true) {
+      g.bonusVerildi = true;
+      s.gorevBonusYeni = true;              // yuva bir kez kutlar, sonra bayrağı düşürür
+      Yuvo.engine.grantEgg();               // commit'i grantEgg yapar (tek kayıt)
+      return true;
+    }
+    commit();
+    return false;
+  };
+
+  // Görev hedefleri — sahnelerin çip çizimi için tek kaynak.
+  Yuvo.engine.gorevHedef = function () {
+    return { ac: GOREV_AC_HEDEF, oyun: GOREV_OYUN_HEDEF };
+  };
+
+  // Kuluçka: Şako gün batımında "yarın sürprizini" bırakır. Seri verilmezse YARININ
+  // serisi seçilir — kapanış ekranındaki silüet vaadiyle sabahki yumurta hep tutarlı.
+  Yuvo.engine.kuluckaBirak = function (seri) {
+    var s = Yuvo.engine.state;
+    if (s.kulucka) return false;            // zaten bekleyen bir kuluçka var
+    if (!seri || seriesKeys().indexOf(seri) === -1) seri = daySeries(s.day + 1);
+    s.kulucka = { seri: seri };
+    commit();
+    return true;
+  };
+
+  // Yarının ambalaj serisi (kapanış ritüeli "Yarın: …" satırı bunu okur).
+  Yuvo.engine.yarinSeri = function () {
+    return daySeries(Yuvo.engine.state.day + 1);
+  };
+
+  // Bekçi Takvimi görünümü için sabitler.
+  Yuvo.engine.streakInfo = function () {
+    return { hedef: STREAK_GOAL, kabuk: STREAK_KABUK };
   };
 
   /* ======================================================================
@@ -11815,6 +12740,12 @@ img, svg { max-width:100%; display:block; }
     var variant = egg.variant | 0;
     if (Yuvo.engine.registerFoil) Yuvo.engine.registerFoil(seri, variant, golden);
 
+    // Oturum döngüsü: kapanış özeti + görev zinciri (bonus grantEgg kendi commit'ini yapar)
+    if (!Array.isArray(s.bugunAcilanlar)) s.bugunAcilanlar = [];
+    s.bugunAcilanlar.push(pufi.id);
+    var gorevBonus = false;
+    if (Yuvo.engine.gorevIlerle) gorevBonus = Yuvo.engine.gorevIlerle('ac') === true;
+
     Yuvo.engine.save();
     if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (e) {} }
 
@@ -11823,7 +12754,8 @@ img, svg { max-width:100%; display:block; }
       pufi:pufi, rarity:rarity, isNew:isNew, kabukGained:kabukGained, celebrationTier:celebrationTier,
       wrapper:{ seri:seri, variant:variant, golden:golden },  // tören görselleri buradan beslenir
       chocolate:1,                                            // her ambalajlı yumurtadan 1 çikolata
-      ormanUnlocked:ormanUnlocked                             // bu açılış Fısıltı Ormanı'nı açtıysa true
+      ormanUnlocked:ormanUnlocked,                            // bu açılış Fısıltı Ormanı'nı açtıysa true
+      gorevBonus:gorevBonus                                   // bu açılış görev zincirini tamamladıysa true
     };
   };
 
@@ -12208,6 +13140,27 @@ img, svg { max-width:100%; display:block; }
     var kilerTavan = ((Yuvo.data.STORE_LIMITS && Yuvo.data.STORE_LIMITS.kilerGunluk) || 5) +
       (s.parent && s.parent.clubActive ? ((Yuvo.data.CLUB && Yuvo.data.CLUB.kilerEk) || 1) : 0);
     var kilerHak = s.kiler && (s.kiler.adet | 0) > 0 && (s.kiler.bugunAcilan | 0) < kilerTavan;
+
+    // Hedef parça ("Arıyorum!") — bulunduysa BİR KEZ kutla, çip yıldıza döner
+    var hedefP = (s.hedefPufi && Yuvo.data && Yuvo.data.pufiById) ? Yuvo.data.pufiById(s.hedefPufi) : null;
+    var hedefBulundu = null;
+    if (hedefP && (s.owned || {})[hedefP.id]) {
+      hedefBulundu = hedefP;
+      s.hedefPufi = null;
+      if (Yuvo.engine && Yuvo.engine.save) { try { Yuvo.engine.save(); } catch (e) {} }
+      play('fanfare');
+      toast('🎯 Aradığın dost geldi: ' + hedefP.ad + '! 🌟');
+      hedefP = null;
+    }
+    // Görev bonusu düştüyse yuva BİR KEZ kutlar (bayrak düşer)
+    if (s.gorevBonusYeni) {
+      s.gorevBonusYeni = false;
+      if (Yuvo.engine && Yuvo.engine.save) { try { Yuvo.engine.save(); } catch (e) {} }
+      play('fanfare');
+      toast('🎁 Günün zinciri tamam — bonus yumurta yuvada!');
+    }
+    var g = s.gorevler || { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false };
+    var gh = (Yuvo.engine && Yuvo.engine.gorevHedef) ? Yuvo.engine.gorevHedef() : { ac: 3, oyun: 1 };
     var html = '';
 
     // Manzara katmanı: gök + tepeler + güneş + sticker bulutlar (tamamı dekor;
@@ -12229,6 +13182,38 @@ img, svg { max-width:100%; display:block; }
                 '</span>' +
               '</span>' +
             '</button>';
+
+    // Günlük görev zinciri çipleri (baskı dili YOK — "kaybettin" asla; 3'ü de → +1 bonus)
+    var gAcOk = (g.ac | 0) >= gh.ac, gOyunOk = (g.oyun | 0) >= gh.oyun, gAlbOk = g.albumZiyaret === true;
+    html += '<div class="home-gorev' + (g.bonusVerildi ? ' done' : '') + '"' +
+              ' role="group" aria-label="Günün küçük görevleri">' +
+              '<span class="gorev-chip' + (gAcOk ? ' ok' : '') + '" aria-label="Yumurta aç: ' +
+                Math.min(g.ac | 0, gh.ac) + '/' + gh.ac + '">🥚<b>' +
+                Math.min(g.ac | 0, gh.ac) + '/' + gh.ac + '</b></span>' +
+              '<button class="gorev-chip' + (gOyunOk ? ' ok' : '') + '" data-act="gorev-oyun"' +
+                ' aria-label="Bir oyun oyna">🎮<b>' + (gOyunOk ? '✓' : '0/1') + '</b></button>' +
+              '<button class="gorev-chip' + (gAlbOk ? ' ok' : '') + '" data-act="album"' +
+                ' aria-label="Albüme bak">📔<b>' + (gAlbOk ? '✓' : '·') + '</b></button>' +
+              '<span class="gorev-odul' + (g.bonusVerildi ? ' ok' : '') + '" aria-hidden="true">' +
+                (g.bonusVerildi ? '🎁✓' : '→🎁') + '</span>' +
+            '</div>';
+
+    // Hedef çipi ("Arıyorum!") — çocuğun kendi seçtiği parça; fiyat dili YOK
+    if (hedefBulundu) {
+      html += '<button class="home-hedef found" data-act="album" aria-label="Albümü aç">' +
+                '<span class="hedef-star" aria-hidden="true">🌟</span>' +
+                '<span>' + hedefBulundu.ad + ' yuvana katıldı!</span></button>';
+    } else if (hedefP) {
+      var hedefSil = '';
+      try {
+        hedefSil = (Yuvo.art && Yuvo.art.pufiSilhouetteSVG && Yuvo.art.pufiSilhouetteSVG(hedefP)) || '';
+      } catch (e) {}
+      html += '<button class="home-hedef" data-act="album"' +
+                ' aria-label="Hedefin: ' + hedefP.ad + ' — albümü aç">' +
+                '<span aria-hidden="true">🎯</span>' +
+                (hedefSil ? '<span class="hedef-sil" aria-hidden="true">' + hedefSil + '</span>' : '') +
+                '<span>Arıyorum: <b>' + hedefP.ad + '</b></span></button>';
+    }
 
     // Kenar düğmeleri: Ebeveyn (gri, göze batmaz) + biyom kapısı + Şako Saklambaç
     html += '<div class="home-side">';
@@ -12271,13 +13256,22 @@ img, svg { max-width:100%; display:block; }
         if (heldIdx === i) cls += ' held';
         else if (holding) cls += ' faded';
         if (dropNew && i === shown - 1) cls += ' drop';
-        var lbl = (heldIdx === i) ? 'Yumurtayı aç — töreni başlat' : 'Yumurtayı eline al';
+        if (list[i] && list[i].kulucka) cls += ' kulucka';
+        var lbl = (heldIdx === i) ? 'Yumurtayı aç — töreni başlat'
+          : (list[i] && list[i].kulucka) ? 'Kuluçka yumurtası hazır — eline al'
+          : 'Yumurtayı eline al';
         html += '<button class="' + cls + '" style="--i:' + i + '" data-act="egg"' +
                   ' data-idx="' + i + '" aria-label="' + lbl + '">' +
                   '<span class="home-egg-art">' + wrapperArt(list[i]) + '</span>' +
+                  (list[i] && list[i].kulucka
+                    ? '<b class="home-egg-badge" aria-hidden="true">☀️ Hazır!</b>' : '') +
                 '</button>';
       }
       if (eggs > shown) html += '<span class="home-egg-more">+' + (eggs - shown) + '</span>';
+      // İlk oturum el ipucu: hiç yumurta açılmadıysa dokunuşu göster (metin okumadan)
+      if ((s.eggCounter | 0) === 0 && !holding) {
+        html += '<div class="home-hand" aria-hidden="true">👆</div>';
+      }
     } else {
       html += '<span class="home-nest-empty" aria-hidden="true">' + moonSVG() + '</span>';
     }
@@ -12309,11 +13303,61 @@ img, svg { max-width:100%; display:block; }
     html += '</div></div>';
     dropNew = false;
 
-    // Gün sonu paneli (yumurta bitince)
+    // Gün sonu paneli (yumurta bitince) — kapanış ritüeli: özet + yarının vaadi
+    // (araştırma: geri sayım sayacı YOK; "yarın sebebi" hikâye kapısıyla verilir)
     if (eggs === 0) {
       var extraLeft = Math.max(0, 2 - (s.extraEggsBought | 0));
       var canAfford = (s.stardust | 0) >= 120;
       html += '<div class="home-dayend">';
+
+      // Bugünün Dostları — bugün açılan portreler (tekrarsız, en çok 6)
+      var acilan = Array.isArray(s.bugunAcilanlar) ? s.bugunAcilanlar : [];
+      var gorulen = {}, dostlar = [], ai, ap;
+      for (ai = 0; ai < acilan.length && dostlar.length < 6; ai++) {
+        if (gorulen[acilan[ai]]) continue;
+        gorulen[acilan[ai]] = true;
+        ap = Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(acilan[ai]);
+        if (ap) dostlar.push(ap);
+      }
+      if (dostlar.length) {
+        html += '<div class="dayend-dostlar" aria-label="Bugünün dostları">' +
+                  '<span class="dayend-baslik">Bugünün Dostları</span>' +
+                  '<span class="dayend-dost-row">';
+        for (ai = 0; ai < dostlar.length; ai++) {
+          html += '<span class="dayend-dost" style="--d:' + (ai * 0.12).toFixed(2) + 's"' +
+                    ' title="' + dostlar[ai].ad + '">' + pufiArt(dostlar[ai]) + '</span>';
+        }
+        html += '</span></div>';
+      }
+
+      // Yarının vaadi: seri silueti — SAYAÇ YOK ("Rüzgâr Postası yarın geliyor")
+      var ySeri = (Yuvo.engine && Yuvo.engine.yarinSeri) ? Yuvo.engine.yarinSeri() : null;
+      var ySeriAd = (ySeri && Yuvo.data.WRAPPER_SERIES && Yuvo.data.WRAPPER_SERIES[ySeri] &&
+                     Yuvo.data.WRAPPER_SERIES[ySeri].ad) || '';
+      if (ySeriAd) {
+        html += '<div class="dayend-yarin" aria-label="Yarın: ' + ySeriAd + '">' +
+                  '<span class="dayend-yarin-egg" aria-hidden="true">' +
+                    wrapperArt({ seri: ySeri, variant: 0 }) + '</span>' +
+                  '<span>Yarın: <b>' + ySeriAd + '</b> deseni geliyor…</span>' +
+                '</div>';
+      }
+
+      // Bekçi Takvimi — CEZASIZ 7 yıldız (kaçan gün zinciri KIRMAZ; "kaybettin" dili yok)
+      var stI = (Yuvo.engine && Yuvo.engine.streakInfo) ? Yuvo.engine.streakInfo()
+                : { hedef: 7, kabuk: 25 };
+      var yFilled = Math.min(stI.hedef, (s.streak && s.streak.yildiz) | 0);
+      var bugunYildiz = (g.ac | 0) > 0;
+      html += '<div class="dayend-takvim" aria-label="Bekçi Takvimi: ' + yFilled +
+                ' yıldız, hedef ' + stI.hedef + '">' +
+                '<span class="dayend-baslik">Bekçi Takvimi</span>' +
+                '<span class="takvim-stars" aria-hidden="true">';
+      for (ai = 0; ai < stI.hedef; ai++) {
+        var stCls = ai < yFilled ? ' on' : (bugunYildiz && ai === yFilled ? ' today' : '');
+        html += '<i class="takvim-star' + stCls + '">★</i>';
+      }
+      html += '</span><small>' + stI.hedef + ' yıldız olunca +' + stI.kabuk + ' Kabuk!' +
+              ((s.streak && (s.streak.rozet | 0) > 0) ? ' · 🏅×' + (s.streak.rozet | 0) : '') +
+              '</small></div>';
       if (extraLeft > 0) {
         html += '<button class="btn btn-primary home-extra" data-act="extra"' +
                   (canAfford ? '' : ' disabled') +
@@ -12381,7 +13425,8 @@ img, svg { max-width:100%; display:block; }
 
   // Salla: eldeki yumurta çıngırdar — ses aileyi fısıldar, nadirliği asla (§1.3)
   function doShake () {
-    play('shakeRattle', { family:'cayir' });  // proto tek aile: çayır çıngıltısı
+    var s0 = st();
+    play('shakeRattle', { family: s0.activeBiome === 'orman' ? 'orman' : 'cayir' });
     var art = el && el.querySelector('.home-egg.held .home-egg-art');
     if (art) {
       art.classList.remove('shake');
@@ -12392,6 +13437,124 @@ img, svg { max-width:100%; display:block; }
         if (a) a.classList.remove('shake');
       }, 700);
     }
+    shakeHints();
+  }
+
+  // Olabilirlik karuseli (POP MART "shake for hints" esinli, DÜRÜST hâli): sallayınca
+  // aktif biyomun EKSİK dostlarından 3 silüet belirir — sonuç henüz çekilmediği için
+  // hepsi gerçekten olası; merak boşluğunu daraltmadan besler. Nadirlik ASLA sızmaz.
+  function shakeHints () {
+    if (!el) return;
+    var held = el.querySelector('.home-egg.held');
+    if (!held) return;
+    var s = st(), biome = s.activeBiome === 'orman' ? 'orman' : 'cayir';
+    var list = (Yuvo.data && Yuvo.data.PUFIS) || [], eksik = [], i, p;
+    for (i = 0; i < list.length; i++) {
+      p = list[i];
+      if ((p.biome || 'cayir') !== biome || p.rarity === 'gizli') continue;
+      if (!(s.owned || {})[p.id]) eksik.push(p);
+    }
+    if (!eksik.length) return;
+    var secim = [];
+    for (i = 0; i < 3 && eksik.length; i++) {
+      secim.push(eksik.splice(Math.floor(Math.random() * eksik.length), 1)[0]);
+    }
+    var old = el.querySelector('.home-shake-hints');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var box = document.createElement('span');
+    box.className = 'home-shake-hints';
+    box.setAttribute('aria-hidden', 'true');
+    var html = '';
+    for (i = 0; i < secim.length; i++) {
+      var sil = '';
+      try { sil = (Yuvo.art && Yuvo.art.pufiSilhouetteSVG && Yuvo.art.pufiSilhouetteSVG(secim[i])) || ''; }
+      catch (e) {}
+      html += '<span class="hint-p" style="--d:' + (i * 0.22).toFixed(2) + 's">' + sil + '</span>';
+    }
+    html += '<b class="hint-q">?</b>';
+    box.innerHTML = html;
+    held.appendChild(box);
+    later(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 2000);
+  }
+
+  // Şako gece uçuşu (gün kapanışı): silüet süzülür, kuluçka yumurtasını bırakır.
+  // Sonuç/nadirlik SIZMAZ — yalnız "yarın sürprizi var" vaadi (ekranda duran kanca).
+  function sakoFlybySVG () {
+    return '<svg viewBox="0 0 120 70" aria-hidden="true" focusable="false">' +
+      '<g fill="#1E2A4A">' +
+        '<ellipse cx="58" cy="40" rx="26" ry="13"/>' +
+        '<circle cx="84" cy="30" r="10"/>' +
+        '<path d="M92 28l14 3-13 5Z"/>' +                          // gaga
+        '<path d="M46 34C30 18 14 16 4 22c12 2 20 8 28 20Z"/>' +    // kanat (yukarı)
+        '<path d="M34 44l-26 14 28-4Z"/>' +                         // kuyruk
+      '</g>' +
+      '<circle cx="86" cy="28" r="1.8" fill="#FFC734"/>' +          // göz parıltısı
+    '</svg>';
+  }
+
+  function sakoFlyby (onDone) {
+    var eski = document.querySelector('.home-sako-flyby');
+    if (eski && eski.parentNode) eski.parentNode.removeChild(eski);
+    var ov = document.createElement('div');
+    ov.className = 'home-sako-flyby';
+    ov.setAttribute('aria-hidden', 'true');
+    ov.innerHTML =
+      '<span class="flyby-kus">' + sakoFlybySVG() + '</span>' +
+      '<span class="flyby-egg">🥚<i>🌙</i></span>' +
+      '<p class="flyby-metin">Şako geçti… yuvaya bir şey bıraktı!</p>';
+    document.body.appendChild(ov);
+    play('chime');
+    later(function () {
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+      if (onDone) onDone();
+    }, 2300);
+  }
+
+  // Kargo balonu teslimatı: kilerden çekilen yumurta adaya süzülen balonla iner
+  // (ticaret dili SIFIR — "Rüzgâr Postası" kurgusu; drawFromKiler commit'i vitrini
+  // zaten doldurdu, bu katman yalnız hikâyeyi anlatır)
+  function kargoBalon () {
+    if (!el) return;
+    var ov = document.createElement('div');
+    ov.className = 'home-kargo';
+    ov.setAttribute('aria-hidden', 'true');
+    ov.innerHTML =
+      '<span class="kargo-balon">' + balloonSVG() + '</span>' +
+      '<span class="kargo-egg">🥚</span>';
+    el.appendChild(ov);
+    play('chime');
+    later(function () {
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+      dropNew = true;
+      toast('Rüzgâr Postası bir sürpriz getirdi!');
+      render();
+    }, 1600);
+  }
+
+  // Yuva çağrısı: rastgele bir yumurta ara ara "hop" yapar + parıltı saçar (dokunulası)
+  function liveliness () {
+    later(function tick () {
+      if (el && heldIdx === null) {
+        var adaylar = el.querySelectorAll('.home-egg');
+        if (adaylar.length) {
+          var secilen = adaylar[Math.floor(Math.random() * adaylar.length)];
+          var art = secilen.querySelector('.home-egg-art');
+          if (art) {
+            art.classList.add('hop');
+            var spark = document.createElement('b');
+            spark.className = 'home-egg-spark';
+            spark.setAttribute('aria-hidden', 'true');
+            spark.textContent = '✨';
+            secilen.appendChild(spark);
+            later(function () {
+              art.classList.remove('hop');
+              if (spark.parentNode) spark.parentNode.removeChild(spark);
+            }, 950);
+          }
+        }
+      }
+      later(tick, 4200 + Math.random() * 2600);
+    }, 3200);
   }
 
   // 400ms basılı tut = salla (jest; tap fallback'i eldeki "Salla!" butonu)
@@ -12465,7 +13628,9 @@ img, svg { max-width:100%; display:block; }
       play('page');
       if (Yuvo.go) Yuvo.go('album');
     } else if (act === 'pufi') {
-      play('pop');
+      // Her Pufi KENDİ cıvıltısıyla selamlar + minik konuşma balonu (yuva canlı hissettirir)
+      var pid = b.getAttribute('data-id');
+      play('pufiChirp', { id: pid || 'pufi' });
       var body = b.querySelector('.home-roamer-body');
       if (body) {
         body.classList.remove('jump');
@@ -12473,6 +13638,15 @@ img, svg { max-width:100%; display:block; }
         body.classList.add('jump');
         later(function () { body.classList.remove('jump'); }, 700);
       }
+      var eskiBalon = b.querySelector('.roamer-bubble');
+      if (eskiBalon && eskiBalon.parentNode) eskiBalon.parentNode.removeChild(eskiBalon);
+      var SELAM = (Yuvo.data && Yuvo.data.DIALOG && Yuvo.data.DIALOG.pufiSelam) ||
+        ['Merhaba!', 'Cik cik!', 'Bugün ne güzel!', 'Beraber oynayalım mı?'];
+      var balon = document.createElement('span');
+      balon.className = 'roamer-bubble';
+      balon.textContent = SELAM[Math.floor(Math.random() * SELAM.length)];
+      b.appendChild(balon);
+      later(function () { if (balon.parentNode) balon.parentNode.removeChild(balon); }, 1500);
     } else if (act === 'extra') {
       putBack(true);
       var ok2 = !!(Yuvo.engine && Yuvo.engine.buyExtraEgg && Yuvo.engine.buyExtraEgg());
@@ -12489,25 +13663,36 @@ img, svg { max-width:100%; display:block; }
     } else if (act === 'endday') {
       putBack(true);
       play('chime');
-      var yeniGun = function () {
-        if (Yuvo.engine && Yuvo.engine.newDay) Yuvo.engine.newDay();
-        toast('Yeni gün! Rüzgâr Postası 3 yumurta bıraktı.');
-        render();
+      var geceSonu = function () {
+        // Şako gece uçuşu: yarının kuluçka sürprizini bırakır (sayaç değil, hikâye kapısı)
+        if (Yuvo.engine && Yuvo.engine.kuluckaBirak) Yuvo.engine.kuluckaBirak();
+        sakoFlyby(function () {
+          if (Yuvo.engine && Yuvo.engine.newDay) Yuvo.engine.newDay();
+          var s5 = st();
+          var kulHazir = !!(s5.todayEggs && s5.todayEggs[0] && s5.todayEggs[0].kulucka);
+          toast(kulHazir
+            ? 'Yeni gün! Şako\'nun bıraktığı kuluçka yumurtası hazır! ☀️'
+            : 'Yeni gün! Rüzgâr Postası yumurtaları bıraktı.');
+          render();
+        });
       };
-      // Luna'nın günbatımı ritüeli (docs/v2/04 §1 14:30) — yoksa doğrudan yeni gün
-      if (Yuvo.scenes.intro && Yuvo.scenes.intro.playDusk) Yuvo.scenes.intro.playDusk(yeniGun);
-      else yeniGun();
+      // Luna'nın günbatımı ritüeli (docs/v2/04 §1 14:30) — yoksa doğrudan gece sonu
+      if (Yuvo.scenes.intro && Yuvo.scenes.intro.playDusk) Yuvo.scenes.intro.playDusk(geceSonu);
+      else geceSonu();
+    } else if (act === 'gorev-oyun') {
+      putBack(true);
+      play('click');
+      if (Yuvo.go) Yuvo.go('minigame');
     } else if (act === 'kiler') {
       putBack(true);
       var okK = !!(Yuvo.engine && Yuvo.engine.drawFromKiler && Yuvo.engine.drawFromKiler());
       if (okK) {
         play('pop');
-        dropNew = true;
-        toast('Sepete bir sürpriz yumurta düştü!');
+        kargoBalon();                         // ticaret dili sıfır: balon süzülür, yumurta iner
       } else {
         toast('Bugünlük sürprizler tamam — yarın devam!');
+        render();
       }
-      render();
     } else if (act === 'parent') {
       putBack(true);
       play('click');
@@ -12545,11 +13730,14 @@ img, svg { max-width:100%; display:block; }
       onState = function () { render(); };
       document.addEventListener('yuvo:state', onState);
       render();
+      liveliness();
     },
     unmount: function () {
       for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
       timers = [];
       clearHold();
+      var fly = document.querySelector('.home-sako-flyby');
+      if (fly && fly.parentNode) fly.parentNode.removeChild(fly);
       window.removeEventListener('pointerup', handleUp);
       window.removeEventListener('pointercancel', handleUp);
       if (onState) { document.removeEventListener('yuvo:state', onState); onState = null; }
@@ -12582,6 +13770,11 @@ img, svg { max-width:100%; display:block; }
   var attempts = 0;     // çift deneme sayısı
   var lock = false;
   var finished = false;
+  // Çıt Çıt Köşesi (P6 — ASMR sakinleşme modu): ödülsüz sonsuz kabuk çıtlatma
+  var mode = 'match';   // 'match' | 'citcit'
+  var citCrack = 0;     // 0-3 (3'te ışık sızar, sonra taze yumurta)
+  var citRarity = 'yaygin';
+  var CIT_RARITIES = ['yaygin', 'azbulunur', 'nadir', 'destansi', 'efsanevi'];
 
   /* ---------- yardımcılar (savunmacı) ---------- */
   function st () { return (Yuvo.engine && Yuvo.engine.state) || {}; }
@@ -12710,8 +13903,35 @@ img, svg { max-width:100%; display:block; }
   }
 
   /* ---------- çizim ---------- */
+  function eggFace2 (r, crack) {
+    if (Yuvo.art && Yuvo.art.eggSVG) {
+      try { var s = Yuvo.art.eggSVG(r, { crack: crack | 0 }); if (s) return s; } catch (e) {}
+    }
+    return '<span class="mg-art-fallback">🥚</span>';
+  }
+
+  // Çıt Çıt Köşesi: sayaç yok, ödül yok, kaybetme yok — yalnız çıtlatma dokusu
+  // (araştırma: ASMR/pop-it döngüsü kendi başına sakinleştirici bir değerdir)
+  function renderCitcit () {
+    var html = '';
+    html += '<div class="mg-head center">' +
+              '<h2 class="mg-title">🎵 Çıt Çıt Köşesi</h2>' +
+              '<p class="mg-sub">Ödül yok, acele yok — sadece çıt çıt keyfi.</p>' +
+            '</div>';
+    html += '<div class="mg-citcit center">' +
+              '<button class="mg-cc-egg c' + citCrack + '" data-mg="crack"' +
+                ' aria-label="Yumurtayı çıtlat">' + eggFace2(citRarity, citCrack) + '</button>' +
+              '<p class="mg-cc-hint">' +
+                (citCrack === 0 ? 'Dokun — çıt!' : citCrack < 3 ? 'Çıt çıt…' : 'Işık sızıyor!') +
+              '</p>' +
+              '<button class="btn btn-soft" data-mg="match">↩ Eşini Bul’a dön</button>' +
+            '</div>';
+    el.innerHTML = html;
+  }
+
   function render () {
     if (!el) return;
+    if (mode === 'citcit') { renderCitcit(); return; }
     var s = st();
     var plays = Math.min(5, s.rewardedPlaysToday | 0);
     var left = 5 - plays;
@@ -12727,6 +13947,7 @@ img, svg { max-width:100%; display:block; }
               '<p class="mg-sub">Aynı iki dostu bul!</p>' +
               '<div class="mg-lives" aria-label="Bugün ödüllü oyun hakkı: ' + left + '/5">' +
                 hak + '</div>' +
+              '<button class="mg-citcit-btn" data-mg="citcit">🎵 Çıt Çıt Köşesi</button>' +
             '</div>';
     html += '<div class="mg-board"><div class="mg-grid">';
     for (var i = 0; i < deck.length; i++) {
@@ -12808,6 +14029,12 @@ img, svg { max-width:100%; display:block; }
     }
     play(stars === 3 ? 'fanfare' : 'star');
 
+    // Günlük görev zinciri: 1 oyun bitirmek bir halka (bonus tamamlandıysa kutla)
+    if (Yuvo.engine && Yuvo.engine.gorevIlerle && Yuvo.engine.gorevIlerle('oyun') === true &&
+        Yuvo.toast) {
+      Yuvo.toast('🎁 Günün zinciri tamamlandı — yuvaya bonus yumurta kondu!');
+    }
+
     var starsHtml = '';
     for (var i = 0; i < 3; i++) {
       starsHtml += '<span class="mg-star' + (i < stars ? ' on' : '') + '" style="--d:' + (i * 0.18) + 's"' +
@@ -12862,6 +14089,26 @@ img, svg { max-width:100%; display:block; }
     } else if (act === 'home') {
       play('click');
       if (Yuvo.go) Yuvo.go('home');
+    } else if (act === 'citcit') {
+      play('click');
+      mode = 'citcit';
+      citCrack = 0;
+      citRarity = CIT_RARITIES[Math.floor(Math.random() * CIT_RARITIES.length)];
+      render();
+    } else if (act === 'match') {
+      play('click');
+      mode = 'match';
+      start();
+    } else if (act === 'crack') {
+      citCrack += 1;
+      if (citCrack > 3) {
+        play('pop');                          // kabuk açıldı → taze yumurta gelir
+        citCrack = 0;
+        citRarity = CIT_RARITIES[Math.floor(Math.random() * CIT_RARITIES.length)];
+      } else {
+        play('crack');
+      }
+      render();
     }
   }
 
@@ -12872,6 +14119,8 @@ img, svg { max-width:100%; display:block; }
       el.className = 'mg-scene';
       rootEl.appendChild(el);
       el.addEventListener('click', handleClick);
+      mode = 'match';
+      citCrack = 0;
       start();
     },
     unmount: function () {
@@ -13033,12 +14282,23 @@ img, svg { max-width:100%; display:block; }
                   : '<button class="alb-biome-tab locked" data-act="biome-locked">🌫 ???</button>') +
               '</div>';
     }
+    var kalan = 30 - owned;
     html += '<div class="alb-progress">' +
               '<span class="alb-progress-num"><b>' + owned + '</b>/30</span>' +
-              '<span class="alb-progress-bar">' +
+              '<span class="alb-progress-bar' + (kalan > 0 && kalan <= 3 ? ' yakin' : '') + '">' +
                 '<span class="alb-progress-fill" style="width:' + pct + '%"></span>' +
               '</span>' +
             '</div>';
+    // Yaklaşma vurgusu (goal-gradient) + önceden görünen büyük ödül — baskı dili YOK
+    if (kalan > 0 && kalan <= 3) {
+      html += '<p class="alb-yakin">🎉 Son ' + kalan + ' dost kaldı!</p>';
+    }
+    html += '<button class="alb-gold-teaser' + (owned >= 30 ? ' ready' : '') + '" data-act="gold-teaser">' +
+              '<span class="agt-ico" aria-hidden="true">🥇</span>' +
+              '<span>' + (owned >= 30
+                ? '<b>Altın Yumurta</b> — aile tamam! 🎊'
+                : '30 dost bir araya gelince: <b>Altın Yumurta</b>') + '</span>' +
+            '</button>';
 
     // Kilometre taşı çipleri — Çayır Sezon-1 rozetleri (orman sayfasında gösterilmez)
     if (viewBiome === 'cayir') {
@@ -13160,8 +14420,8 @@ img, svg { max-width:100%; display:block; }
     var ri = rarInfo(p.rarity);
 
     if (n > 0) {
-      // Sahipli: ad + nadirlik + bio + birleşmiş oyuncak
-      play('pop');
+      // Sahipli: albüm bir oyuncak sandığı — dokununca Pufi KENDİ sesiyle selam verir
+      try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play('pufiChirp', { id: p.id }); } catch (eCh) {}
       var htmlOwned =
         '<div class="alb-modal center">' +
           '<div class="alb-modal-art rf rf-' + p.rarity + '">' + toyArt(p) + '</div>' +
@@ -13223,6 +14483,12 @@ img, svg { max-width:100%; display:block; }
         body += '<button class="btn btn-soft alb-wish-btn" id="alb-wish-btn">' +
                   ic('star', '💫') + 'Dilek Kavanozu\'na Fısılda</button>';
       }
+      // Hedef parça ("Arıyorum!"): çocuğun KENDİ oyun-içi hedefi — fiyatla ilgisi yok
+      if (s.hedefPufi === p.id) {
+        body += '<p class="alb-wish-note">🎯 <span>Şu an hedefin bu dost!</span></p>';
+      } else {
+        body += '<button class="btn btn-soft alb-hedef-btn" id="alb-hedef-btn">🎯 Hedefim Bu!</button>';
+      }
     }
     body += '</div></div>';
 
@@ -13242,6 +14508,18 @@ img, svg { max-width:100%; display:block; }
         } else {
           toast('Kavanoz dolu — bir dilek gerçekleşince yenisi sığar.');
         }
+      });
+    }
+    var hbtn = document.getElementById('alb-hedef-btn');
+    if (hbtn) {
+      hbtn.addEventListener('click', function () {
+        var s2 = st();
+        s2.hedefPufi = p.id;
+        try { if (Yuvo.engine && Yuvo.engine.save) Yuvo.engine.save(); } catch (eH) {}
+        play('star');
+        toast('Yeni hedefin: ' + p.ad + '! Yuvada seni bekliyor 🎯');
+        if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (eR) {} }
+        try { close(); } catch (e2) {}
       });
     }
   }
@@ -13281,10 +14559,27 @@ img, svg { max-width:100%; display:block; }
     if (!b) return;
     var act = b.getAttribute('data-act');
     if (act === 'cell') {
+      // Soundboard hissi: sahipli hücre zıplar (roamer jump deseni)
+      if (!b.classList.contains('missing')) {
+        b.classList.remove('cell-jump');
+        void b.offsetWidth;
+        b.classList.add('cell-jump');
+        later(function () { b.classList.remove('cell-jump'); }, 650);
+      }
       openDetail(b.getAttribute('data-id'));
     } else if (act === 'biome') {
       var nb = b.getAttribute('data-biome');
       if (nb && nb !== viewBiome) { viewBiome = nb; play('page'); render(); }
+    } else if (act === 'gold-teaser') {
+      var sG = st();
+      var ownedG = ownedCount(viewBiome);
+      if (ownedG >= 30) {
+        play('fanfare');
+        toast('🥇 Altın Yumurta ailenin! Bütün ada seninle gurur duyuyor!');
+      } else {
+        play('click');
+        toast('Aile tamamlanınca Altın Yumurta açılır — acele yok, dostlar kaçmaz!');
+      }
     } else if (act === 'biome-locked') {
       play('click');
       toast('Sisin ardında bir yer var… Çayırda 10 dost topla!');
@@ -13324,6 +14619,10 @@ img, svg { max-width:100%; display:block; }
       var s = st();
       viewBiome = (s.activeBiome === 'orman' && s.ormanAcik) ? 'orman' : 'cayir';
       render();
+      // Günlük görev zinciri: albüme bakmak da bir halka (bonus tamamlandıysa kutla)
+      if (Yuvo.engine.gorevIlerle && Yuvo.engine.gorevIlerle('album') === true) {
+        toast('🎁 Günün zinciri tamamlandı — yuvaya bonus yumurta kondu!');
+      }
       // Kiki'nin albüm hediyesi — FTUE sonrası İLK albüm ziyaretinde bir kez (v2·04 §1 5:30)
       if (s.introDone && !s.introGiftShown && Yuvo.dialog && Yuvo.data && Yuvo.data.DIALOG) {
         s.introGiftShown = true;
@@ -13843,6 +15142,9 @@ img, svg { max-width:100%; display:block; }
   function play (name) {
     try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(name); } catch (e) {}
   }
+  function play2 (name, opts) { // parametreli ses (pufiChirp gibi)
+    try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(name, opts); } catch (e) {}
+  }
   // Sürekli crinkle dokusu (§5.6): parmak hızı gain'i modüle eder; API yoksa sessiz geç
   function crinkleStart () {
     try { if (Yuvo.audio && Yuvo.audio.crinkleStart) Yuvo.audio.crinkleStart(); } catch (e) {}
@@ -14268,6 +15570,24 @@ img, svg { max-width:100%; display:block; }
     else if (tier === 1) play('chime');
     else play('pop'); // capsulePop henüz sentezlenmediyse de doruk duyulur
     vibrate(tier >= 3 ? [40, 60, 120] : [20, 30, 80]);
+    // Nadirlik SPLASH'i: renk + simge + BÜYÜK yazı — okuma bilmeyene simge/renk yeter
+    if (tier >= 1 && stageEl) {
+      var ri = rarityInfo(result && result.rarity);
+      var sp = document.createElement('div');
+      sp.className = 'rit-rarity-splash t' + tier;
+      sp.style.setProperty('--rc', ri.renk);
+      sp.textContent = (ri.simge ? ri.simge + ' ' : '') + String(ri.ad).toLocaleUpperCase('tr') + '!';
+      stageEl.appendChild(sp);
+      later(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 2000);
+    }
+    // Kiki'nin hayranlık balonu (kutlama dili — baskı/aciliyet değil), kendiliğinden kapanır
+    if (tier >= 2 && Yuvo.dialog) {
+      Yuvo.dialog.say({
+        kim: 'kiki',
+        metin: tier >= 3 ? 'VAAAY! Gözlerime inanamıyorum — bu bir EFSANE!' : 'Vaay! Bu ÇOK nadir bir dost!',
+        sure: 2600
+      });
+    }
   }
 
   // =======================================================================
@@ -14680,7 +16000,27 @@ img, svg { max-width:100%; display:block; }
       openCapsule(false); // zıplar, PAT!
     }, 560);
   }
+  // "Ne çıkacak?" anı (unboxing duraklaması): POP'tan hemen önce ~420ms TAM sessizlik +
+  // vinyet + hafif zoom. Sync (test) yolu duraklamayı atlar — duman testi senkron kalır.
+  var hushing = false;
   function openCapsule (sync) {
+    if (capOpened || hushing || !mounted) return;
+    if (sync) { popNow(true); return; }
+    hushing = true;
+    advancing = true;                 // girişler kilitlenir; çift tetik yok
+    holdT0 = 0; twisting = false;
+    if (eggWrapEl) eggWrapEl.classList.remove('twist-wobble', 'hold-shake', 'thrown');
+    if (ringsEl) ringsEl.innerHTML = '';
+    if (kikiEl) kikiEl.hidden = true;
+    setHint('');
+    if (stageEl) stageEl.classList.add('hush');
+    slater(function () {
+      hushing = false;
+      if (stageEl) stageEl.classList.remove('hush');
+      popNow(false);
+    }, 420);
+  }
+  function popNow (sync) {
     if (capOpened || !mounted) return;
     capOpened = true; advancing = true;
     holdT0 = 0; twisting = false;
@@ -14696,8 +16036,10 @@ img, svg { max-width:100%; display:block; }
     renderCapsule();
     play('capsulePop'); // "POP!" + konfeti + tier fanfarı (mevcut kutlama aynen)
     celebrate();
+    // Nadirlikte uzayan reveal: doruk anı kademeyle orantılı nefes alır
+    var t = tierOf();
     if (sync) next();
-    else slater(next, tierOf() >= 3 ? 1500 : 900);
+    else slater(next, t >= 3 ? 2600 : t === 2 ? 2200 : t === 1 ? 1300 : 900);
   }
 
   // ---------- e1. KARŞILAŞMA (mevcut mantık: Pufi zıplayarak çıkar; kopyada kısaltılmış) ----------
@@ -14712,6 +16054,8 @@ img, svg { max-width:100%; display:block; }
       }
       if (fxEl) fxEl.innerHTML = html;
       play('pop');
+      // Her Pufi'nin KENDİ sesi — karşılaşmada ilk kez duyulur (albüm soundboard'la aynı imza)
+      if (result && result.pufi) slater(function () { play2('pufiChirp', { id: result.pufi.id }); }, 320);
       var tier = tierOf();
       var dur = kopya ? 1300 : (tier >= 3 ? 2300 : (fast ? 800 : 1800));
       slater(next, dur);
@@ -14739,11 +16083,29 @@ img, svg { max-width:100%; display:block; }
       var btn = (result && result.isNew)
         ? '<button class="btn btn-primary" id="cere-next">Oyuncağını Birleştir!</button>'
         : '<button class="btn btn-primary" id="cere-next">Devam ▶</button>';
+      // Seri numarası satırı ("Güneş Çayırı · 7/30") — sonraki merakı doğurur
+      var seriSatir = '';
+      try {
+        var pb = (p.biome || 'cayir'), listP = (Yuvo.data && Yuvo.data.PUFIS) || [];
+        var no = 0, tot = 0, ii, q;
+        for (ii = 0; ii < listP.length; ii++) {
+          q = listP[ii];
+          if ((q.biome || 'cayir') !== pb || q.rarity === 'gizli') continue;
+          tot += 1;
+          if (q.id === p.id) no = tot;
+        }
+        var bioAd = (Yuvo.data && Yuvo.data.BIOMES && Yuvo.data.BIOMES[pb] && Yuvo.data.BIOMES[pb].ad) ||
+                    'Güneş Çayırı';
+        if (no > 0) seriSatir = '<p class="cere-serino">' + esc(bioAd) + ' · ' + no + '/' + tot + '</p>';
+        else if (p.rarity === 'gizli') seriSatir = '<p class="cere-serino">' + esc(bioAd) + ' · ☾ Gizli Dost</p>';
+      } catch (eSer) {}
       if (fxEl) {
         fxEl.innerHTML =
           '<div class="cere-card card">' +
+            '<div class="cere-card-rays" aria-hidden="true"></div>' +
             '<div class="cere-portrait rf rf-' + esc(result && result.rarity) + '">' + pufiSVG('happy') + '</div>' +
             '<h2 class="cere-name">' + esc(p.ad) + '</h2>' +
+            seriSatir +
             '<div class="cere-tags">' +
               '<span class="rarity-tag" style="background:' + esc(ri.renk) + '33;border-color:' + esc(ri.renk) + '">' +
                 esc((ri.simge ? ri.simge + ' ' : '') + ri.ad) + '</span>' +
@@ -14828,7 +16190,7 @@ img, svg { max-width:100%; display:block; }
       lastTap = 0; tapGuardUntil = 0; downT = 0; moved = 0; downOnTarget = false;
       torn = 0; dragging = false; dragAcc = 0;
       bites = 0; chocoDone = false;
-      capStage = 0; capOpened = false; twisting = false; twistAcc = 0; twistTaps = 0;
+      capStage = 0; capOpened = false; hushing = false; twisting = false; twistAcc = 0; twistTaps = 0;
       holdT0 = 0; holdTapCount = 0; magicEl = null; ringStep = 0;
 
       // 1) openEgg(eggIdx) ÖNCE çağrılır ve saklanır — görseller sonuçtan beslenir (§1.3)
@@ -15388,10 +16750,30 @@ img, svg { max-width:100%; display:block; }
   }
 
   function starSVG () {
+    // Minik yüz: ilk 60 saniyede karakter tanıma — "yüzü olan şey dost" (araştırma: ikon/yüz)
     return '<svg viewBox="0 0 90 90" aria-hidden="true">' +
       '<path d="M45 8 L54 33 L80 35 L60 51 L67 77 L45 62 L23 77 L30 51 L10 35 L36 33 Z"' +
       ' fill="#FFD34D" stroke="#3E2A1C" stroke-width="4" stroke-linejoin="round"/>' +
-      '<circle cx="38" cy="30" r="4" fill="#FFFFFF" opacity="0.85"/></svg>';
+      '<circle cx="38" cy="30" r="4" fill="#FFFFFF" opacity="0.85"/>' +
+      '<circle cx="38.5" cy="42" r="3.1" fill="#3E2A1C"/>' +
+      '<circle cx="52.5" cy="42" r="3.1" fill="#3E2A1C"/>' +
+      '<circle cx="37.4" cy="41" r="1" fill="#FFFFFF"/>' +
+      '<circle cx="51.4" cy="41" r="1" fill="#FFFFFF"/>' +
+      '<path d="M39 50 Q 45.5 56 52 50" fill="none" stroke="#3E2A1C" stroke-width="2.6"' +
+      ' stroke-linecap="round"/>' +
+      '<circle cx="33" cy="47" r="2.6" fill="#FF8FB0" opacity="0.75"/>' +
+      '<circle cx="58" cy="47" r="2.6" fill="#FF8FB0" opacity="0.75"/></svg>';
+  }
+
+  // Yıldız serpintili gök (dekor) — boş mor bant yerine canlı kompozisyon
+  function starfield () {
+    var out = '<div class="intro-starfield" aria-hidden="true">';
+    for (var i = 0; i < 14; i++) {
+      out += '<span class="if-star" style="left:' + (4 + (i * 29) % 92) + '%;top:' +
+             (3 + (i * 17) % 52) + '%;animation-delay:' + ((i % 5) * 0.4).toFixed(1) +
+             's;font-size:' + (9 + (i * 7) % 12) + 'px">✦</span>';
+    }
+    return out + '</div>';
   }
 
   /* ---------- aşamalar ---------- */
@@ -15403,15 +16785,17 @@ img, svg { max-width:100%; display:block; }
         '<div class="intro-glow-egg beat" aria-hidden="true">' + eggArt() + '</div>' +
       '</div>';
     play('chime');
-    later(showYildiz, 2200);
+    later(showYildiz, 1800);                    // hedef: ilk çıtlamaya ≤25 sn
   }
 
   function showYildiz () {
     phase = 'yildiz';
     el.innerHTML =
       '<div class="intro-stage intro-dusk">' +
+        starfield() +
         '<div class="intro-hills" aria-hidden="true"></div>' +
         '<button class="intro-star" aria-label="Yıldıza dokun">' +
+          '<span class="intro-star-tail" aria-hidden="true"></span>' +
           '<span class="intro-star-ring" aria-hidden="true"></span>' +
           '<span class="intro-star-body">' + starSVG() + '</span>' +
         '</button>' +
@@ -15425,8 +16809,9 @@ img, svg { max-width:100%; display:block; }
       var D = dlg();
       var lines = (D.anlatici && D.anlatici.giris) || [];
       if (Y.dialog && lines.length) {
-        Y.dialog.say({ kim: null, metin: lines[0] });
-        Y.dialog.say({ kim: null, metin: lines[1] || '', cb: function () { showIsit(); } });
+        // Balonlar OTOMATİK akar (dokunuş atlatır) — okuma beklemeden ritim
+        Y.dialog.say({ kim: null, metin: lines[0], sure: 2400 });
+        Y.dialog.say({ kim: null, metin: lines[1] || '', sure: 2400, cb: function () { showIsit(); } });
       } else {
         later(showIsit, 900);
       }
@@ -15518,8 +16903,9 @@ img, svg { max-width:100%; display:block; }
     var D = dlg();
     var ninni = (D.luna && D.luna.ninni) || [];
     if (Y.dialog && ninni.length) {
-      Y.dialog.say({ kim: 'luna', mood: 'sleep', metin: ninni[0] });
-      Y.dialog.say({ kim: 'luna', mood: 'sleep', metin: ninni[1] || '', cb: bitir });
+      // Sakin otomatik akış (dokunuş atlatır) — kapanış ritmi çocuğu bekletmez
+      Y.dialog.say({ kim: 'luna', mood: 'sleep', metin: ninni[0], sure: 2600 });
+      Y.dialog.say({ kim: 'luna', mood: 'sleep', metin: ninni[1] || '', sure: 2600, cb: bitir });
     } else {
       setTimeout(bitir, 1400);
     }
@@ -15965,6 +17351,22 @@ img, svg { max-width:100%; display:block; }
     else if (pct >= 80) note = 'Sınırın %80’ini geçtiniz · sayaç her ayın 1’inde yenilenir.';
     info.appendChild(el('div', 'par-strip-note', esc(note)));
 
+    // Dilek rozeti — girişte "çocuk ne diliyor?" görünür (satış değil, iletişim)
+    var wn = (state().wishes || []).length;
+    if (wn > 0) {
+      var wb = el('button', 'par-strip-wish', '💌 Kavanozda ' + esc(wn) + ' dilek var');
+      wb.type = 'button';
+      on(wb, 'click', function () {
+        activeTab = 'magaza';
+        renderPanel();
+        later(function () {
+          var wj = root && root.querySelector('.par-wish');
+          if (wj && wj.scrollIntoView) { try { wj.scrollIntoView({ behavior: 'smooth' }); } catch (e) { wj.scrollIntoView(); } }
+        }, 40);
+      });
+      info.appendChild(wb);
+    }
+
     row.appendChild(info);
 
     var back = el('button', 'par-btn par-btn-ghost par-strip-back', 'Oyuna dön');
@@ -16008,11 +17410,41 @@ img, svg { max-width:100%; display:block; }
   /* ---------------------------------------------------------------------
    * MAĞAZA SEKMESİ
    * ------------------------------------------------------------------- */
+  function wishAgeDays(w) {
+    var ts = Number(w && w.ts) || 0;
+    if (!ts) return 0;
+    return Math.max(0, Math.floor((Date.now() - ts) / 86400000));
+  }
+
+  // Ücretsiz yumurtalarla kaba varış tahmini (goal-gradient kaygı söndürücü):
+  // beklenen yumurta ≈ havuz / oran; günde 3 ücretsiz hak. Akıllı düşüş eksik
+  // parçayı kayırdığından bu ÜST sınıra yakın bir tahmindir — abartı değil.
+  function freeEtaDays(p) {
+    var ORAN = { yaygin: 0.55, azbulunur: 0.25, nadir: 0.14, destansi: 0.046, efsanevi: 0.009 };
+    var HAVUZ = { yaygin: 12, azbulunur: 9, nadir: 6, destansi: 2, efsanevi: 1 };
+    var r = String((p && p.rarity) || '');
+    if (!ORAN[r]) return 0;                       // gizli vb. → tahmin verilmez
+    var rInfo = null;
+    try { rInfo = Yuvo.data && Yuvo.data.RARITIES && Yuvo.data.RARITIES[r]; } catch (e) {}
+    var oran = (rInfo && typeof rInfo.oran === 'number') ? rInfo.oran : ORAN[r];
+    var beklenen = Math.ceil(HAVUZ[r] / oran);
+    if (r === 'efsanevi') beklenen = Math.min(beklenen, 50);  // kötü şans koruması tavanı
+    return Math.max(1, Math.ceil(beklenen / 3));
+  }
+
+  function findWish(id) {
+    var arr = state().wishes || [];
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] && String(arr[i].pufiId) === String(id)) return arr[i];
+    }
+    return null;
+  }
+
   function renderWishJar() {
     var s = state();
     var card = el('section', 'par-card par-wish');
     card.appendChild(el('h2', 'par-card-title', 'Dilek Kavanozu'));
-    card.appendChild(el('p', 'par-card-sub', 'Çocuğunuzun oyundan işaretlediği Pufi’ler. Satın alma zorunluluğu yoktur.'));
+    card.appendChild(el('p', 'par-card-sub', 'Çocuğunuzun oyundan işaretlediği Pufi’ler. Satın alma zorunluluğu yoktur; “Şimdi değil” demeniz çocuğun ekranında hiçbir iz bırakmaz.'));
 
     var wishes = s.wishes || [];
     if (!wishes.length) {
@@ -16027,24 +17459,53 @@ img, svg { max-width:100%; display:block; }
       var w = wishes[i] || {};
       var pid = w.pufiId;
       var p = pufiById(pid) || { id: pid, ad: String(pid || 'Pufi'), rarity: '—' };
-      if (isBigRarity(p.rarity)) bigSeen = true;
+      var big = isBigRarity(p.rarity);
+      if (big) bigSeen = true;
 
-      var li = el('li', 'par-wish-row');
+      var li = el('li', 'par-wish-row' + (w.durum === 'sonra' ? ' is-later' : ''));
       var art = el('span', 'par-wish-art', pufiSVG(p));
       art.setAttribute('aria-hidden', 'true');
       li.appendChild(art);
 
       var meta = el('span', 'par-wish-meta');
-      meta.appendChild(el('span', 'par-wish-name', esc(p.ad || pid)));
+      var nameRow = el('span', 'par-wish-name', esc(p.ad || pid));
+      if (w.not === 'dogumgunu') nameRow.innerHTML += ' <span class="par-wish-chip">🎂 doğum günü</span>';
+      if (w.durum === 'sonra') nameRow.innerHTML += ' <span class="par-wish-chip par-chip-mute">şimdi değil</span>';
+      meta.appendChild(nameRow);
       var rInfo = (window.Yuvo && Yuvo.data && Yuvo.data.RARITIES && Yuvo.data.RARITIES[p.rarity]) || null;
       meta.appendChild(el('span', 'par-wish-rarity', esc((rInfo && rInfo.ad) || p.rarity || '—')));
+      // Kart+ satırı: yaş + ücretsiz varış tahmini — satın alma tek yol DEĞİL mesajı
+      var age = wishAgeDays(w);
+      var eta = freeEtaDays(p);
+      var satir = (age === 0 ? 'Bugün eklendi' : age + ' gündür kavanozda');
+      if (big) satir += ' · oyunla gelir (vaat olarak satılmaz)';
+      else if (eta > 0) satir += ' · ücretsiz yumurtalarla ~' + eta + ' günde gelebilir';
+      meta.appendChild(el('span', 'par-wish-eta', esc(satir)));
       li.appendChild(meta);
 
+      var acts = el('span', 'par-wish-acts');
+      if (!big) {
+        var git = el('button', 'par-btn par-btn-quiet par-wish-act', 'Kiler’e ekle');
+        git.type = 'button';
+        git.setAttribute('data-wishgo', String(pid));
+        git.setAttribute('aria-label', (p.ad || pid) + ' için paketlere bak');
+        acts.appendChild(git);
+      }
+      var sonra = el('button', 'par-btn par-btn-quiet par-wish-act', w.durum === 'sonra' ? 'Geri al' : 'Şimdi değil');
+      sonra.type = 'button';
+      sonra.setAttribute('data-wishlater', String(pid));
+      acts.appendChild(sonra);
+      var dg = el('button', 'par-btn par-btn-quiet par-wish-act', w.not === 'dogumgunu' ? '🎂 Notu sil' : '🎂 Not');
+      dg.type = 'button';
+      dg.setAttribute('data-wishnot', String(pid));
+      dg.setAttribute('aria-label', 'Doğum günü notu');
+      acts.appendChild(dg);
       var rm = el('button', 'par-btn par-btn-quiet par-wish-rm', 'Kaldır');
       rm.type = 'button';
       rm.setAttribute('data-wish', String(pid));
       rm.setAttribute('aria-label', (p.ad || pid) + ' dileğini kaldır');
-      li.appendChild(rm);
+      acts.appendChild(rm);
+      li.appendChild(acts);
 
       list.appendChild(li);
     }
@@ -16057,15 +17518,43 @@ img, svg { max-width:100%; display:block; }
 
     on(list, 'click', function (ev) {
       var t = ev.target;
-      while (t && t !== list && !(t.getAttribute && t.getAttribute('data-wish'))) t = t.parentNode;
+      while (t && t !== list && !(t.getAttribute &&
+        (t.getAttribute('data-wish') || t.getAttribute('data-wishnot') ||
+         t.getAttribute('data-wishlater') || t.getAttribute('data-wishgo')))) t = t.parentNode;
       if (!t || t === list) return;
-      var id = t.getAttribute('data-wish');
+      var id, w;
+      if ((id = t.getAttribute('data-wishgo'))) {
+        var pk = root && root.querySelector('.par-packs-card');
+        if (pk && pk.scrollIntoView) { try { pk.scrollIntoView({ behavior: 'smooth' }); } catch (e) { pk.scrollIntoView(); } }
+        return;
+      }
+      if ((id = t.getAttribute('data-wishlater'))) {
+        w = findWish(id);
+        if (w) {
+          if (w.durum === 'sonra') delete w.durum; else w.durum = 'sonra';
+          save();
+          toast(w.durum === 'sonra' ? 'Not edildi — çocuğun ekranında hiçbir şey değişmez.' : 'İşaret kaldırıldı.');
+          renderPanel();
+        }
+        return;
+      }
+      if ((id = t.getAttribute('data-wishnot'))) {
+        w = findWish(id);
+        if (w) {
+          if (w.not === 'dogumgunu') delete w.not; else w.not = 'dogumgunu';
+          save();
+          toast(w.not === 'dogumgunu' ? 'Doğum günü notu eklendi.' : 'Doğum günü notu kaldırıldı.');
+          renderPanel();
+        }
+        return;
+      }
+      id = t.getAttribute('data-wish');
       var done = engineCall('clearWish', id, null);
       if (done === null) {
         var st = state();
         var arr = st.wishes || [];
-        for (var i = arr.length - 1; i >= 0; i--) {
-          if (arr[i] && String(arr[i].pufiId) === String(id)) arr.splice(i, 1);
+        for (var j = arr.length - 1; j >= 0; j--) {
+          if (arr[j] && String(arr[j].pufiId) === String(id)) arr.splice(j, 1);
         }
         st.wishes = arr;
         save();
@@ -16086,6 +17575,7 @@ img, svg { max-width:100%; display:block; }
     var list = packs();
     for (var i = 0; i < list.length; i++) {
       var p = list[i];
+      if (p.tekSeferlik) continue;            // Hoş Geldin Sepeti ayrı kartta yaşar
       var card = el('article', 'par-pack' + (p.populer ? ' is-popular' : ''));
       card.setAttribute('data-pack', String(p.id));
       card.setAttribute('tabindex', '0');
@@ -16227,8 +17717,54 @@ img, svg { max-width:100%; display:block; }
     return card;
   }
 
+  // Güven şeridi — panelin ilk cümlesi bir satış değil, dört ilke (Applaydu konumlanması)
+  function renderTrust() {
+    var strip = el('section', 'par-trust');
+    strip.setAttribute('aria-label', 'Güven ilkeleri');
+    strip.innerHTML =
+      '<span>🛡️ Reklam yok</span>' +
+      '<span>🙈 Çocuk ekranında fiyat yok</span>' +
+      '<span>📊 Oranlar açık</span>' +
+      '<span>♾️ Satın alınanlar kalıcı</span>';
+    return strip;
+  }
+
+  function hosgeldinKullanildi() {
+    var s = state(), arr = s.purchases || [];
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] && String(arr[i].paketId) === 'hosgeldin') return true;
+    }
+    return false;
+  }
+
+  // Hoş Geldin Sepeti — TEK SEFERLİK ama GERİ SAYIMSIZ: "hep burada durur" dili
+  // (docs/v2/05 §1.6 — FOMO tersine çevrilir: acele ettirmeyen karşılama).
+  function renderWelcome() {
+    if (hosgeldinKullanildi()) return null;
+    var list = packs(), p = null;
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === 'hosgeldin') { p = list[i]; break; }
+    }
+    if (!p) return null;
+    var card = el('section', 'par-card par-welcome');
+    card.appendChild(el('h2', 'par-card-title', '👋 Hoş Geldin Sepeti'));
+    card.appendChild(el('p', 'par-card-sub',
+      esc(p.adet + ' yumurta · ' + p.garanti + ' · tek seferlik başlangıç fiyatı')));
+    card.appendChild(el('p', 'par-welcome-price par-num', esc(tl(p.tl))));
+    card.appendChild(el('p', 'par-note',
+      'Acele ettirmez: süresi yok, geri sayımı yok — siz hazır olana dek burada durur.'));
+    var b = el('button', 'par-btn par-btn-primary', 'İncele ve al');
+    b.type = 'button';
+    on(b, 'click', function () { openPurchase(p); });
+    card.appendChild(b);
+    return card;
+  }
+
   function renderStoreTab(host) {
+    host.appendChild(renderTrust());
     host.appendChild(renderWishJar());
+    var welcome = renderWelcome();
+    if (welcome) host.appendChild(welcome);
     host.appendChild(renderPacks());
     host.appendChild(renderClub());
     host.appendChild(renderTransparency());
@@ -16241,6 +17777,9 @@ img, svg { max-width:100%; display:block; }
   function openPurchase(p) {
     var sl = spentAndLimit();
     var after = sl.spent + (Number(p.tl) || 0);
+    // Yayılım önizlemesi: paket bir "binge" değil, günlere yayılan bir tedarik
+    var gunluk = Number(limits().kilerGunluk) || 5;
+    var yayilim = Math.max(1, Math.ceil((Number(p.adet) || 0) / gunluk));
 
     var body =
       '<div class="par-buy">' +
@@ -16248,6 +17787,8 @@ img, svg { max-width:100%; display:block; }
       '<p class="par-buy-price par-num">' + esc(tl(p.tl)) + ' <span class="par-buy-unit">(yumurta başına ' + esc(tl(unitPrice(p))) + ')</span></p>' +
       '<p class="par-badge par-badge-block">' + esc(p.garanti) + '</p>' +
       '<p class="par-buy-spend par-num">Bu ay: ' + esc(tlInt(sl.spent)) + ' → bu alımla ' + esc(tlInt(after)) + ' / limit ' + esc(tlInt(sl.limit)) + '</p>' +
+      '<p class="par-buy-yayilim">Bu ' + esc(p.adet) + ' yumurta kilere düşer; günde en çok ' +
+        esc(gunluk) + ' açılışla ~' + esc(yayilim) + ' güne yayılır — günlük oyun süresi değişmez.</p>' +
       '<h3 class="par-sub-title">Ne çıkabilir?</h3>' +
       transparencyBodyHTML() +
       '<p class="par-demo">' + esc(DEMO_UYARI) + '</p>' +
@@ -16566,6 +18107,16 @@ img, svg { max-width:100%; display:block; }
     kpis.appendChild(kpi('Aylık limit', tlInt(r.limitTL)));
     kpis.appendChild(kpi('Açılan yumurta', String(Number(r.yumurta) || 0)));
     kpis.appendChild(kpi('Yeni Pufi', String(Number(r.pufi) || 0)));
+    // Kümülatif yıl toplamı — büyük resim gizlenmez (güven belgesi ilkesi)
+    var yil = new Date().getFullYear();
+    var yilToplam = 0;
+    var alims = state().purchases || [];
+    for (var yi = 0; yi < alims.length; yi++) {
+      var pu = alims[yi] || {};
+      var puYil = pu.ts ? new Date(Number(pu.ts)).getFullYear() : yil;
+      if (puYil === yil) yilToplam += Number(pu.tutar) || 0;
+    }
+    kpis.appendChild(kpi('Bu yıl toplam', tl(yilToplam)));
     card.appendChild(kpis);
 
     var pk = (r.paketler && r.paketler.length) ? r.paketler : [];
@@ -16949,6 +18500,10 @@ img, svg { max-width:100%; display:block; }
     app.classList.toggle('fullscreen', !!FULLSCREEN[name]);
     renderNav();
     current.mount(sceneRoot, params || {});
+    // Yumuşak sahne girişi (180ms) — mount SENKRON kalır (test kancaları/akış bozulmaz)
+    sceneRoot.classList.remove('scene-fade');
+    void sceneRoot.offsetWidth;
+    sceneRoot.classList.add('scene-fade');
   };
 
   // Arka plana tıklayınca kapatma: kalıcı overlayRoot'a BİR KEZ bağlanır (dinleyici birikmez)

@@ -7,6 +7,11 @@
   var EXTRA_EGG_COST = 120;
   var EXTRA_EGG_MAX = 2;
   var DAILY_EGGS = 3;                       // newDay(): vitrine 3 ambalajlı yumurta
+  var EGG_STACK_MAX = 9;                    // haklar BİRİKİR (kaçıran çocuk cezalanmaz) — tavan 9
+  var STREAK_GOAL = 7;                      // Bekçi Takvimi: 7 yıldız → rozet + Kabuk
+  var STREAK_KABUK = 25;
+  var GOREV_AC_HEDEF = 3;                   // günlük görev zinciri: 3 yumurta aç · 1 oyun · albüme bak
+  var GOREV_OYUN_HEDEF = 1;
   var FREE_TOOLS = ['burgu', 'cekic', 'firlat'];
 
   // Kilometre taşları: ownedCount eşiği → { anahtar, Kabuk ödülü }
@@ -107,6 +112,13 @@
       activeBiome: 'cayir',                   // 'cayir' | 'orman' — gacha havuzu bunu okur
       ormanAcik: false,                       // Fısıltı Ormanı kilidi (Çayır 10/30'da açılır)
       sakoHidden: null,                       // Şako'nun sakladığı orman parçası (pufiId|null)
+      hedefPufi: null,                        // çocuğun kendi seçtiği hedef parça ("Arıyorum!" — fiyat dili yok)
+      // --- oturum döngüsü kancaları (araştırma: randevu = ekranda duran kanca, sayaç değil) ---
+      kulucka: null,                          // {seri} — Şako'nun bıraktığı "yarın sürprizi"; newDay'de özel yumurta olur
+      bugunAcilanlar: [],                     // bugün açılan pufiId'ler (kapanış özeti için)
+      gorevler: { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false }, // günlük görev zinciri
+      gorevBonusYeni: false,                  // görev bonusu düştü — yuva bir kez kutlar
+      streak: { yildiz: 0, rozet: 0 },        // Bekçi Takvimi — CEZASIZ: kaçan gün zinciri kırmaz
       seed: freshSeed()                       // mulberry32 tohumu (gacha.js kullanır)
     };
     fillTodayEggs(s, DAILY_EGGS);
@@ -193,6 +205,7 @@
         if (keys.indexOf(e.seri) === -1) e.seri = daySeries(base.day);
         e.variant = Math.max(0, Math.min(variantCount() - 1, e.variant | 0));
         if (e.golden !== true) e.golden = null;
+        if (e.kulucka !== true) delete e.kulucka;
         temiz.push(e);
       }
       base.todayEggs = temiz;
@@ -228,11 +241,33 @@
     for (i = 0; i < base.wishes.length; i++) {
       var w = base.wishes[i];
       if (w && typeof w === 'object' && typeof w.pufiId === 'string') {
-        temizW.push({ pufiId: w.pufiId, ts: Math.max(0, w.ts | 0) });
+        var tw = { pufiId: w.pufiId, ts: Math.max(0, w.ts | 0) };
+        if (w.not === 'dogumgunu') tw.not = 'dogumgunu';   // ebeveyn notu (panel)
+        if (w.durum === 'sonra') tw.durum = 'sonra';        // "şimdi değil" işareti
+        temizW.push(tw);
       }
     }
     base.wishes = temizW;
     if (!Array.isArray(base.purchases)) base.purchases = [];
+
+    // --- oturum döngüsü alanları (tip onarımı — eski kayıt varsayılanla açılır) ---
+    if (!base.kulucka || typeof base.kulucka !== 'object' || typeof base.kulucka.seri !== 'string') {
+      base.kulucka = null;
+    }
+    if (!Array.isArray(base.bugunAcilanlar)) base.bugunAcilanlar = [];
+    if (!base.gorevler || typeof base.gorevler !== 'object' || Array.isArray(base.gorevler)) {
+      base.gorevler = { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false };
+    }
+    base.gorevler.ac = Math.max(0, base.gorevler.ac | 0);
+    base.gorevler.oyun = Math.max(0, base.gorevler.oyun | 0);
+    base.gorevler.albumZiyaret = base.gorevler.albumZiyaret === true;
+    base.gorevler.bonusVerildi = base.gorevler.bonusVerildi === true;
+    base.gorevBonusYeni = base.gorevBonusYeni === true;
+    if (!base.streak || typeof base.streak !== 'object' || Array.isArray(base.streak)) {
+      base.streak = { yildiz: 0, rozet: 0 };
+    }
+    base.streak.yildiz = Math.max(0, base.streak.yildiz | 0);
+    base.streak.rozet = Math.max(0, base.streak.rozet | 0);
 
     base.version = 3;
     base.eggsAvailable = base.todayEggs.length;  // ZORUNLU senkron (main.js HUD / home bunu okur)
@@ -257,14 +292,46 @@
 
   Yuvo.engine.newDay = function () {
     var s = Yuvo.engine.state;
+    // Bekçi Takvimi: dün en az 1 yumurta açıldıysa 1 yıldız. CEZASIZ — oynanmayan gün
+    // zinciri KIRMAZ, yıldızlar birikmeye devam eder; "kaybettin" dili hiçbir yerde yok.
+    if (s.gorevler && (s.gorevler.ac | 0) > 0) {
+      s.streak.yildiz = (s.streak.yildiz | 0) + 1;
+      if (s.streak.yildiz >= STREAK_GOAL) {
+        s.streak.yildiz = 0;
+        s.streak.rozet = (s.streak.rozet | 0) + 1;
+        s.kabuk += STREAK_KABUK;
+      }
+    }
     s.day += 1;
-    fillTodayEggs(s, DAILY_EGGS);           // aktif seriden 3 ambalajlı yumurta + senkron
+    // Haklar BİRİKİR: vitrin sıfırlanmaz — kalan + 3 yeni, tavan 9 (TCG Pocket stack modeli).
+    var kalan = Array.isArray(s.todayEggs) ? s.todayEggs.slice(0, EGG_STACK_MAX) : [];
+    var eklenecek = Math.min(DAILY_EGGS, Math.max(0, EGG_STACK_MAX - kalan.length));
+    for (var ne = 0; ne < eklenecek; ne++) kalan.push(makeEgg(s.day));
+    s.todayEggs = kalan;
+    if (s.parent.clubActive) {              // Club: her gün 1 bonus yumurta (tavanı aşmaz)
+      var cAdet = clubInfo().gunlukYumurta | 0, ci;
+      for (ci = 0; ci < cAdet; ci++) {
+        if (s.todayEggs.length < EGG_STACK_MAX) s.todayEggs.push(makeEgg(s.day));
+      }
+    }
+    // Kuluçka: Şako'nun dün akşam bıraktığı yumurta sabah "hazır!" olur — vitrinin İLK
+    // sırasına düşer ve tavana SAYILMAZ (bekletilen sürpriz asla yanmaz).
+    if (s.kulucka && typeof s.kulucka === 'object') {
+      var kEgg = makeEgg(s.day, s.kulucka.seri);
+      kEgg.kulucka = true;
+      s.todayEggs.unshift(kEgg);
+      s.kulucka = null;
+    }
+    s.eggsAvailable = s.todayEggs.length;   // ZORUNLU senkron
     s.extraEggsBought = 0;
     s.rewardedPlaysToday = 0;
     s.firstRitualDoneToday = false;         // günün ilk yumurtası yine tam ritüel
     s.chocolateStarsToday = 0;
     s.kumbaraToday = 0;
     s.kiler.bugunAcilan = 0;                // kilerden günlük açma hakkı tazelenir
+    s.gorevler = { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false };
+    s.gorevBonusYeni = false;
+    s.bugunAcilanlar = [];
     syncMonth(s);                           // ay döndüyse ebeveyn harcaması sıfırlanır
     // Şako: orman açıkken sahipli bir orman parçasını "saklar" (yok olmaz, iz bırakır)
     if (s.ormanAcik && !s.sakoHidden) {
@@ -275,11 +342,6 @@
         if (op && op.biome === 'orman' && op.rarity !== 'gizli') ormanIds.push(oid);
       }
       if (ormanIds.length >= 2) s.sakoHidden = ormanIds[Math.floor(Math.random() * ormanIds.length)];
-    }
-    if (s.parent.clubActive) {              // Club: her gün 1 bonus yumurta doğrudan vitrine
-      var cAdet = clubInfo().gunlukYumurta | 0, ci;
-      for (ci = 0; ci < cAdet; ci++) { s.todayEggs.push(makeEgg(s.day)); }
-      s.eggsAvailable = s.todayEggs.length;
     }
     if ((s.day - 1) % 7 === 0) s.weekCrafts = 0;  // yeni hafta → Atölye hakkı tazelenir
     commit();
@@ -427,6 +489,59 @@
     Yuvo.engine.checkMilestones();
     commit();
     return { ok:true };
+  };
+
+  /* ======================================================================
+     Oturum döngüsü: görev zinciri + kuluçka (araştırma: "yarın sebebi" =
+     ekranda fiziksel duran kanca; geri sayım sayacı YOK — hikâye kapısı)
+     ====================================================================== */
+
+  // Günlük görev zinciri ilerletir: 'ac' | 'oyun' | 'album'. Üçü de tamamlanınca
+  // BİR KEZ +1 bonus yumurta düşer ve true döner (yuva kutlar). Baskı dili yok.
+  Yuvo.engine.gorevIlerle = function (tip) {
+    var s = Yuvo.engine.state, g = s.gorevler;
+    if (!g || typeof g !== 'object') {
+      g = s.gorevler = { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false };
+    }
+    if (tip === 'ac') g.ac = (g.ac | 0) + 1;
+    else if (tip === 'oyun') g.oyun = (g.oyun | 0) + 1;
+    else if (tip === 'album') g.albumZiyaret = true;
+    else return false;
+    if (!g.bonusVerildi && (g.ac | 0) >= GOREV_AC_HEDEF &&
+        (g.oyun | 0) >= GOREV_OYUN_HEDEF && g.albumZiyaret === true) {
+      g.bonusVerildi = true;
+      s.gorevBonusYeni = true;              // yuva bir kez kutlar, sonra bayrağı düşürür
+      Yuvo.engine.grantEgg();               // commit'i grantEgg yapar (tek kayıt)
+      return true;
+    }
+    commit();
+    return false;
+  };
+
+  // Görev hedefleri — sahnelerin çip çizimi için tek kaynak.
+  Yuvo.engine.gorevHedef = function () {
+    return { ac: GOREV_AC_HEDEF, oyun: GOREV_OYUN_HEDEF };
+  };
+
+  // Kuluçka: Şako gün batımında "yarın sürprizini" bırakır. Seri verilmezse YARININ
+  // serisi seçilir — kapanış ekranındaki silüet vaadiyle sabahki yumurta hep tutarlı.
+  Yuvo.engine.kuluckaBirak = function (seri) {
+    var s = Yuvo.engine.state;
+    if (s.kulucka) return false;            // zaten bekleyen bir kuluçka var
+    if (!seri || seriesKeys().indexOf(seri) === -1) seri = daySeries(s.day + 1);
+    s.kulucka = { seri: seri };
+    commit();
+    return true;
+  };
+
+  // Yarının ambalaj serisi (kapanış ritüeli "Yarın: …" satırı bunu okur).
+  Yuvo.engine.yarinSeri = function () {
+    return daySeries(Yuvo.engine.state.day + 1);
+  };
+
+  // Bekçi Takvimi görünümü için sabitler.
+  Yuvo.engine.streakInfo = function () {
+    return { hedef: STREAK_GOAL, kabuk: STREAK_KABUK };
   };
 
   /* ======================================================================

@@ -15,6 +15,11 @@
   var attempts = 0;     // çift deneme sayısı
   var lock = false;
   var finished = false;
+  // Çıt Çıt Köşesi (P6 — ASMR sakinleşme modu): ödülsüz sonsuz kabuk çıtlatma
+  var mode = 'match';   // 'match' | 'citcit'
+  var citCrack = 0;     // 0-3 (3'te ışık sızar, sonra taze yumurta)
+  var citRarity = 'yaygin';
+  var CIT_RARITIES = ['yaygin', 'azbulunur', 'nadir', 'destansi', 'efsanevi'];
 
   /* ---------- yardımcılar (savunmacı) ---------- */
   function st () { return (Yuvo.engine && Yuvo.engine.state) || {}; }
@@ -143,8 +148,35 @@
   }
 
   /* ---------- çizim ---------- */
+  function eggFace2 (r, crack) {
+    if (Yuvo.art && Yuvo.art.eggSVG) {
+      try { var s = Yuvo.art.eggSVG(r, { crack: crack | 0 }); if (s) return s; } catch (e) {}
+    }
+    return '<span class="mg-art-fallback">🥚</span>';
+  }
+
+  // Çıt Çıt Köşesi: sayaç yok, ödül yok, kaybetme yok — yalnız çıtlatma dokusu
+  // (araştırma: ASMR/pop-it döngüsü kendi başına sakinleştirici bir değerdir)
+  function renderCitcit () {
+    var html = '';
+    html += '<div class="mg-head center">' +
+              '<h2 class="mg-title">🎵 Çıt Çıt Köşesi</h2>' +
+              '<p class="mg-sub">Ödül yok, acele yok — sadece çıt çıt keyfi.</p>' +
+            '</div>';
+    html += '<div class="mg-citcit center">' +
+              '<button class="mg-cc-egg c' + citCrack + '" data-mg="crack"' +
+                ' aria-label="Yumurtayı çıtlat">' + eggFace2(citRarity, citCrack) + '</button>' +
+              '<p class="mg-cc-hint">' +
+                (citCrack === 0 ? 'Dokun — çıt!' : citCrack < 3 ? 'Çıt çıt…' : 'Işık sızıyor!') +
+              '</p>' +
+              '<button class="btn btn-soft" data-mg="match">↩ Eşini Bul’a dön</button>' +
+            '</div>';
+    el.innerHTML = html;
+  }
+
   function render () {
     if (!el) return;
+    if (mode === 'citcit') { renderCitcit(); return; }
     var s = st();
     var plays = Math.min(5, s.rewardedPlaysToday | 0);
     var left = 5 - plays;
@@ -160,6 +192,7 @@
               '<p class="mg-sub">Aynı iki dostu bul!</p>' +
               '<div class="mg-lives" aria-label="Bugün ödüllü oyun hakkı: ' + left + '/5">' +
                 hak + '</div>' +
+              '<button class="mg-citcit-btn" data-mg="citcit">🎵 Çıt Çıt Köşesi</button>' +
             '</div>';
     html += '<div class="mg-board"><div class="mg-grid">';
     for (var i = 0; i < deck.length; i++) {
@@ -241,6 +274,12 @@
     }
     play(stars === 3 ? 'fanfare' : 'star');
 
+    // Günlük görev zinciri: 1 oyun bitirmek bir halka (bonus tamamlandıysa kutla)
+    if (Yuvo.engine && Yuvo.engine.gorevIlerle && Yuvo.engine.gorevIlerle('oyun') === true &&
+        Yuvo.toast) {
+      Yuvo.toast('🎁 Günün zinciri tamamlandı — yuvaya bonus yumurta kondu!');
+    }
+
     var starsHtml = '';
     for (var i = 0; i < 3; i++) {
       starsHtml += '<span class="mg-star' + (i < stars ? ' on' : '') + '" style="--d:' + (i * 0.18) + 's"' +
@@ -295,6 +334,26 @@
     } else if (act === 'home') {
       play('click');
       if (Yuvo.go) Yuvo.go('home');
+    } else if (act === 'citcit') {
+      play('click');
+      mode = 'citcit';
+      citCrack = 0;
+      citRarity = CIT_RARITIES[Math.floor(Math.random() * CIT_RARITIES.length)];
+      render();
+    } else if (act === 'match') {
+      play('click');
+      mode = 'match';
+      start();
+    } else if (act === 'crack') {
+      citCrack += 1;
+      if (citCrack > 3) {
+        play('pop');                          // kabuk açıldı → taze yumurta gelir
+        citCrack = 0;
+        citRarity = CIT_RARITIES[Math.floor(Math.random() * CIT_RARITIES.length)];
+      } else {
+        play('crack');
+      }
+      render();
     }
   }
 
@@ -305,6 +364,8 @@
       el.className = 'mg-scene';
       rootEl.appendChild(el);
       el.addEventListener('click', handleClick);
+      mode = 'match';
+      citCrack = 0;
       start();
     },
     unmount: function () {

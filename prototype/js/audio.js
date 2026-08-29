@@ -220,6 +220,19 @@
     tone(t + 0.6, 0.85, 2093, { gain: 0.055, att: 0.015 });
     burst(t + 0.56, 0.7, { ftype: 'highpass', f0: 5500, gain: 0.045, att: 0.06, q: 0.7 });
   };
+  SOUNDS.pufiChirp = function (t, o) { // her Pufi'nin KENDİ cıvıltısı: id-hash imzalı
+    var s = String((o && o.id) || 'pufi'), h = 2166136261 >>> 0, i;
+    for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    var base = 520 + (h % 700);                       // 520–1220 Hz taban perdesi
+    var step = 0.08 + ((h >>> 4) % 40) / 1000;        // nota aralığı 80–120 ms
+    var type = ((h >>> 8) % 2) ? 'triangle' : 'sine';
+    var SEQ2 = [[1, 1.25, 1.5], [1, 1.5, 1.2], [1.2, 1, 1.4], [1, 1.33, 1, 1.6]];
+    var seq = SEQ2[h % 4];
+    for (i = 0; i < seq.length; i++) {
+      tone(t + i * step, 0.14, base * seq[i],
+        { type: type, glide: base * seq[i] * 1.07, glideT: 0.6, gain: 0.09, att: 0.008 });
+    }
+  };
   SOUNDS.stampSlap = function (t) { // defter "şlap"
     burst(t, 0.06, { ftype: 'lowpass', f0: 900, f1: 250, gain: 0.28, q: 0.6 });
     burst(t, 0.03, { f0: 1800, f1: 900, gain: 0.13 });

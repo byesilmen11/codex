@@ -64,6 +64,9 @@
   function play (name) {
     try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(name); } catch (e) {}
   }
+  function play2 (name, opts) { // parametreli ses (pufiChirp gibi)
+    try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(name, opts); } catch (e) {}
+  }
   // Sürekli crinkle dokusu (§5.6): parmak hızı gain'i modüle eder; API yoksa sessiz geç
   function crinkleStart () {
     try { if (Yuvo.audio && Yuvo.audio.crinkleStart) Yuvo.audio.crinkleStart(); } catch (e) {}
@@ -489,6 +492,24 @@
     else if (tier === 1) play('chime');
     else play('pop'); // capsulePop henüz sentezlenmediyse de doruk duyulur
     vibrate(tier >= 3 ? [40, 60, 120] : [20, 30, 80]);
+    // Nadirlik SPLASH'i: renk + simge + BÜYÜK yazı — okuma bilmeyene simge/renk yeter
+    if (tier >= 1 && stageEl) {
+      var ri = rarityInfo(result && result.rarity);
+      var sp = document.createElement('div');
+      sp.className = 'rit-rarity-splash t' + tier;
+      sp.style.setProperty('--rc', ri.renk);
+      sp.textContent = (ri.simge ? ri.simge + ' ' : '') + String(ri.ad).toLocaleUpperCase('tr') + '!';
+      stageEl.appendChild(sp);
+      later(function () { if (sp.parentNode) sp.parentNode.removeChild(sp); }, 2000);
+    }
+    // Kiki'nin hayranlık balonu (kutlama dili — baskı/aciliyet değil), kendiliğinden kapanır
+    if (tier >= 2 && Yuvo.dialog) {
+      Yuvo.dialog.say({
+        kim: 'kiki',
+        metin: tier >= 3 ? 'VAAAY! Gözlerime inanamıyorum — bu bir EFSANE!' : 'Vaay! Bu ÇOK nadir bir dost!',
+        sure: 2600
+      });
+    }
   }
 
   // =======================================================================
@@ -901,7 +922,27 @@
       openCapsule(false); // zıplar, PAT!
     }, 560);
   }
+  // "Ne çıkacak?" anı (unboxing duraklaması): POP'tan hemen önce ~420ms TAM sessizlik +
+  // vinyet + hafif zoom. Sync (test) yolu duraklamayı atlar — duman testi senkron kalır.
+  var hushing = false;
   function openCapsule (sync) {
+    if (capOpened || hushing || !mounted) return;
+    if (sync) { popNow(true); return; }
+    hushing = true;
+    advancing = true;                 // girişler kilitlenir; çift tetik yok
+    holdT0 = 0; twisting = false;
+    if (eggWrapEl) eggWrapEl.classList.remove('twist-wobble', 'hold-shake', 'thrown');
+    if (ringsEl) ringsEl.innerHTML = '';
+    if (kikiEl) kikiEl.hidden = true;
+    setHint('');
+    if (stageEl) stageEl.classList.add('hush');
+    slater(function () {
+      hushing = false;
+      if (stageEl) stageEl.classList.remove('hush');
+      popNow(false);
+    }, 420);
+  }
+  function popNow (sync) {
     if (capOpened || !mounted) return;
     capOpened = true; advancing = true;
     holdT0 = 0; twisting = false;
@@ -917,8 +958,10 @@
     renderCapsule();
     play('capsulePop'); // "POP!" + konfeti + tier fanfarı (mevcut kutlama aynen)
     celebrate();
+    // Nadirlikte uzayan reveal: doruk anı kademeyle orantılı nefes alır
+    var t = tierOf();
     if (sync) next();
-    else slater(next, tierOf() >= 3 ? 1500 : 900);
+    else slater(next, t >= 3 ? 2600 : t === 2 ? 2200 : t === 1 ? 1300 : 900);
   }
 
   // ---------- e1. KARŞILAŞMA (mevcut mantık: Pufi zıplayarak çıkar; kopyada kısaltılmış) ----------
@@ -933,6 +976,8 @@
       }
       if (fxEl) fxEl.innerHTML = html;
       play('pop');
+      // Her Pufi'nin KENDİ sesi — karşılaşmada ilk kez duyulur (albüm soundboard'la aynı imza)
+      if (result && result.pufi) slater(function () { play2('pufiChirp', { id: result.pufi.id }); }, 320);
       var tier = tierOf();
       var dur = kopya ? 1300 : (tier >= 3 ? 2300 : (fast ? 800 : 1800));
       slater(next, dur);
@@ -960,11 +1005,29 @@
       var btn = (result && result.isNew)
         ? '<button class="btn btn-primary" id="cere-next">Oyuncağını Birleştir!</button>'
         : '<button class="btn btn-primary" id="cere-next">Devam ▶</button>';
+      // Seri numarası satırı ("Güneş Çayırı · 7/30") — sonraki merakı doğurur
+      var seriSatir = '';
+      try {
+        var pb = (p.biome || 'cayir'), listP = (Yuvo.data && Yuvo.data.PUFIS) || [];
+        var no = 0, tot = 0, ii, q;
+        for (ii = 0; ii < listP.length; ii++) {
+          q = listP[ii];
+          if ((q.biome || 'cayir') !== pb || q.rarity === 'gizli') continue;
+          tot += 1;
+          if (q.id === p.id) no = tot;
+        }
+        var bioAd = (Yuvo.data && Yuvo.data.BIOMES && Yuvo.data.BIOMES[pb] && Yuvo.data.BIOMES[pb].ad) ||
+                    'Güneş Çayırı';
+        if (no > 0) seriSatir = '<p class="cere-serino">' + esc(bioAd) + ' · ' + no + '/' + tot + '</p>';
+        else if (p.rarity === 'gizli') seriSatir = '<p class="cere-serino">' + esc(bioAd) + ' · ☾ Gizli Dost</p>';
+      } catch (eSer) {}
       if (fxEl) {
         fxEl.innerHTML =
           '<div class="cere-card card">' +
+            '<div class="cere-card-rays" aria-hidden="true"></div>' +
             '<div class="cere-portrait rf rf-' + esc(result && result.rarity) + '">' + pufiSVG('happy') + '</div>' +
             '<h2 class="cere-name">' + esc(p.ad) + '</h2>' +
+            seriSatir +
             '<div class="cere-tags">' +
               '<span class="rarity-tag" style="background:' + esc(ri.renk) + '33;border-color:' + esc(ri.renk) + '">' +
                 esc((ri.simge ? ri.simge + ' ' : '') + ri.ad) + '</span>' +
@@ -1049,7 +1112,7 @@
       lastTap = 0; tapGuardUntil = 0; downT = 0; moved = 0; downOnTarget = false;
       torn = 0; dragging = false; dragAcc = 0;
       bites = 0; chocoDone = false;
-      capStage = 0; capOpened = false; twisting = false; twistAcc = 0; twistTaps = 0;
+      capStage = 0; capOpened = false; hushing = false; twisting = false; twistAcc = 0; twistTaps = 0;
       holdT0 = 0; holdTapCount = 0; magicEl = null; ringStep = 0;
 
       // 1) openEgg(eggIdx) ÖNCE çağrılır ve saklanır — görseller sonuçtan beslenir (§1.3)

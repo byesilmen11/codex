@@ -27,6 +27,10 @@
     app.classList.toggle('fullscreen', !!FULLSCREEN[name]);
     renderNav();
     current.mount(sceneRoot, params || {});
+    // Yumuşak sahne girişi (180ms) — mount SENKRON kalır (test kancaları/akış bozulmaz)
+    sceneRoot.classList.remove('scene-fade');
+    void sceneRoot.offsetWidth;
+    sceneRoot.classList.add('scene-fade');
   };
 
   // Arka plana tıklayınca kapatma: kalıcı overlayRoot'a BİR KEZ bağlanır (dinleyici birikmez)

@@ -35,10 +35,30 @@
   }
 
   function starSVG () {
+    // Minik yüz: ilk 60 saniyede karakter tanıma — "yüzü olan şey dost" (araştırma: ikon/yüz)
     return '<svg viewBox="0 0 90 90" aria-hidden="true">' +
       '<path d="M45 8 L54 33 L80 35 L60 51 L67 77 L45 62 L23 77 L30 51 L10 35 L36 33 Z"' +
       ' fill="#FFD34D" stroke="#3E2A1C" stroke-width="4" stroke-linejoin="round"/>' +
-      '<circle cx="38" cy="30" r="4" fill="#FFFFFF" opacity="0.85"/></svg>';
+      '<circle cx="38" cy="30" r="4" fill="#FFFFFF" opacity="0.85"/>' +
+      '<circle cx="38.5" cy="42" r="3.1" fill="#3E2A1C"/>' +
+      '<circle cx="52.5" cy="42" r="3.1" fill="#3E2A1C"/>' +
+      '<circle cx="37.4" cy="41" r="1" fill="#FFFFFF"/>' +
+      '<circle cx="51.4" cy="41" r="1" fill="#FFFFFF"/>' +
+      '<path d="M39 50 Q 45.5 56 52 50" fill="none" stroke="#3E2A1C" stroke-width="2.6"' +
+      ' stroke-linecap="round"/>' +
+      '<circle cx="33" cy="47" r="2.6" fill="#FF8FB0" opacity="0.75"/>' +
+      '<circle cx="58" cy="47" r="2.6" fill="#FF8FB0" opacity="0.75"/></svg>';
+  }
+
+  // Yıldız serpintili gök (dekor) — boş mor bant yerine canlı kompozisyon
+  function starfield () {
+    var out = '<div class="intro-starfield" aria-hidden="true">';
+    for (var i = 0; i < 14; i++) {
+      out += '<span class="if-star" style="left:' + (4 + (i * 29) % 92) + '%;top:' +
+             (3 + (i * 17) % 52) + '%;animation-delay:' + ((i % 5) * 0.4).toFixed(1) +
+             's;font-size:' + (9 + (i * 7) % 12) + 'px">✦</span>';
+    }
+    return out + '</div>';
   }
 
   /* ---------- aşamalar ---------- */
@@ -50,15 +70,17 @@
         '<div class="intro-glow-egg beat" aria-hidden="true">' + eggArt() + '</div>' +
       '</div>';
     play('chime');
-    later(showYildiz, 2200);
+    later(showYildiz, 1800);                    // hedef: ilk çıtlamaya ≤25 sn
   }
 
   function showYildiz () {
     phase = 'yildiz';
     el.innerHTML =
       '<div class="intro-stage intro-dusk">' +
+        starfield() +
         '<div class="intro-hills" aria-hidden="true"></div>' +
         '<button class="intro-star" aria-label="Yıldıza dokun">' +
+          '<span class="intro-star-tail" aria-hidden="true"></span>' +
           '<span class="intro-star-ring" aria-hidden="true"></span>' +
           '<span class="intro-star-body">' + starSVG() + '</span>' +
         '</button>' +
@@ -72,8 +94,9 @@
       var D = dlg();
       var lines = (D.anlatici && D.anlatici.giris) || [];
       if (Y.dialog && lines.length) {
-        Y.dialog.say({ kim: null, metin: lines[0] });
-        Y.dialog.say({ kim: null, metin: lines[1] || '', cb: function () { showIsit(); } });
+        // Balonlar OTOMATİK akar (dokunuş atlatır) — okuma beklemeden ritim
+        Y.dialog.say({ kim: null, metin: lines[0], sure: 2400 });
+        Y.dialog.say({ kim: null, metin: lines[1] || '', sure: 2400, cb: function () { showIsit(); } });
       } else {
         later(showIsit, 900);
       }
@@ -165,8 +188,9 @@
     var D = dlg();
     var ninni = (D.luna && D.luna.ninni) || [];
     if (Y.dialog && ninni.length) {
-      Y.dialog.say({ kim: 'luna', mood: 'sleep', metin: ninni[0] });
-      Y.dialog.say({ kim: 'luna', mood: 'sleep', metin: ninni[1] || '', cb: bitir });
+      // Sakin otomatik akış (dokunuş atlatır) — kapanış ritmi çocuğu bekletmez
+      Y.dialog.say({ kim: 'luna', mood: 'sleep', metin: ninni[0], sure: 2600 });
+      Y.dialog.say({ kim: 'luna', mood: 'sleep', metin: ninni[1] || '', sure: 2600, cb: bitir });
     } else {
       setTimeout(bitir, 1400);
     }

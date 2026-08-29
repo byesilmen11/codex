@@ -399,6 +399,22 @@
     else if (pct >= 80) note = 'Sınırın %80’ini geçtiniz · sayaç her ayın 1’inde yenilenir.';
     info.appendChild(el('div', 'par-strip-note', esc(note)));
 
+    // Dilek rozeti — girişte "çocuk ne diliyor?" görünür (satış değil, iletişim)
+    var wn = (state().wishes || []).length;
+    if (wn > 0) {
+      var wb = el('button', 'par-strip-wish', '💌 Kavanozda ' + esc(wn) + ' dilek var');
+      wb.type = 'button';
+      on(wb, 'click', function () {
+        activeTab = 'magaza';
+        renderPanel();
+        later(function () {
+          var wj = root && root.querySelector('.par-wish');
+          if (wj && wj.scrollIntoView) { try { wj.scrollIntoView({ behavior: 'smooth' }); } catch (e) { wj.scrollIntoView(); } }
+        }, 40);
+      });
+      info.appendChild(wb);
+    }
+
     row.appendChild(info);
 
     var back = el('button', 'par-btn par-btn-ghost par-strip-back', 'Oyuna dön');
@@ -442,11 +458,41 @@
   /* ---------------------------------------------------------------------
    * MAĞAZA SEKMESİ
    * ------------------------------------------------------------------- */
+  function wishAgeDays(w) {
+    var ts = Number(w && w.ts) || 0;
+    if (!ts) return 0;
+    return Math.max(0, Math.floor((Date.now() - ts) / 86400000));
+  }
+
+  // Ücretsiz yumurtalarla kaba varış tahmini (goal-gradient kaygı söndürücü):
+  // beklenen yumurta ≈ havuz / oran; günde 3 ücretsiz hak. Akıllı düşüş eksik
+  // parçayı kayırdığından bu ÜST sınıra yakın bir tahmindir — abartı değil.
+  function freeEtaDays(p) {
+    var ORAN = { yaygin: 0.55, azbulunur: 0.25, nadir: 0.14, destansi: 0.046, efsanevi: 0.009 };
+    var HAVUZ = { yaygin: 12, azbulunur: 9, nadir: 6, destansi: 2, efsanevi: 1 };
+    var r = String((p && p.rarity) || '');
+    if (!ORAN[r]) return 0;                       // gizli vb. → tahmin verilmez
+    var rInfo = null;
+    try { rInfo = Yuvo.data && Yuvo.data.RARITIES && Yuvo.data.RARITIES[r]; } catch (e) {}
+    var oran = (rInfo && typeof rInfo.oran === 'number') ? rInfo.oran : ORAN[r];
+    var beklenen = Math.ceil(HAVUZ[r] / oran);
+    if (r === 'efsanevi') beklenen = Math.min(beklenen, 50);  // kötü şans koruması tavanı
+    return Math.max(1, Math.ceil(beklenen / 3));
+  }
+
+  function findWish(id) {
+    var arr = state().wishes || [];
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] && String(arr[i].pufiId) === String(id)) return arr[i];
+    }
+    return null;
+  }
+
   function renderWishJar() {
     var s = state();
     var card = el('section', 'par-card par-wish');
     card.appendChild(el('h2', 'par-card-title', 'Dilek Kavanozu'));
-    card.appendChild(el('p', 'par-card-sub', 'Çocuğunuzun oyundan işaretlediği Pufi’ler. Satın alma zorunluluğu yoktur.'));
+    card.appendChild(el('p', 'par-card-sub', 'Çocuğunuzun oyundan işaretlediği Pufi’ler. Satın alma zorunluluğu yoktur; “Şimdi değil” demeniz çocuğun ekranında hiçbir iz bırakmaz.'));
 
     var wishes = s.wishes || [];
     if (!wishes.length) {
@@ -461,24 +507,53 @@
       var w = wishes[i] || {};
       var pid = w.pufiId;
       var p = pufiById(pid) || { id: pid, ad: String(pid || 'Pufi'), rarity: '—' };
-      if (isBigRarity(p.rarity)) bigSeen = true;
+      var big = isBigRarity(p.rarity);
+      if (big) bigSeen = true;
 
-      var li = el('li', 'par-wish-row');
+      var li = el('li', 'par-wish-row' + (w.durum === 'sonra' ? ' is-later' : ''));
       var art = el('span', 'par-wish-art', pufiSVG(p));
       art.setAttribute('aria-hidden', 'true');
       li.appendChild(art);
 
       var meta = el('span', 'par-wish-meta');
-      meta.appendChild(el('span', 'par-wish-name', esc(p.ad || pid)));
+      var nameRow = el('span', 'par-wish-name', esc(p.ad || pid));
+      if (w.not === 'dogumgunu') nameRow.innerHTML += ' <span class="par-wish-chip">🎂 doğum günü</span>';
+      if (w.durum === 'sonra') nameRow.innerHTML += ' <span class="par-wish-chip par-chip-mute">şimdi değil</span>';
+      meta.appendChild(nameRow);
       var rInfo = (window.Yuvo && Yuvo.data && Yuvo.data.RARITIES && Yuvo.data.RARITIES[p.rarity]) || null;
       meta.appendChild(el('span', 'par-wish-rarity', esc((rInfo && rInfo.ad) || p.rarity || '—')));
+      // Kart+ satırı: yaş + ücretsiz varış tahmini — satın alma tek yol DEĞİL mesajı
+      var age = wishAgeDays(w);
+      var eta = freeEtaDays(p);
+      var satir = (age === 0 ? 'Bugün eklendi' : age + ' gündür kavanozda');
+      if (big) satir += ' · oyunla gelir (vaat olarak satılmaz)';
+      else if (eta > 0) satir += ' · ücretsiz yumurtalarla ~' + eta + ' günde gelebilir';
+      meta.appendChild(el('span', 'par-wish-eta', esc(satir)));
       li.appendChild(meta);
 
+      var acts = el('span', 'par-wish-acts');
+      if (!big) {
+        var git = el('button', 'par-btn par-btn-quiet par-wish-act', 'Kiler’e ekle');
+        git.type = 'button';
+        git.setAttribute('data-wishgo', String(pid));
+        git.setAttribute('aria-label', (p.ad || pid) + ' için paketlere bak');
+        acts.appendChild(git);
+      }
+      var sonra = el('button', 'par-btn par-btn-quiet par-wish-act', w.durum === 'sonra' ? 'Geri al' : 'Şimdi değil');
+      sonra.type = 'button';
+      sonra.setAttribute('data-wishlater', String(pid));
+      acts.appendChild(sonra);
+      var dg = el('button', 'par-btn par-btn-quiet par-wish-act', w.not === 'dogumgunu' ? '🎂 Notu sil' : '🎂 Not');
+      dg.type = 'button';
+      dg.setAttribute('data-wishnot', String(pid));
+      dg.setAttribute('aria-label', 'Doğum günü notu');
+      acts.appendChild(dg);
       var rm = el('button', 'par-btn par-btn-quiet par-wish-rm', 'Kaldır');
       rm.type = 'button';
       rm.setAttribute('data-wish', String(pid));
       rm.setAttribute('aria-label', (p.ad || pid) + ' dileğini kaldır');
-      li.appendChild(rm);
+      acts.appendChild(rm);
+      li.appendChild(acts);
 
       list.appendChild(li);
     }
@@ -491,15 +566,43 @@
 
     on(list, 'click', function (ev) {
       var t = ev.target;
-      while (t && t !== list && !(t.getAttribute && t.getAttribute('data-wish'))) t = t.parentNode;
+      while (t && t !== list && !(t.getAttribute &&
+        (t.getAttribute('data-wish') || t.getAttribute('data-wishnot') ||
+         t.getAttribute('data-wishlater') || t.getAttribute('data-wishgo')))) t = t.parentNode;
       if (!t || t === list) return;
-      var id = t.getAttribute('data-wish');
+      var id, w;
+      if ((id = t.getAttribute('data-wishgo'))) {
+        var pk = root && root.querySelector('.par-packs-card');
+        if (pk && pk.scrollIntoView) { try { pk.scrollIntoView({ behavior: 'smooth' }); } catch (e) { pk.scrollIntoView(); } }
+        return;
+      }
+      if ((id = t.getAttribute('data-wishlater'))) {
+        w = findWish(id);
+        if (w) {
+          if (w.durum === 'sonra') delete w.durum; else w.durum = 'sonra';
+          save();
+          toast(w.durum === 'sonra' ? 'Not edildi — çocuğun ekranında hiçbir şey değişmez.' : 'İşaret kaldırıldı.');
+          renderPanel();
+        }
+        return;
+      }
+      if ((id = t.getAttribute('data-wishnot'))) {
+        w = findWish(id);
+        if (w) {
+          if (w.not === 'dogumgunu') delete w.not; else w.not = 'dogumgunu';
+          save();
+          toast(w.not === 'dogumgunu' ? 'Doğum günü notu eklendi.' : 'Doğum günü notu kaldırıldı.');
+          renderPanel();
+        }
+        return;
+      }
+      id = t.getAttribute('data-wish');
       var done = engineCall('clearWish', id, null);
       if (done === null) {
         var st = state();
         var arr = st.wishes || [];
-        for (var i = arr.length - 1; i >= 0; i--) {
-          if (arr[i] && String(arr[i].pufiId) === String(id)) arr.splice(i, 1);
+        for (var j = arr.length - 1; j >= 0; j--) {
+          if (arr[j] && String(arr[j].pufiId) === String(id)) arr.splice(j, 1);
         }
         st.wishes = arr;
         save();
@@ -520,6 +623,7 @@
     var list = packs();
     for (var i = 0; i < list.length; i++) {
       var p = list[i];
+      if (p.tekSeferlik) continue;            // Hoş Geldin Sepeti ayrı kartta yaşar
       var card = el('article', 'par-pack' + (p.populer ? ' is-popular' : ''));
       card.setAttribute('data-pack', String(p.id));
       card.setAttribute('tabindex', '0');
@@ -661,8 +765,54 @@
     return card;
   }
 
+  // Güven şeridi — panelin ilk cümlesi bir satış değil, dört ilke (Applaydu konumlanması)
+  function renderTrust() {
+    var strip = el('section', 'par-trust');
+    strip.setAttribute('aria-label', 'Güven ilkeleri');
+    strip.innerHTML =
+      '<span>🛡️ Reklam yok</span>' +
+      '<span>🙈 Çocuk ekranında fiyat yok</span>' +
+      '<span>📊 Oranlar açık</span>' +
+      '<span>♾️ Satın alınanlar kalıcı</span>';
+    return strip;
+  }
+
+  function hosgeldinKullanildi() {
+    var s = state(), arr = s.purchases || [];
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] && String(arr[i].paketId) === 'hosgeldin') return true;
+    }
+    return false;
+  }
+
+  // Hoş Geldin Sepeti — TEK SEFERLİK ama GERİ SAYIMSIZ: "hep burada durur" dili
+  // (docs/v2/05 §1.6 — FOMO tersine çevrilir: acele ettirmeyen karşılama).
+  function renderWelcome() {
+    if (hosgeldinKullanildi()) return null;
+    var list = packs(), p = null;
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].id) === 'hosgeldin') { p = list[i]; break; }
+    }
+    if (!p) return null;
+    var card = el('section', 'par-card par-welcome');
+    card.appendChild(el('h2', 'par-card-title', '👋 Hoş Geldin Sepeti'));
+    card.appendChild(el('p', 'par-card-sub',
+      esc(p.adet + ' yumurta · ' + p.garanti + ' · tek seferlik başlangıç fiyatı')));
+    card.appendChild(el('p', 'par-welcome-price par-num', esc(tl(p.tl))));
+    card.appendChild(el('p', 'par-note',
+      'Acele ettirmez: süresi yok, geri sayımı yok — siz hazır olana dek burada durur.'));
+    var b = el('button', 'par-btn par-btn-primary', 'İncele ve al');
+    b.type = 'button';
+    on(b, 'click', function () { openPurchase(p); });
+    card.appendChild(b);
+    return card;
+  }
+
   function renderStoreTab(host) {
+    host.appendChild(renderTrust());
     host.appendChild(renderWishJar());
+    var welcome = renderWelcome();
+    if (welcome) host.appendChild(welcome);
     host.appendChild(renderPacks());
     host.appendChild(renderClub());
     host.appendChild(renderTransparency());
@@ -675,6 +825,9 @@
   function openPurchase(p) {
     var sl = spentAndLimit();
     var after = sl.spent + (Number(p.tl) || 0);
+    // Yayılım önizlemesi: paket bir "binge" değil, günlere yayılan bir tedarik
+    var gunluk = Number(limits().kilerGunluk) || 5;
+    var yayilim = Math.max(1, Math.ceil((Number(p.adet) || 0) / gunluk));
 
     var body =
       '<div class="par-buy">' +
@@ -682,6 +835,8 @@
       '<p class="par-buy-price par-num">' + esc(tl(p.tl)) + ' <span class="par-buy-unit">(yumurta başına ' + esc(tl(unitPrice(p))) + ')</span></p>' +
       '<p class="par-badge par-badge-block">' + esc(p.garanti) + '</p>' +
       '<p class="par-buy-spend par-num">Bu ay: ' + esc(tlInt(sl.spent)) + ' → bu alımla ' + esc(tlInt(after)) + ' / limit ' + esc(tlInt(sl.limit)) + '</p>' +
+      '<p class="par-buy-yayilim">Bu ' + esc(p.adet) + ' yumurta kilere düşer; günde en çok ' +
+        esc(gunluk) + ' açılışla ~' + esc(yayilim) + ' güne yayılır — günlük oyun süresi değişmez.</p>' +
       '<h3 class="par-sub-title">Ne çıkabilir?</h3>' +
       transparencyBodyHTML() +
       '<p class="par-demo">' + esc(DEMO_UYARI) + '</p>' +
@@ -1000,6 +1155,16 @@
     kpis.appendChild(kpi('Aylık limit', tlInt(r.limitTL)));
     kpis.appendChild(kpi('Açılan yumurta', String(Number(r.yumurta) || 0)));
     kpis.appendChild(kpi('Yeni Pufi', String(Number(r.pufi) || 0)));
+    // Kümülatif yıl toplamı — büyük resim gizlenmez (güven belgesi ilkesi)
+    var yil = new Date().getFullYear();
+    var yilToplam = 0;
+    var alims = state().purchases || [];
+    for (var yi = 0; yi < alims.length; yi++) {
+      var pu = alims[yi] || {};
+      var puYil = pu.ts ? new Date(Number(pu.ts)).getFullYear() : yil;
+      if (puYil === yil) yilToplam += Number(pu.tutar) || 0;
+    }
+    kpis.appendChild(kpi('Bu yıl toplam', tl(yilToplam)));
     card.appendChild(kpis);
 
     var pk = (r.paketler && r.paketler.length) ? r.paketler : [];

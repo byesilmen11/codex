@@ -30,7 +30,13 @@
       persona:'Doğum günü hediyesi' },
     { id:'kumbara', ad:'Sezon Kumbarası', adet:100, tl:199.99, usd:8.99,
       garanti:'1 seçmeli parça + 2 Destansı + 10 Nadir', garantiKisa:'Seçmeli parça',
-      persona:'Bayram / büyük hediye' }
+      persona:'Bayram / büyük hediye' },
+    // Hoş Geldin Sepeti (v2·05 §1.6): TEK SEFERLİK, GERİ SAYIMSIZ — "süresi dolmaz,
+    // hep burada durur" dili. Normal paket ızgarasında GÖRÜNMEZ (tekSeferlik bayrağı);
+    // ebeveyn paneli ayrı kartta, yalnız hiç kullanılmamışsa gösterir.
+    { id:'hosgeldin', ad:'Hoş Geldin Sepeti', adet:5, tl:14.99, usd:0.69,
+      garanti:'En az 1 Nadir', garantiKisa:'1 Nadir',
+      persona:'Tek seferlik başlangıç — acele ettirmez, süresi yok', tekSeferlik:true }
   ];
 
   Y.data.CLUB = {

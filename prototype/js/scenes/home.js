@@ -372,6 +372,27 @@
     var kilerTavan = ((Yuvo.data.STORE_LIMITS && Yuvo.data.STORE_LIMITS.kilerGunluk) || 5) +
       (s.parent && s.parent.clubActive ? ((Yuvo.data.CLUB && Yuvo.data.CLUB.kilerEk) || 1) : 0);
     var kilerHak = s.kiler && (s.kiler.adet | 0) > 0 && (s.kiler.bugunAcilan | 0) < kilerTavan;
+
+    // Hedef parça ("Arıyorum!") — bulunduysa BİR KEZ kutla, çip yıldıza döner
+    var hedefP = (s.hedefPufi && Yuvo.data && Yuvo.data.pufiById) ? Yuvo.data.pufiById(s.hedefPufi) : null;
+    var hedefBulundu = null;
+    if (hedefP && (s.owned || {})[hedefP.id]) {
+      hedefBulundu = hedefP;
+      s.hedefPufi = null;
+      if (Yuvo.engine && Yuvo.engine.save) { try { Yuvo.engine.save(); } catch (e) {} }
+      play('fanfare');
+      toast('🎯 Aradığın dost geldi: ' + hedefP.ad + '! 🌟');
+      hedefP = null;
+    }
+    // Görev bonusu düştüyse yuva BİR KEZ kutlar (bayrak düşer)
+    if (s.gorevBonusYeni) {
+      s.gorevBonusYeni = false;
+      if (Yuvo.engine && Yuvo.engine.save) { try { Yuvo.engine.save(); } catch (e) {} }
+      play('fanfare');
+      toast('🎁 Günün zinciri tamam — bonus yumurta yuvada!');
+    }
+    var g = s.gorevler || { ac: 0, oyun: 0, albumZiyaret: false, bonusVerildi: false };
+    var gh = (Yuvo.engine && Yuvo.engine.gorevHedef) ? Yuvo.engine.gorevHedef() : { ac: 3, oyun: 1 };
     var html = '';
 
     // Manzara katmanı: gök + tepeler + güneş + sticker bulutlar (tamamı dekor;
@@ -393,6 +414,38 @@
                 '</span>' +
               '</span>' +
             '</button>';
+
+    // Günlük görev zinciri çipleri (baskı dili YOK — "kaybettin" asla; 3'ü de → +1 bonus)
+    var gAcOk = (g.ac | 0) >= gh.ac, gOyunOk = (g.oyun | 0) >= gh.oyun, gAlbOk = g.albumZiyaret === true;
+    html += '<div class="home-gorev' + (g.bonusVerildi ? ' done' : '') + '"' +
+              ' role="group" aria-label="Günün küçük görevleri">' +
+              '<span class="gorev-chip' + (gAcOk ? ' ok' : '') + '" aria-label="Yumurta aç: ' +
+                Math.min(g.ac | 0, gh.ac) + '/' + gh.ac + '">🥚<b>' +
+                Math.min(g.ac | 0, gh.ac) + '/' + gh.ac + '</b></span>' +
+              '<button class="gorev-chip' + (gOyunOk ? ' ok' : '') + '" data-act="gorev-oyun"' +
+                ' aria-label="Bir oyun oyna">🎮<b>' + (gOyunOk ? '✓' : '0/1') + '</b></button>' +
+              '<button class="gorev-chip' + (gAlbOk ? ' ok' : '') + '" data-act="album"' +
+                ' aria-label="Albüme bak">📔<b>' + (gAlbOk ? '✓' : '·') + '</b></button>' +
+              '<span class="gorev-odul' + (g.bonusVerildi ? ' ok' : '') + '" aria-hidden="true">' +
+                (g.bonusVerildi ? '🎁✓' : '→🎁') + '</span>' +
+            '</div>';
+
+    // Hedef çipi ("Arıyorum!") — çocuğun kendi seçtiği parça; fiyat dili YOK
+    if (hedefBulundu) {
+      html += '<button class="home-hedef found" data-act="album" aria-label="Albümü aç">' +
+                '<span class="hedef-star" aria-hidden="true">🌟</span>' +
+                '<span>' + hedefBulundu.ad + ' yuvana katıldı!</span></button>';
+    } else if (hedefP) {
+      var hedefSil = '';
+      try {
+        hedefSil = (Yuvo.art && Yuvo.art.pufiSilhouetteSVG && Yuvo.art.pufiSilhouetteSVG(hedefP)) || '';
+      } catch (e) {}
+      html += '<button class="home-hedef" data-act="album"' +
+                ' aria-label="Hedefin: ' + hedefP.ad + ' — albümü aç">' +
+                '<span aria-hidden="true">🎯</span>' +
+                (hedefSil ? '<span class="hedef-sil" aria-hidden="true">' + hedefSil + '</span>' : '') +
+                '<span>Arıyorum: <b>' + hedefP.ad + '</b></span></button>';
+    }
 
     // Kenar düğmeleri: Ebeveyn (gri, göze batmaz) + biyom kapısı + Şako Saklambaç
     html += '<div class="home-side">';
@@ -435,13 +488,22 @@
         if (heldIdx === i) cls += ' held';
         else if (holding) cls += ' faded';
         if (dropNew && i === shown - 1) cls += ' drop';
-        var lbl = (heldIdx === i) ? 'Yumurtayı aç — töreni başlat' : 'Yumurtayı eline al';
+        if (list[i] && list[i].kulucka) cls += ' kulucka';
+        var lbl = (heldIdx === i) ? 'Yumurtayı aç — töreni başlat'
+          : (list[i] && list[i].kulucka) ? 'Kuluçka yumurtası hazır — eline al'
+          : 'Yumurtayı eline al';
         html += '<button class="' + cls + '" style="--i:' + i + '" data-act="egg"' +
                   ' data-idx="' + i + '" aria-label="' + lbl + '">' +
                   '<span class="home-egg-art">' + wrapperArt(list[i]) + '</span>' +
+                  (list[i] && list[i].kulucka
+                    ? '<b class="home-egg-badge" aria-hidden="true">☀️ Hazır!</b>' : '') +
                 '</button>';
       }
       if (eggs > shown) html += '<span class="home-egg-more">+' + (eggs - shown) + '</span>';
+      // İlk oturum el ipucu: hiç yumurta açılmadıysa dokunuşu göster (metin okumadan)
+      if ((s.eggCounter | 0) === 0 && !holding) {
+        html += '<div class="home-hand" aria-hidden="true">👆</div>';
+      }
     } else {
       html += '<span class="home-nest-empty" aria-hidden="true">' + moonSVG() + '</span>';
     }
@@ -473,11 +535,61 @@
     html += '</div></div>';
     dropNew = false;
 
-    // Gün sonu paneli (yumurta bitince)
+    // Gün sonu paneli (yumurta bitince) — kapanış ritüeli: özet + yarının vaadi
+    // (araştırma: geri sayım sayacı YOK; "yarın sebebi" hikâye kapısıyla verilir)
     if (eggs === 0) {
       var extraLeft = Math.max(0, 2 - (s.extraEggsBought | 0));
       var canAfford = (s.stardust | 0) >= 120;
       html += '<div class="home-dayend">';
+
+      // Bugünün Dostları — bugün açılan portreler (tekrarsız, en çok 6)
+      var acilan = Array.isArray(s.bugunAcilanlar) ? s.bugunAcilanlar : [];
+      var gorulen = {}, dostlar = [], ai, ap;
+      for (ai = 0; ai < acilan.length && dostlar.length < 6; ai++) {
+        if (gorulen[acilan[ai]]) continue;
+        gorulen[acilan[ai]] = true;
+        ap = Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(acilan[ai]);
+        if (ap) dostlar.push(ap);
+      }
+      if (dostlar.length) {
+        html += '<div class="dayend-dostlar" aria-label="Bugünün dostları">' +
+                  '<span class="dayend-baslik">Bugünün Dostları</span>' +
+                  '<span class="dayend-dost-row">';
+        for (ai = 0; ai < dostlar.length; ai++) {
+          html += '<span class="dayend-dost" style="--d:' + (ai * 0.12).toFixed(2) + 's"' +
+                    ' title="' + dostlar[ai].ad + '">' + pufiArt(dostlar[ai]) + '</span>';
+        }
+        html += '</span></div>';
+      }
+
+      // Yarının vaadi: seri silueti — SAYAÇ YOK ("Rüzgâr Postası yarın geliyor")
+      var ySeri = (Yuvo.engine && Yuvo.engine.yarinSeri) ? Yuvo.engine.yarinSeri() : null;
+      var ySeriAd = (ySeri && Yuvo.data.WRAPPER_SERIES && Yuvo.data.WRAPPER_SERIES[ySeri] &&
+                     Yuvo.data.WRAPPER_SERIES[ySeri].ad) || '';
+      if (ySeriAd) {
+        html += '<div class="dayend-yarin" aria-label="Yarın: ' + ySeriAd + '">' +
+                  '<span class="dayend-yarin-egg" aria-hidden="true">' +
+                    wrapperArt({ seri: ySeri, variant: 0 }) + '</span>' +
+                  '<span>Yarın: <b>' + ySeriAd + '</b> deseni geliyor…</span>' +
+                '</div>';
+      }
+
+      // Bekçi Takvimi — CEZASIZ 7 yıldız (kaçan gün zinciri KIRMAZ; "kaybettin" dili yok)
+      var stI = (Yuvo.engine && Yuvo.engine.streakInfo) ? Yuvo.engine.streakInfo()
+                : { hedef: 7, kabuk: 25 };
+      var yFilled = Math.min(stI.hedef, (s.streak && s.streak.yildiz) | 0);
+      var bugunYildiz = (g.ac | 0) > 0;
+      html += '<div class="dayend-takvim" aria-label="Bekçi Takvimi: ' + yFilled +
+                ' yıldız, hedef ' + stI.hedef + '">' +
+                '<span class="dayend-baslik">Bekçi Takvimi</span>' +
+                '<span class="takvim-stars" aria-hidden="true">';
+      for (ai = 0; ai < stI.hedef; ai++) {
+        var stCls = ai < yFilled ? ' on' : (bugunYildiz && ai === yFilled ? ' today' : '');
+        html += '<i class="takvim-star' + stCls + '">★</i>';
+      }
+      html += '</span><small>' + stI.hedef + ' yıldız olunca +' + stI.kabuk + ' Kabuk!' +
+              ((s.streak && (s.streak.rozet | 0) > 0) ? ' · 🏅×' + (s.streak.rozet | 0) : '') +
+              '</small></div>';
       if (extraLeft > 0) {
         html += '<button class="btn btn-primary home-extra" data-act="extra"' +
                   (canAfford ? '' : ' disabled') +
@@ -545,7 +657,8 @@
 
   // Salla: eldeki yumurta çıngırdar — ses aileyi fısıldar, nadirliği asla (§1.3)
   function doShake () {
-    play('shakeRattle', { family:'cayir' });  // proto tek aile: çayır çıngıltısı
+    var s0 = st();
+    play('shakeRattle', { family: s0.activeBiome === 'orman' ? 'orman' : 'cayir' });
     var art = el && el.querySelector('.home-egg.held .home-egg-art');
     if (art) {
       art.classList.remove('shake');
@@ -556,6 +669,124 @@
         if (a) a.classList.remove('shake');
       }, 700);
     }
+    shakeHints();
+  }
+
+  // Olabilirlik karuseli (POP MART "shake for hints" esinli, DÜRÜST hâli): sallayınca
+  // aktif biyomun EKSİK dostlarından 3 silüet belirir — sonuç henüz çekilmediği için
+  // hepsi gerçekten olası; merak boşluğunu daraltmadan besler. Nadirlik ASLA sızmaz.
+  function shakeHints () {
+    if (!el) return;
+    var held = el.querySelector('.home-egg.held');
+    if (!held) return;
+    var s = st(), biome = s.activeBiome === 'orman' ? 'orman' : 'cayir';
+    var list = (Yuvo.data && Yuvo.data.PUFIS) || [], eksik = [], i, p;
+    for (i = 0; i < list.length; i++) {
+      p = list[i];
+      if ((p.biome || 'cayir') !== biome || p.rarity === 'gizli') continue;
+      if (!(s.owned || {})[p.id]) eksik.push(p);
+    }
+    if (!eksik.length) return;
+    var secim = [];
+    for (i = 0; i < 3 && eksik.length; i++) {
+      secim.push(eksik.splice(Math.floor(Math.random() * eksik.length), 1)[0]);
+    }
+    var old = el.querySelector('.home-shake-hints');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var box = document.createElement('span');
+    box.className = 'home-shake-hints';
+    box.setAttribute('aria-hidden', 'true');
+    var html = '';
+    for (i = 0; i < secim.length; i++) {
+      var sil = '';
+      try { sil = (Yuvo.art && Yuvo.art.pufiSilhouetteSVG && Yuvo.art.pufiSilhouetteSVG(secim[i])) || ''; }
+      catch (e) {}
+      html += '<span class="hint-p" style="--d:' + (i * 0.22).toFixed(2) + 's">' + sil + '</span>';
+    }
+    html += '<b class="hint-q">?</b>';
+    box.innerHTML = html;
+    held.appendChild(box);
+    later(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 2000);
+  }
+
+  // Şako gece uçuşu (gün kapanışı): silüet süzülür, kuluçka yumurtasını bırakır.
+  // Sonuç/nadirlik SIZMAZ — yalnız "yarın sürprizi var" vaadi (ekranda duran kanca).
+  function sakoFlybySVG () {
+    return '<svg viewBox="0 0 120 70" aria-hidden="true" focusable="false">' +
+      '<g fill="#1E2A4A">' +
+        '<ellipse cx="58" cy="40" rx="26" ry="13"/>' +
+        '<circle cx="84" cy="30" r="10"/>' +
+        '<path d="M92 28l14 3-13 5Z"/>' +                          // gaga
+        '<path d="M46 34C30 18 14 16 4 22c12 2 20 8 28 20Z"/>' +    // kanat (yukarı)
+        '<path d="M34 44l-26 14 28-4Z"/>' +                         // kuyruk
+      '</g>' +
+      '<circle cx="86" cy="28" r="1.8" fill="#FFC734"/>' +          // göz parıltısı
+    '</svg>';
+  }
+
+  function sakoFlyby (onDone) {
+    var eski = document.querySelector('.home-sako-flyby');
+    if (eski && eski.parentNode) eski.parentNode.removeChild(eski);
+    var ov = document.createElement('div');
+    ov.className = 'home-sako-flyby';
+    ov.setAttribute('aria-hidden', 'true');
+    ov.innerHTML =
+      '<span class="flyby-kus">' + sakoFlybySVG() + '</span>' +
+      '<span class="flyby-egg">🥚<i>🌙</i></span>' +
+      '<p class="flyby-metin">Şako geçti… yuvaya bir şey bıraktı!</p>';
+    document.body.appendChild(ov);
+    play('chime');
+    later(function () {
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+      if (onDone) onDone();
+    }, 2300);
+  }
+
+  // Kargo balonu teslimatı: kilerden çekilen yumurta adaya süzülen balonla iner
+  // (ticaret dili SIFIR — "Rüzgâr Postası" kurgusu; drawFromKiler commit'i vitrini
+  // zaten doldurdu, bu katman yalnız hikâyeyi anlatır)
+  function kargoBalon () {
+    if (!el) return;
+    var ov = document.createElement('div');
+    ov.className = 'home-kargo';
+    ov.setAttribute('aria-hidden', 'true');
+    ov.innerHTML =
+      '<span class="kargo-balon">' + balloonSVG() + '</span>' +
+      '<span class="kargo-egg">🥚</span>';
+    el.appendChild(ov);
+    play('chime');
+    later(function () {
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+      dropNew = true;
+      toast('Rüzgâr Postası bir sürpriz getirdi!');
+      render();
+    }, 1600);
+  }
+
+  // Yuva çağrısı: rastgele bir yumurta ara ara "hop" yapar + parıltı saçar (dokunulası)
+  function liveliness () {
+    later(function tick () {
+      if (el && heldIdx === null) {
+        var adaylar = el.querySelectorAll('.home-egg');
+        if (adaylar.length) {
+          var secilen = adaylar[Math.floor(Math.random() * adaylar.length)];
+          var art = secilen.querySelector('.home-egg-art');
+          if (art) {
+            art.classList.add('hop');
+            var spark = document.createElement('b');
+            spark.className = 'home-egg-spark';
+            spark.setAttribute('aria-hidden', 'true');
+            spark.textContent = '✨';
+            secilen.appendChild(spark);
+            later(function () {
+              art.classList.remove('hop');
+              if (spark.parentNode) spark.parentNode.removeChild(spark);
+            }, 950);
+          }
+        }
+      }
+      later(tick, 4200 + Math.random() * 2600);
+    }, 3200);
   }
 
   // 400ms basılı tut = salla (jest; tap fallback'i eldeki "Salla!" butonu)
@@ -629,7 +860,9 @@
       play('page');
       if (Yuvo.go) Yuvo.go('album');
     } else if (act === 'pufi') {
-      play('pop');
+      // Her Pufi KENDİ cıvıltısıyla selamlar + minik konuşma balonu (yuva canlı hissettirir)
+      var pid = b.getAttribute('data-id');
+      play('pufiChirp', { id: pid || 'pufi' });
       var body = b.querySelector('.home-roamer-body');
       if (body) {
         body.classList.remove('jump');
@@ -637,6 +870,15 @@
         body.classList.add('jump');
         later(function () { body.classList.remove('jump'); }, 700);
       }
+      var eskiBalon = b.querySelector('.roamer-bubble');
+      if (eskiBalon && eskiBalon.parentNode) eskiBalon.parentNode.removeChild(eskiBalon);
+      var SELAM = (Yuvo.data && Yuvo.data.DIALOG && Yuvo.data.DIALOG.pufiSelam) ||
+        ['Merhaba!', 'Cik cik!', 'Bugün ne güzel!', 'Beraber oynayalım mı?'];
+      var balon = document.createElement('span');
+      balon.className = 'roamer-bubble';
+      balon.textContent = SELAM[Math.floor(Math.random() * SELAM.length)];
+      b.appendChild(balon);
+      later(function () { if (balon.parentNode) balon.parentNode.removeChild(balon); }, 1500);
     } else if (act === 'extra') {
       putBack(true);
       var ok2 = !!(Yuvo.engine && Yuvo.engine.buyExtraEgg && Yuvo.engine.buyExtraEgg());
@@ -653,25 +895,36 @@
     } else if (act === 'endday') {
       putBack(true);
       play('chime');
-      var yeniGun = function () {
-        if (Yuvo.engine && Yuvo.engine.newDay) Yuvo.engine.newDay();
-        toast('Yeni gün! Rüzgâr Postası 3 yumurta bıraktı.');
-        render();
+      var geceSonu = function () {
+        // Şako gece uçuşu: yarının kuluçka sürprizini bırakır (sayaç değil, hikâye kapısı)
+        if (Yuvo.engine && Yuvo.engine.kuluckaBirak) Yuvo.engine.kuluckaBirak();
+        sakoFlyby(function () {
+          if (Yuvo.engine && Yuvo.engine.newDay) Yuvo.engine.newDay();
+          var s5 = st();
+          var kulHazir = !!(s5.todayEggs && s5.todayEggs[0] && s5.todayEggs[0].kulucka);
+          toast(kulHazir
+            ? 'Yeni gün! Şako\'nun bıraktığı kuluçka yumurtası hazır! ☀️'
+            : 'Yeni gün! Rüzgâr Postası yumurtaları bıraktı.');
+          render();
+        });
       };
-      // Luna'nın günbatımı ritüeli (docs/v2/04 §1 14:30) — yoksa doğrudan yeni gün
-      if (Yuvo.scenes.intro && Yuvo.scenes.intro.playDusk) Yuvo.scenes.intro.playDusk(yeniGun);
-      else yeniGun();
+      // Luna'nın günbatımı ritüeli (docs/v2/04 §1 14:30) — yoksa doğrudan gece sonu
+      if (Yuvo.scenes.intro && Yuvo.scenes.intro.playDusk) Yuvo.scenes.intro.playDusk(geceSonu);
+      else geceSonu();
+    } else if (act === 'gorev-oyun') {
+      putBack(true);
+      play('click');
+      if (Yuvo.go) Yuvo.go('minigame');
     } else if (act === 'kiler') {
       putBack(true);
       var okK = !!(Yuvo.engine && Yuvo.engine.drawFromKiler && Yuvo.engine.drawFromKiler());
       if (okK) {
         play('pop');
-        dropNew = true;
-        toast('Sepete bir sürpriz yumurta düştü!');
+        kargoBalon();                         // ticaret dili sıfır: balon süzülür, yumurta iner
       } else {
         toast('Bugünlük sürprizler tamam — yarın devam!');
+        render();
       }
-      render();
     } else if (act === 'parent') {
       putBack(true);
       play('click');
@@ -709,11 +962,14 @@
       onState = function () { render(); };
       document.addEventListener('yuvo:state', onState);
       render();
+      liveliness();
     },
     unmount: function () {
       for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
       timers = [];
       clearHold();
+      var fly = document.querySelector('.home-sako-flyby');
+      if (fly && fly.parentNode) fly.parentNode.removeChild(fly);
       window.removeEventListener('pointerup', handleUp);
       window.removeEventListener('pointercancel', handleUp);
       if (onState) { document.removeEventListener('yuvo:state', onState); onState = null; }

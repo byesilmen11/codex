@@ -68,6 +68,16 @@
       kaybetti: [
         'Buldun demek. Şans. Kesinlikle şans. …Bir daha oynayalım mı?'
       ]
-    }
+    },
+
+    // Çayırda gezinen Pufi'lere dokununca çıkan minik selamlar (home.js roamer balonu)
+    pufiSelam: [
+      'Merhaba!',
+      'Cik cik!',
+      'Bugün ne güzel!',
+      'Beraber oynayalım mı?',
+      'Seni görünce sevindim!',
+      'Hihi, gıdıklandım!'
+    ]
   };
 })();

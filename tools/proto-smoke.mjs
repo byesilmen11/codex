@@ -72,11 +72,10 @@ try {
     step('A· 09-intro.png kaydedildi (yıldız çocuğun dokunuşunu bekliyor)');
     await page.click('.intro-star', { force: true });
     await page.waitForSelector('.dlg-bubble', { timeout: 5000 });
-    step('A· anlatıcı konuştu (balon açık)');
-    await page.click('.dlg-bubble'); // 1. cümle
-    await page.waitForTimeout(250);
-    await page.click('.dlg-bubble'); // 2. cümle → ısıtma aşaması
-    await page.waitForSelector('.intro-egg', { timeout: 5000 });
+    step('A· anlatıcı konuştu (balon açık, otomatik akar)');
+    // Balonlar artık otomatik akar (sure: 2400) — kancayla atlat (tıklama yarışı olmasın)
+    await page.evaluate(() => { while (window.Yuvo.test.dialogNext()) {} });
+    await page.waitForSelector('.intro-egg', { timeout: 8000 });
     step('A· ısıtma aşaması açıldı (üşüyen yumurta)');
     for (let i = 0; i < 3; i++) {
       await page.click('.intro-egg', { force: true });
@@ -210,6 +209,22 @@ try {
   await page.screenshot({ path: join(shotDir, '06-minigame.png') });
   step('06-minigame.png kaydedildi');
 
+  // ---- 9b) Çıt Çıt Köşesi (P6): ödülsüz sonsuz çıtlatma modu ----
+  await page.click('.mg-citcit-btn');
+  await page.waitForSelector('.mg-cc-egg', { timeout: 4000 });
+  const star0cc = await page.evaluate(() => window.Yuvo.test.state().stardust);
+  for (let i = 0; i < 5; i++) {
+    await page.click('.mg-cc-egg', { force: true });
+    await page.waitForTimeout(120);
+  }
+  const star1cc = await page.evaluate(() => window.Yuvo.test.state().stardust);
+  if (star0cc !== star1cc) fail('Çıt Çıt Köşesi ödül DAĞITMAMALI (⭐ ' + star0cc + '→' + star1cc + ')');
+  await page.screenshot({ path: join(shotDir, '17-citcit.png') });
+  step('Çıt Çıt Köşesi: 5 çıtlatma, ödül yok (17-citcit.png)');
+  await page.click('[data-mg="match"]');
+  await page.waitForSelector('.mg-grid .mg-card', { timeout: 4000 });
+  step('Eşini Bul\'a dönüldü');
+
   // ---- 10) Alt navdan Defter → Ambalaj Defteri (≥1 pul işli) ----
   await page.click('#bottom-nav button[data-go="foilbook"]');
   await page.waitForSelector('.fb-grid', { timeout: 5000 });
@@ -268,6 +283,24 @@ try {
   const panelText = await page.evaluate(() => document.body.textContent || '');
   if (!/DEMO/.test(panelText)) fail('panelde DEMO uyarısı görünmüyor');
   step('PIN 1234 → panel açıldı (6 paket + DEMO uyarısı + dilek listesi)');
+
+  // ---- 12b) P5 güven kancaları: güven şeridi + Hoş Geldin + Dilek Kartı+ ----
+  if (!(await page.$('.par-trust'))) fail('güven şeridi (.par-trust) panelde yok');
+  if (!(await page.$('.par-welcome'))) fail('Hoş Geldin Sepeti kartı yok (hiç alım yapılmadı)');
+  const welcomeText = await page.evaluate(() =>
+    (document.querySelector('.par-welcome') || {}).textContent || '');
+  // Güvence cümlesi ZORUNLU; gerçek baskı kalıpları ("son şans", "kaldı", sayaç) YASAK
+  if (!/süresi yok|burada durur/.test(welcomeText)) {
+    fail('Hoş Geldin Sepeti "geri sayımsız" güvence cümlesini taşımıyor: ' + welcomeText);
+  }
+  if (/son şans|son fırsat|sadece bugün|kaçırma|hemen al|saat kaldı|dakika kaldı/i.test(welcomeText)) {
+    fail('Hoş Geldin Sepeti baskı dili içeriyor: ' + welcomeText);
+  }
+  if (!(await page.$('.par-wish-eta'))) fail('Dilek Kartı+ satırı (.par-wish-eta) yok');
+  const etaText = await page.evaluate(() =>
+    (document.querySelector('.par-wish-eta') || {}).textContent || '');
+  if (!/kavanozda|Bugün eklendi/.test(etaText)) fail('dilek yaşı satırı eksik: ' + etaText);
+  step('P5: güven şeridi + geri sayımsız Hoş Geldin + Dilek Kartı+ ("' + etaText + '")');
   await page.waitForTimeout(350);
   await page.screenshot({ path: join(shotDir, '10-parent.png') });
   step('10-parent.png kaydedildi');
@@ -361,7 +394,111 @@ try {
   if (starSonra !== starOnce + 10) fail('Saklambaç ödülü +10⭐ olmalıydı (' + starOnce + '→' + starSonra + ')');
   step('Saklambaç kazanıldı (+10⭐) — "Bir Daha!" görünür');
 
+  /* ---- 16) P3 oturum döngüsü: görev çipleri → kapanış ritüeli → Şako uçuşu → kuluçka ---- */
+  await page.evaluate(() => window.Yuvo.go('home')); // Saklambaç tam ekran — nav görünmez
+  await page.waitForSelector('.home-gorev', { timeout: 5000 });
+  const gorevChips = await page.$$eval('.home-gorev .gorev-chip', (els) => els.length);
+  if (gorevChips !== 3) fail('3 görev çipi beklenirdi, ölçülen ' + gorevChips);
+  step('günlük görev çipleri görünür (🥚 · 🎮 · 📔 → 🎁)');
+
+  // Vitrini boşalt → kapanış ritüeli paneli (özet + yarın silueti + Bekçi Takvimi)
+  await page.evaluate(() => {
+    const s = window.Yuvo.test.state();
+    s.todayEggs = [];
+    s.eggsAvailable = 0;
+    window.Yuvo.engine.save();
+    window.Yuvo.refresh();
+  });
+  await page.waitForSelector('.home-dayend', { timeout: 5000 });
+  const kapanis = await page.evaluate(() => ({
+    dostlar: document.querySelectorAll('.dayend-dost').length,
+    yarin: !!document.querySelector('.dayend-yarin'),
+    takvim: document.querySelectorAll('.takvim-star').length,
+    metin: (document.querySelector('.home-dayend') || {}).textContent || '',
+  }));
+  if (!kapanis.yarin) fail('kapanış panelinde yarının serisi satırı yok');
+  if (kapanis.takvim !== 7) fail('Bekçi Takvimi 7 yıldız çizmeli, ölçülen ' + kapanis.takvim);
+  if (kapanis.dostlar < 1) fail('Bugünün Dostları portresi yok (bugün 1 yumurta açıldı)');
+  if (/saniye|dakika kaldı|geri sayım/i.test(kapanis.metin)) fail('kapanış panelinde geri sayım dili var');
+  step('kapanış ritüeli: Bugünün Dostları + yarın silueti + Bekçi Takvimi (geri sayım YOK)');
+  await page.screenshot({ path: join(shotDir, '15-dayend.png') });
+  step('15-dayend.png kaydedildi');
+
+  // Günü Bitir → Luna ninnisi (otomatik akar) → Şako gece uçuşu → yeni gün + kuluçka
+  await page.click('.home-endday');
+  await page.waitForSelector('.home-sako-flyby', { timeout: 20000 });
+  step('Şako gece uçuşu göründü (kuluçka bırakılıyor)');
+  await page.waitForSelector('.home-egg.kulucka', { timeout: 20000 });
+  const kul = await page.evaluate(() => {
+    const s = window.Yuvo.test.state();
+    return {
+      ilk: !!(s.todayEggs[0] && s.todayEggs[0].kulucka),
+      adet: s.todayEggs.length,
+      gorevAc: s.gorevler.ac,
+      yildiz: s.streak.yildiz,
+      acilanlar: s.bugunAcilanlar.length,
+    };
+  });
+  if (!kul.ilk) fail('kuluçka yumurtası vitrinin İLK sırasında değil');
+  if (kul.adet !== 4) fail('yeni gün: 3 yeni + 1 kuluçka beklenirdi, ölçülen ' + kul.adet);
+  if (kul.gorevAc !== 0 || kul.acilanlar !== 0) fail('görev zinciri/özet yeni günde sıfırlanmadı');
+  if (kul.yildiz !== 1) fail('dün oynandı → Bekçi Takvimi 1 yıldız beklerdi, ölçülen ' + kul.yildiz);
+  step('yeni gün: kuluçka yumurtası İLK sırada "Hazır!" rozetiyle + takvimde 1 yıldız');
+  await page.screenshot({ path: join(shotDir, '16-kulucka.png') });
+  step('16-kulucka.png kaydedildi');
+
   await context.close();
+
+  /* ================= BÖLÜM C — nadirlik reveal sahnelemesi (3. yumurta Nadir+ garantisi) ================= */
+  {
+    const { context: ctxC, page: pC } = await newPage();
+    await pC.waitForSelector('.intro-scene', { timeout: 10000 });
+    await pC.evaluate(() => window.Yuvo.test.skipIntro());
+    await pC.waitForSelector('.home-egg', { timeout: 5000 });
+    // Deterministik Nadir+ reveal: sıradaki açılış 3. yumurta sayılır (onboarding garantisi)
+    await pC.evaluate(() => {
+      const s = window.Yuvo.test.state();
+      s.eggCounter = 2;
+      window.Yuvo.engine.save();
+    });
+    await pC.click('.home-egg[data-idx="0"]', { force: true });
+    await pC.waitForSelector('.home-egg.held', { timeout: 5000 });
+    await pC.click('.home-egg.held', { force: true });
+    await pC.waitForSelector('#cere-stage', { timeout: 5000 });
+    // Tam ritüel: folyo → çikolata → kapsül (B ile aynı tap fallback yolları)
+    await pC.waitForSelector('.cere-egg-wrap.warm', { timeout: 5000 });
+    for (let i = 0; i < 3; i++) { await pC.click('#rit-tab', { force: true }); await pC.waitForTimeout(150); }
+    await pC.waitForSelector('#rit-eat', { timeout: 5000 });
+    for (let i = 0; i < 4; i++) { await pC.click('#rit-eat', { force: true }); await pC.waitForTimeout(140); }
+    await pC.waitForSelector('.cere-egg-wrap.capsule', { timeout: 5000 });
+    for (let i = 0; i < 6; i++) {
+      const opened = await pC.$('.cere-egg-wrap.opened');
+      if (opened) break;
+      await pC.click('#rit-obj', { force: true });
+      await pC.waitForTimeout(120);
+    }
+    await pC.waitForSelector('.cere-egg-wrap.opened', { timeout: 6000 });
+    // P1 doğrulaması: nadirlik SPLASH (tier ≥1) + karttaki seri numarası satırı
+    await pC.waitForSelector('.rit-rarity-splash', { timeout: 6000 });
+    const splashText = await pC.evaluate(() =>
+      (document.querySelector('.rit-rarity-splash') || {}).textContent || '');
+    step('nadirlik SPLASH göründü: "' + splashText.trim() + '"');
+    await pC.screenshot({ path: join(shotDir, '18-rarity-splash.png') });
+    step('18-rarity-splash.png kaydedildi');
+    await pC.waitForSelector('.cere-card', { timeout: 12000 });
+    const seriNo = await pC.evaluate(() =>
+      (document.querySelector('.cere-serino') || {}).textContent || '');
+    if (!/\d+\s*\/\s*30|Gizli/.test(seriNo)) fail('sonuç kartında seri numarası satırı yok: "' + seriNo + '"');
+    step('sonuç kartı seri satırı: "' + seriNo.trim() + '" (sıradaki merak kancası)');
+    const rarityDrawn = await pC.evaluate(() => {
+      const s = window.Yuvo.test.state();
+      let n = 0;
+      for (const id in s.owned) if (s.owned[id]) n += 1;
+      return n;
+    });
+    if (rarityDrawn < 1) fail('Bölüm C açılışı sahipliğe işlenmedi');
+    await ctxC.close();
+  }
 } finally {
   await browser.close();
 }

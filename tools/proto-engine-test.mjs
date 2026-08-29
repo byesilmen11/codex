@@ -225,9 +225,9 @@ Yuvo.engine.reset(777);
   assert(Yuvo.engine.redeemChocolates() === false, 'aynı gün 2. dönüşüm reddedildi (KUMBARA_GUNLUK=1)');
   Yuvo.engine.newDay();
   assert(Yuvo.engine.state.kumbaraToday === 0 && Yuvo.engine.state.chocolates === 30 &&
-    Yuvo.engine.state.todayEggs.length === 3 && Yuvo.engine.state.eggsAvailable === 3 &&
+    Yuvo.engine.state.todayEggs.length === 7 && Yuvo.engine.state.eggsAvailable === 7 &&
     Yuvo.engine.state.firstRitualDoneToday === false,
-    'newDay: vitrin 3 yumurtayla kuruldu, kumbara hakkı ve ritüel bayrağı sıfırlandı, kumbara birikimi korundu');
+    'newDay: haklar birikti (4 kalan + 3 yeni = 7), kumbara hakkı ve ritüel bayrağı sıfırlandı');
   assert(Yuvo.engine.redeemChocolates() === true && Yuvo.engine.state.chocolates === 15,
     'yeni gün → şölen hakkı tazelendi');
 }
@@ -337,12 +337,18 @@ console.log('# v3: v2 → v3 migrasyonu (bozuk veri onarımı)');
 console.log('# v3: mağaza verisi (docs/v2/05 §1-§2)');
 {
   const P = Yuvo.data.PACKS;
-  assert(Array.isArray(P) && P.length === 6, `6 paket kademesi (ölçülen ${P ? P.length : 0})`);
+  const merdiven = (P || []).filter((p) => !p.tekSeferlik);
+  assert(Array.isArray(P) && merdiven.length === 6,
+    `6 paket kademesi (ölçülen ${merdiven.length})`);
   let mono = true;
-  for (let i = 1; i < P.length; i++) {
-    if (P[i].tl / P[i].adet > P[i - 1].tl / P[i - 1].adet + 1e-9) mono = false;
+  for (let i = 1; i < merdiven.length; i++) {
+    if (merdiven[i].tl / merdiven[i].adet > merdiven[i - 1].tl / merdiven[i - 1].adet + 1e-9) mono = false;
   }
   assert(mono, 'birim fiyat merdiveni tekdüze iniyor (₺9,99 → ₺2,00)');
+  const hosg = (P || []).find((p) => p.id === 'hosgeldin');
+  assert(!!hosg && hosg.tekSeferlik === true && hosg.adet === 5 &&
+    Yuvo.engine.buyPack && typeof hosg.tl === 'number',
+    'Hoş Geldin Sepeti: tekSeferlik bayraklı, merdiven dışında (geri sayımsız karşılama)');
   assert(P.every((p) => p.id && p.ad && p.adet > 0 && p.tl > 0 && p.garanti), 'her pakette id/ad/adet/tl/garanti dolu');
   const efs = (Yuvo.data.ODDS || []).find((o) => o.satilmaz);
   assert(!!efs && efs.garanti.indexOf('SATILMAZ') >= 0, 'ODDS: Efsanevi "vaat olarak SATILMAZ" satırı işaretli');
@@ -405,9 +411,70 @@ console.log('# v3: drawFromKiler — günlük tavan 5 (+1 Club)');
   Yuvo.engine.newDay();
   s = Yuvo.engine.state;
   assert(s.kiler.bugunAcilan === 0 && s.kiler.adet === 14, 'newDay → kiler hakkı tazelendi, stok korundu');
-  assert(s.todayEggs.length === 4 && s.eggsAvailable === 4,
-    'newDay + Club: vitrin 3 günlük + 1 Club yumurtası');
+  assert(s.todayEggs.length === 9 && s.eggsAvailable === 9,
+    'newDay + Club: dünden kalan 9 KORUNDU, tavan 9 aşılmadı (yeni/Club eklenmedi)');
   assert(Yuvo.engine.drawFromKiler() === true, 'yeni gün → kilerden çekim yeniden açık');
+}
+
+// ---------- P3: oturum döngüsü — hak birikimi, kuluçka, görev zinciri, cezasız streak ----------
+console.log('# P3: haklar birikir (tavan 9) + kuluçka + görev zinciri + Bekçi Takvimi');
+{
+  Yuvo.engine.reset(5151);
+  let s = Yuvo.engine.state;
+  Yuvo.engine.newDay();
+  assert(s.todayEggs.length === 6 && s.eggsAvailable === 6, 'birikim: 3 kalan + 3 yeni = 6');
+  Yuvo.engine.newDay();
+  assert(s.todayEggs.length === 9, 'birikim: 6 + 3 = 9');
+  Yuvo.engine.newDay();
+  assert(s.todayEggs.length === 9, 'tavan 9: daha fazla birikmez');
+  assert(s.streak.yildiz === 0 && s.streak.rozet === 0,
+    'oynanmayan günler yıldız üretmez ama zinciri de KIRMAZ (cezasız)');
+  // Kuluçka döngüsü: akşam bırakılır → sabah İLK sırada "hazır", tavana sayılmaz
+  assert(Yuvo.engine.kuluckaBirak('yildiztozu') === true, 'kuluçka bırakıldı');
+  assert(Yuvo.engine.kuluckaBirak() === false, 'ikinci kuluçka reddedildi (tek sürpriz)');
+  Yuvo.engine.newDay();
+  assert(s.todayEggs[0] && s.todayEggs[0].kulucka === true && s.todayEggs[0].seri === 'yildiztozu',
+    'kuluçka yumurtası sabah İLK sırada, bırakılan seriyle hazır');
+  assert(s.kulucka === null, 'kuluçka alanı temizlendi (tek seferlik)');
+  assert(s.todayEggs.length === 10 && s.eggsAvailable === 10,
+    'kuluçka tavana SAYILMAZ — bekletilen sürpriz asla yanmaz (9 + 1 hazır)');
+  assert(Yuvo.engine.yarinSeri() === Yuvo.engine.yarinSeri() && typeof Yuvo.engine.yarinSeri() === 'string',
+    'yarinSeri deterministik bir seri anahtarı döndürür');
+}
+{
+  // Görev zinciri: 3 aç + 1 oyun + albüm → BİR KEZ +1 bonus yumurta
+  Yuvo.engine.reset(5252);
+  const s = Yuvo.engine.state;
+  assert(Yuvo.engine.gorevIlerle('oyun') === false, 'oyun tek başına bonus vermez');
+  assert(Yuvo.engine.gorevIlerle('album') === false, 'albüm tek başına bonus vermez');
+  assert(Yuvo.engine.gorevIlerle('bilinmeyen') === false, 'bilinmeyen görev tipi reddedilir');
+  const r1 = Yuvo.engine.openEgg();
+  const r2 = Yuvo.engine.openEgg();
+  assert(!r1.error && r1.gorevBonus === false && !r2.error && r2.gorevBonus === false,
+    'ilk 2 açılış: zincir henüz tamam değil, bonus yok');
+  const r3 = Yuvo.engine.openEgg();
+  assert(!r3.error && r3.gorevBonus === true, '3. açılış zinciri tamamladı → bonus yumurta!');
+  assert(s.gorevler.bonusVerildi === true && s.gorevBonusYeni === true,
+    'bonus bayrakları kuruldu (yuva bir kez kutlayacak)');
+  assert(s.todayEggs.length === 1 && s.eggsAvailable === 1,
+    'bonus yumurta vitrine düştü (3 açıldı → 0, +1 bonus)');
+  const r4 = Yuvo.engine.openEgg();
+  assert(!r4.error && r4.gorevBonus === false, 'bonus BİR KEZ — 4. açılışta tekrarlanmaz');
+  assert(Array.isArray(s.bugunAcilanlar) && s.bugunAcilanlar.length === 4 &&
+    s.bugunAcilanlar.every((id) => typeof id === 'string'),
+    'bugunAcilanlar: 4 açılış kapanış özeti için kaydedildi');
+  // Bekçi Takvimi: oynanan gün → 1 yıldız; kaçan günler düşürmez; 7'de +25 Kabuk + rozet
+  Yuvo.engine.newDay();
+  assert(s.streak.yildiz === 1, 'oynanan günün sabahında 1 yıldız');
+  assert(s.gorevler.ac === 0 && s.gorevler.oyun === 0 && s.gorevler.albumZiyaret === false &&
+    s.gorevler.bonusVerildi === false && s.bugunAcilanlar.length === 0 && s.gorevBonusYeni === false,
+    'newDay → görev zinciri ve kapanış özeti sıfırlandı');
+  for (let d = 0; d < 6; d++) Yuvo.engine.newDay();       // hiç oynanmadı
+  assert(s.streak.yildiz === 1, 'kaçan 6 gün yıldızı DÜŞÜRMEDİ (Duolingo-freeze değil, yapısal cezasızlık)');
+  const kab0 = s.kabuk;
+  for (let d = 0; d < 6; d++) { s.gorevler.ac = 1; Yuvo.engine.newDay(); }  // 6 oynanan gün
+  assert(s.streak.yildiz === 0 && s.streak.rozet === 1 && s.kabuk === kab0 + 25,
+    '7. yıldızda +25 Kabuk + rozet, şerit sıfırdan devam');
 }
 
 // ---------- v3: Dilek Kavanozu ----------

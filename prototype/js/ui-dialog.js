@@ -18,7 +18,11 @@
 
   var ADLAR = { kiki:'Kiki', luna:'Luna', ustakabuk:'Usta Kabuk', sako:'Şako', pofu:'Pofu' };
   var queue = [];
-  var root = null, open = false;
+  var root = null, open = false, autoTimer = null;
+
+  function clearAuto () {
+    if (autoTimer !== null) { clearTimeout(autoTimer); autoTimer = null; }
+  }
 
   function play (n) { try { if (Y.audio && Y.audio.play) Y.audio.play(n); } catch (e) {} }
 
@@ -61,9 +65,13 @@
     bub.addEventListener('click', advance);
     open = true;
     play('pop');
+    // sure verildiyse balon kendiliğinden akar (tören kutlamaları / selamlar)
+    clearAuto();
+    if (item.sure > 0) autoTimer = setTimeout(advance, item.sure);
   }
 
   function advance () {
+    clearAuto();
     var done = queue.shift();
     if (done && typeof done.cb === 'function') { try { done.cb(); } catch (e) {} }
     if (queue.length) { render(queue[0]); }
@@ -71,6 +79,7 @@
   }
 
   function close () {
+    clearAuto();
     open = false;
     if (root) root.innerHTML = '';
   }
@@ -78,7 +87,8 @@
   Y.dialog = {
     say: function (opts) {
       if (!opts || !opts.metin) return;
-      queue.push({ kim: opts.kim || null, metin: opts.metin, mood: opts.mood, cb: opts.cb });
+      queue.push({ kim: opts.kim || null, metin: opts.metin, mood: opts.mood, cb: opts.cb,
+                   sure: (opts.sure > 0) ? (opts.sure | 0) : 0 });
       if (!open) render(queue[0]);
     },
     clear: function () { queue = []; close(); },

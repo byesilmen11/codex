@@ -140,12 +140,23 @@
                   : '<button class="alb-biome-tab locked" data-act="biome-locked">🌫 ???</button>') +
               '</div>';
     }
+    var kalan = 30 - owned;
     html += '<div class="alb-progress">' +
               '<span class="alb-progress-num"><b>' + owned + '</b>/30</span>' +
-              '<span class="alb-progress-bar">' +
+              '<span class="alb-progress-bar' + (kalan > 0 && kalan <= 3 ? ' yakin' : '') + '">' +
                 '<span class="alb-progress-fill" style="width:' + pct + '%"></span>' +
               '</span>' +
             '</div>';
+    // Yaklaşma vurgusu (goal-gradient) + önceden görünen büyük ödül — baskı dili YOK
+    if (kalan > 0 && kalan <= 3) {
+      html += '<p class="alb-yakin">🎉 Son ' + kalan + ' dost kaldı!</p>';
+    }
+    html += '<button class="alb-gold-teaser' + (owned >= 30 ? ' ready' : '') + '" data-act="gold-teaser">' +
+              '<span class="agt-ico" aria-hidden="true">🥇</span>' +
+              '<span>' + (owned >= 30
+                ? '<b>Altın Yumurta</b> — aile tamam! 🎊'
+                : '30 dost bir araya gelince: <b>Altın Yumurta</b>') + '</span>' +
+            '</button>';
 
     // Kilometre taşı çipleri — Çayır Sezon-1 rozetleri (orman sayfasında gösterilmez)
     if (viewBiome === 'cayir') {
@@ -267,8 +278,8 @@
     var ri = rarInfo(p.rarity);
 
     if (n > 0) {
-      // Sahipli: ad + nadirlik + bio + birleşmiş oyuncak
-      play('pop');
+      // Sahipli: albüm bir oyuncak sandığı — dokununca Pufi KENDİ sesiyle selam verir
+      try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play('pufiChirp', { id: p.id }); } catch (eCh) {}
       var htmlOwned =
         '<div class="alb-modal center">' +
           '<div class="alb-modal-art rf rf-' + p.rarity + '">' + toyArt(p) + '</div>' +
@@ -330,6 +341,12 @@
         body += '<button class="btn btn-soft alb-wish-btn" id="alb-wish-btn">' +
                   ic('star', '💫') + 'Dilek Kavanozu\'na Fısılda</button>';
       }
+      // Hedef parça ("Arıyorum!"): çocuğun KENDİ oyun-içi hedefi — fiyatla ilgisi yok
+      if (s.hedefPufi === p.id) {
+        body += '<p class="alb-wish-note">🎯 <span>Şu an hedefin bu dost!</span></p>';
+      } else {
+        body += '<button class="btn btn-soft alb-hedef-btn" id="alb-hedef-btn">🎯 Hedefim Bu!</button>';
+      }
     }
     body += '</div></div>';
 
@@ -349,6 +366,18 @@
         } else {
           toast('Kavanoz dolu — bir dilek gerçekleşince yenisi sığar.');
         }
+      });
+    }
+    var hbtn = document.getElementById('alb-hedef-btn');
+    if (hbtn) {
+      hbtn.addEventListener('click', function () {
+        var s2 = st();
+        s2.hedefPufi = p.id;
+        try { if (Yuvo.engine && Yuvo.engine.save) Yuvo.engine.save(); } catch (eH) {}
+        play('star');
+        toast('Yeni hedefin: ' + p.ad + '! Yuvada seni bekliyor 🎯');
+        if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (eR) {} }
+        try { close(); } catch (e2) {}
       });
     }
   }
@@ -388,10 +417,27 @@
     if (!b) return;
     var act = b.getAttribute('data-act');
     if (act === 'cell') {
+      // Soundboard hissi: sahipli hücre zıplar (roamer jump deseni)
+      if (!b.classList.contains('missing')) {
+        b.classList.remove('cell-jump');
+        void b.offsetWidth;
+        b.classList.add('cell-jump');
+        later(function () { b.classList.remove('cell-jump'); }, 650);
+      }
       openDetail(b.getAttribute('data-id'));
     } else if (act === 'biome') {
       var nb = b.getAttribute('data-biome');
       if (nb && nb !== viewBiome) { viewBiome = nb; play('page'); render(); }
+    } else if (act === 'gold-teaser') {
+      var sG = st();
+      var ownedG = ownedCount(viewBiome);
+      if (ownedG >= 30) {
+        play('fanfare');
+        toast('🥇 Altın Yumurta ailenin! Bütün ada seninle gurur duyuyor!');
+      } else {
+        play('click');
+        toast('Aile tamamlanınca Altın Yumurta açılır — acele yok, dostlar kaçmaz!');
+      }
     } else if (act === 'biome-locked') {
       play('click');
       toast('Sisin ardında bir yer var… Çayırda 10 dost topla!');
@@ -431,6 +477,10 @@
       var s = st();
       viewBiome = (s.activeBiome === 'orman' && s.ormanAcik) ? 'orman' : 'cayir';
       render();
+      // Günlük görev zinciri: albüme bakmak da bir halka (bonus tamamlandıysa kutla)
+      if (Yuvo.engine.gorevIlerle && Yuvo.engine.gorevIlerle('album') === true) {
+        toast('🎁 Günün zinciri tamamlandı — yuvaya bonus yumurta kondu!');
+      }
       // Kiki'nin albüm hediyesi — FTUE sonrası İLK albüm ziyaretinde bir kez (v2·04 §1 5:30)
       if (s.introDone && !s.introGiftShown && Yuvo.dialog && Yuvo.data && Yuvo.data.DIALOG) {
         s.introGiftShown = true;
