@@ -130,6 +130,51 @@
     return '';
   }
 
+  // ---------- marka yardımcıları (salt string üreticiler; BRAND.md §3–4) ----------
+  // Yuvo.icons güvenli erişim: ikon yoksa emoji fallback (main.js ico() deseni)
+  function ico (name, fallback) {
+    try {
+      if (Yuvo.icons && Yuvo.icons[name]) {
+        var s = Yuvo.icons[name]();
+        if (s) return s;
+      }
+    } catch (e) {}
+    return '<span class="ico-fallback">' + fallback + '</span>';
+  }
+  // Atölye masası ortam sanatı (env modülü henüz yoksa CSS gradyan zemin yeter)
+  function envBg () {
+    try {
+      if (Yuvo.art && Yuvo.art.env && Yuvo.art.env.tableWood) {
+        var s = Yuvo.art.env.tableWood();
+        if (s) return '<div class="asm-bg" aria-hidden="true">' + s + '</div>';
+      }
+    } catch (e) {}
+    return '';
+  }
+  // Oturma parıltısı: defs'siz (statik id YOK), marka renkli yıldızlar
+  function sparkSVG () {
+    return '<svg viewBox="0 0 64 64" aria-hidden="true">' +
+      '<path d="M32 6 L37 27 L58 32 L37 37 L32 58 L27 37 L6 32 L27 27 Z" fill="#FFC734" stroke="#3E2A1C" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M50 8 L52.5 15.5 L60 18 L52.5 20.5 L50 28 L47.5 20.5 L40 18 L47.5 15.5 Z" fill="#FFA94D" stroke="#3E2A1C" stroke-width="1.5" stroke-linejoin="round"/>' +
+      '<path d="M13 40 L15 46 L21 48 L15 50 L13 56 L11 50 L5 48 L11 46 Z" fill="#FFFFFF" stroke="#3E2A1C" stroke-width="1.5" stroke-linejoin="round"/>' +
+      '</svg>';
+  }
+  // Bitiş konfetisi: --dx/--dy/--rot inline, marka renk dizisi (zamanlamaya dokunmaz)
+  function confettiHTML (n) {
+    var renkler = ['#FFC734', '#FF7C33', '#8AD9F7', '#8ED94F', '#FF8FB0'];
+    var out = '';
+    for (var i = 0; i < n; i++) {
+      var a = (i / n) * Math.PI * 2;
+      var r = 90 + Math.random() * 60;
+      var dx = Math.round(Math.cos(a) * r);
+      var dy = Math.round(Math.sin(a) * r * 0.8) - 30;
+      var rot = Math.round(Math.random() * 360 - 180);
+      out += '<i style="--dx:' + dx + 'px;--dy:' + dy + 'px;--rot:' + rot + 'deg;' +
+        'background:' + renkler[i % renkler.length] + ';animation-delay:' + ((i % 5) * 40) + 'ms"></i>';
+    }
+    return out;
+  }
+
   // ---------- çizim ----------
   function render () {
     var slotsHtml = '', i;
@@ -151,10 +196,11 @@
 
     rootEl.innerHTML =
       '<div class="asm-stage" id="asm-stage">' +
-        '<button class="btn btn-soft asm-skip" id="asm-skip">Atla ▶</button>' +
+        envBg() +
+        '<button class="btn btn-soft asm-skip" id="asm-skip">Atla ' + ico('skip', '▶') + '</button>' +
         '<h2 class="asm-title">' + esc(iyelik(pufi.ad)) + ' oyuncağını birleştir!</h2>' +
         '<div class="asm-board" id="asm-board">' + slotsHtml + '</div>' +
-        '<p class="asm-hint">Parçaları yuvalarına sürükle ✨</p>' +
+        '<p class="asm-hint">Parçaları yuvalarına sürükle</p>' +
         '<div class="asm-shelf" id="asm-shelf">' + piecesHtml + '</div>' +
       '</div>';
 
@@ -306,7 +352,7 @@
     if (slot) {
       slot.classList.remove('near');
       slot.classList.add('filled');
-      slot.innerHTML = '<div class="slot-fill">' + partSVG(partId) + '</div><i class="asm-spark"></i>';
+      slot.innerHTML = '<div class="slot-fill">' + partSVG(partId) + '</div><i class="asm-spark">' + sparkSVG() + '</i>';
     }
     var piece = pieceEl || (shelfEl ? shelfEl.querySelector('.asm-piece[data-part="' + partId + '"]') : null);
     if (piece) {
@@ -328,9 +374,10 @@
     if (stageEl) {
       stageEl.innerHTML =
         '<div class="asm-done">' +
+          '<div class="asm-confetti" aria-hidden="true">' + confettiHTML(14) + '</div>' +
           '<div class="asm-toy">' + assembledSVG() + '</div>' +
           '<div class="asm-dance">' + pufiHappySVG() + '</div>' +
-          '<div class="asm-banner">Albüme İşlendi 📔</div>' +
+          '<div class="asm-banner">' + ico('check', '✔') + ' Albüme işlendi!</div>' +
         '</div>';
     }
     later(function () { if (Yuvo.go) Yuvo.go('album'); }, 1000);

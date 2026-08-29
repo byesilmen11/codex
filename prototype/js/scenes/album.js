@@ -1,5 +1,7 @@
-/* Yuvo — Sahne: Albüm ("Güneş Çayırı" sayfası: 30 hücre + gizli, kilometre taşları, Atölye).
-   Sahip: scenes-meta ajanı. Sözleşme: ARCHITECTURE.md */
+/* Yuvo — Sahne: Albüm ("Güneş Çayırı" hikâye kitabı sayfası: 30 hücre + gizli,
+   kilometre taşları, Atölye). Sahip: scenes-meta ajanı. Sözleşme: ARCHITECTURE.md —
+   claimMilestones/openDetail/doCraft/handleClick mantığı DEĞİŞMEDİ, yalnız markup.
+   Görsel dil: BRAND.md §3 sticker reçetesi + §5 Albüm atmosferi. */
 (function () {
   var Yuvo = window.Yuvo = window.Yuvo || { data:{}, art:{}, audio:{}, engine:{}, scenes:{}, test:{} };
   Yuvo.scenes = Yuvo.scenes || {};
@@ -21,6 +23,38 @@
   function play (n) { try { if (Yuvo.audio && Yuvo.audio.play) Yuvo.audio.play(n); } catch (e) {} }
   function toast (t) { if (Yuvo.toast) Yuvo.toast(t); }
   function later (fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+
+  // Yuvo.icons güvenli erişim (main.js ico() deseni): ikon yoksa emoji fallback
+  function ico (name, fb) {
+    try {
+      if (Yuvo.icons && Yuvo.icons[name]) { var s = Yuvo.icons[name](); if (s) return s; }
+    } catch (e) {}
+    return '<span class="ico-fallback">' + fb + '</span>';
+  }
+  function ic (name, fb, cls) {
+    return '<span class="ys-ico' + (cls ? ' ' + cls : '') + '" aria-hidden="true">' +
+           ico(name, fb) + '</span>';
+  }
+
+  // Düz dolgulu mini ay (id'siz) — gizli şerit süsü
+  function moonSVG () {
+    return '<svg viewBox="0 0 28 28" aria-hidden="true" focusable="false">' +
+      '<path d="M18.6 3.9a11 11 0 1 0 5.6 16.6 9.1 9.1 0 0 1-5.6-16.6Z" fill="#FFC734"' +
+        ' stroke="#3E2A1C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<ellipse cx="11.6" cy="9" rx="2.1" ry="1.3" transform="rotate(-22 11.6 9)"' +
+        ' fill="#FFFFFF" opacity=".75"/>' +
+    '</svg>';
+  }
+
+  // Düz dolgulu yıldız patlaması (id'siz) — üretim töreni kıvılcımı
+  function sparkSVG () {
+    return '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">' +
+      '<path d="M24 4l4.2 9.8L38 18l-9.8 4.2L24 32l-4.2-9.8L10 18l9.8-4.2Z" fill="#FFC734"' +
+        ' stroke="#3E2A1C" stroke-width="2.4" stroke-linejoin="round"/>' +
+      '<circle cx="38.5" cy="9.5" r="3" fill="#FF8FB0" stroke="#3E2A1C" stroke-width="1.6"/>' +
+      '<circle cx="9.5" cy="34.5" r="2.4" fill="#8AD9F7" stroke="#3E2A1C" stroke-width="1.6"/>' +
+    '</svg>';
+  }
 
   function pufiList () { return (Yuvo.data && Yuvo.data.PUFIS) || []; }
   function byId (id) { return (Yuvo.data && Yuvo.data.pufiById && Yuvo.data.pufiById(id)) || null; }
@@ -70,17 +104,27 @@
     var miles = s.milestones || [];
     var html = '';
 
-    // Üst bilgi: başlık + Kabuk bakiyesi + ilerleme
+    // Hikâye kitabı sayfası: kâğıt dokulu sarmalayıcı (mevcut sınıflar içinde aynen)
+    html += '<div class="alb-page">';
+
+    // Üst bilgi: kurdele/arma başlık + Kabuk bakiyesi
     html += '<div class="alb-head">' +
-              '<h2 class="alb-title">📔 Güneş Çayırı</h2>' +
-              '<span class="alb-shell">🐚 ' + (s.kabuk | 0) + '</span>' +
+              '<span class="alb-ribbon">' +
+                '<span class="alb-ribbon-ico" aria-hidden="true">' + ico('album', '📔') + '</span>' +
+                '<h2 class="alb-title">Güneş Çayırı</h2>' +
+              '</span>' +
+              '<span class="alb-shell" aria-label="Kabuk bakiyesi">' +
+                ic('shell', '🐚') + '<b>' + (s.kabuk | 0) + '</b>' +
+              '</span>' +
             '</div>';
     html += '<div class="alb-progress">' +
               '<span class="alb-progress-num"><b>' + owned + '</b>/30</span>' +
-              '<span class="alb-progress-bar"><span class="alb-progress-fill" style="width:' + pct + '%"></span></span>' +
+              '<span class="alb-progress-bar">' +
+                '<span class="alb-progress-fill" style="width:' + pct + '%"></span>' +
+              '</span>' +
             '</div>';
 
-    // Kilometre taşı çipleri
+    // Kilometre taşı çipleri — ödül satırı Kabuk ikonlu
     html += '<div class="alb-chips">';
     for (var m = 0; m < MILES.length; m++) {
       var mi = MILES[m];
@@ -89,7 +133,9 @@
       var cls = claimed ? 'done' : (ready ? 'ready' : 'locked');
       html += '<button class="alb-chip ' + cls + '" data-act="mile" data-key="' + mi.key + '">' +
                 '<b>' + mi.at + '</b>' +
-                '<small>' + (claimed ? '✓ alındı' : '+' + mi.odul + ' 🐚') + '</small>' +
+                (claimed
+                  ? '<small>' + ic('check', '✓') + 'alındı</small>'
+                  : '<small>+' + mi.odul + ' ' + ic('shell', '🐚') + '</small>') +
               '</button>';
     }
     html += '</div>';
@@ -117,22 +163,25 @@
     }
     html += '</div>';
 
-    // Ayrık gizli hücre
+    // Ayrık gizli hücre — pastel gece adası (yıldız benekleri CSS'te, ay süsü burada)
     var gizli = null;
     for (var g = 0; g < list.length; g++) { if (list[g].rarity === 'gizli') { gizli = list[g]; break; } }
     if (gizli) {
       var gn = ownedMap[gizli.id] | 0;
       html += '<div class="alb-secret-row">' +
+                '<span class="alb-secret-moon" aria-hidden="true">' + moonSVG() + '</span>' +
                 '<button class="alb-cell alb-secret rf rf-gizli' + (gn > 0 ? '' : ' missing') + '"' +
                   ' data-act="cell" data-id="' + gizli.id + '" aria-label="Gizli Pufi">' +
                   (gn > 0 ? miniArt(gizli) + (gn > 1 ? '<span class="alb-copy">×' + gn + '</span>' : '')
                           : '<span class="alb-q big">???</span>') +
                 '</button>' +
                 '<span class="alb-secret-label">' +
-                  (gn > 0 ? gizli.ad + ' aramıza katıldı! 🌙' : 'Çayırda bir sır fısıldanıyor…') +
+                  (gn > 0 ? gizli.ad + ' aramıza katıldı!' : 'Çayırda bir sır fısıldanıyor…') +
                 '</span>' +
               '</div>';
     }
+
+    html += '</div>'; // .alb-page
 
     el.innerHTML = html;
   }
@@ -216,15 +265,19 @@
         '<p class="alb-modal-tags"><span class="rarity-tag" style="background:' + ri.renk + '33;border-color:' + ri.renk + '">' +
           (ri.simge ? ri.simge + ' ' : '') + ri.ad + '</span></p>' +
         '<div class="alb-workshop">' +
-          '<p class="alb-workshop-note">🐢 Usta Kabuk atölyesinde bu dostun oyuncağını üretebilir.</p>' +
-          '<p class="alb-cost">Maliyet: <b>' + cost + ' 🐚</b> · Cüzdanın: <b>' + wallet + ' 🐚</b></p>';
+          '<p class="alb-workshop-note">' + ic('shell', '🐚') +
+            '<span><b>Usta Kabuk</b> atölyesinde bu dostun oyuncağını üretebilir.</span></p>' +
+          '<p class="alb-cost">' +
+            '<span class="alb-cost-item">Maliyet <b>' + cost + '</b>' + ic('shell', '🐚') + '</span>' +
+            '<span class="alb-cost-item">Cüzdanın <b>' + wallet + '</b>' + ic('shell', '🐚') + '</span>' +
+          '</p>';
     if (gizliLocked) {
-      body += '<p class="alb-locked">🔒 Usta Kabuk fısıldar: “Önce 30 dostu yuvaya getir…” (' +
+      body += '<p class="alb-locked">Usta Kabuk fısıldar: “Önce 30 dostu yuvaya getir…” (' +
                 ownedCount() + '/30)</p>';
     } else {
       body += '<button class="btn btn-primary alb-craft-btn" id="alb-craft-btn"' + (enough ? '' : ' disabled') + '>' +
-                '🐢 Usta Kabuk\'a Ürettir</button>';
-      if (!enough) body += '<p class="alb-locked">🐚 Kabuk yetersiz — kopyalar Kabuk kazandırır!</p>';
+                ic('shell', '🐢') + 'Usta Kabuk\'a Ürettir</button>';
+      if (!enough) body += '<p class="alb-locked">Kabuk yetersiz — kopyalar Kabuk kazandırır!</p>';
     }
     body += '</div></div>';
 
@@ -244,10 +297,10 @@
       if (box) {
         box.innerHTML =
           '<div class="alb-craft-anim center">' +
-            '<div class="alb-craft-spark" aria-hidden="true">✨</div>' +
+            '<div class="alb-craft-spark" aria-hidden="true">' + sparkSVG() + '</div>' +
             '<div class="alb-modal-art rf rf-' + p.rarity + ' alb-pop">' + toyArt(p) + '</div>' +
             '<h3 class="alb-modal-name">' + p.ad + '</h3>' +
-            '<p class="alb-workshop-note">Albüme işlendi! 📔</p>' +
+            '<p class="alb-workshop-note">' + ic('album', '📔') + '<span>Albüme işlendi!</span></p>' +
           '</div>';
       }
       later(function () {

@@ -193,7 +193,7 @@
   z-index: 3;
   pointer-events: none;
   background: radial-gradient(circle at 50% 38%,
-    rgba(255, 244, 200, .95) 0%, rgba(255, 211, 77, .45) 42%, transparent 78%);
+    rgba(255, 244, 200, .95) 0%, rgba(255, 199, 52, .45) 42%, transparent 78%);
   animation: big-glow 1.9s ease forwards;
 }
 @keyframes big-glow {
@@ -212,12 +212,14 @@
   max-width: 88%;
   text-align: center;
   font-size: 19px;
-  font-weight: bold;
+  font-family: var(--font-display);
+  font-weight: 700;
   color: var(--ink);
-  background: rgba(255, 255, 255, .78);
+  background: var(--card);
+  border: 2.5px solid var(--line);
   border-radius: 999px;
   padding: 10px 20px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--halo-sm), var(--shadow);
   pointer-events: none;
 }
 .cere-hint:empty { display: none; }
@@ -240,6 +242,8 @@
   width: 150px;
   height: 150px;
   border-radius: 50%;
+  border: 2.5px solid var(--line);
+  box-shadow: var(--halo-sm);
   background: var(--bg2);
   padding: 12px;
   display: flex;
@@ -277,6 +281,8 @@
 .cere-noegg-box .btn { width: 100%; }
 
 /* ========================= BİRLEŞTİRME ========================= */
+/* Atölye masası (BRAND §5): sıcak ahşap-krem zemin + %4–5 benek dokusu.
+   Ortam sanatı .asm-bg (Yuvo.art.env.tableWood) — yoksa gradyan tek başına yeter. */
 
 .asm-stage {
   position: relative;
@@ -288,10 +294,29 @@
   justify-content: space-between;
   gap: 8px;
   padding: calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  background:
+    radial-gradient(rgba(122, 74, 32, .05) 1.5px, transparent 1.5px) 0 0 / 26px 26px,
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 62%, #FFE0AC 100%);
   touch-action: none;
 }
-.asm-title { font-size: 20px; text-align: center; padding: 0 76px; }
+.asm-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.asm-bg svg { width: 100%; height: 100%; }
+.asm-title, .asm-board, .asm-hint, .asm-shelf { position: relative; z-index: 1; }
+
+/* Başlık: sticker hap; sağda 64px Atla düğmesine çarpmasın diye margin-right */
+.asm-title {
+  align-self: flex-start;
+  margin-right: 92px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 21px;
+  color: var(--ink);
+  background: var(--card);
+  border: 2.5px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 18px;
+  box-shadow: var(--halo-sm), 0 3px 0 rgba(62, 42, 28, .16), var(--shadow);
+}
 
 /* Takılan çocuk için görünür çıkış: köşede Atla düğmesi */
 .asm-skip {
@@ -303,6 +328,7 @@
   padding: 10px 16px;
   font-size: 16px;
 }
+.asm-skip svg { width: 22px; height: 22px; }
 
 /* Hedef silüet tahtası */
 .asm-board {
@@ -314,9 +340,10 @@
 }
 .asm-slot {
   position: absolute;
-  border: 3px dashed rgba(74, 59, 42, .28);
-  border-radius: 26px;
-  background: rgba(255, 255, 255, .35);
+  border: 3px dashed rgba(62, 42, 28, .32);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, .55);
+  box-shadow: inset 0 3px 9px rgba(122, 74, 32, .16), 0 0 0 4px rgba(255, 255, 255, .45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -327,20 +354,23 @@
 .asm-slot-govde    { width: 48%; aspect-ratio: 1; top: 34%; left: 50%; transform: translateX(-50%); }
 .asm-slot-aksesuar { width: 32%; aspect-ratio: 1; bottom: 0; right: 4%; }
 
-/* Silüet hayaleti — ince parçalar krem zeminde de seçilsin diye .4 opaklık */
+/* Silüet hayaleti — zarif, krem zeminde yine seçilir */
 .slot-ghost { width: 100%; height: 100%; }
-.slot-ghost svg { width: 100%; height: 100%; filter: brightness(0) opacity(.4); }
+.slot-ghost svg { width: 100%; height: 100%; filter: brightness(0) opacity(.32); }
 
-/* Mıknatıs yaklaşınca parıltı */
+/* Mıknatıs yaklaşınca parıltı — marka renkleri (--sun/--accent ailesi) */
 .asm-slot.near {
   border-color: var(--accent);
-  background: rgba(255, 211, 77, .3);
-  box-shadow: 0 0 18px rgba(255, 138, 92, .65);
+  border-style: solid;
+  background: rgba(255, 199, 52, .3);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, .85), 0 0 22px rgba(255, 199, 52, .8),
+    inset 0 0 12px rgba(255, 169, 77, .5);
 }
 .asm-slot.filled {
   border-color: transparent;
   border-style: solid;
   background: transparent;
+  box-shadow: none;
 }
 .slot-fill { width: 100%; height: 100%; animation: fill-pop .3s ease; }
 .slot-fill svg { width: 100%; height: 100%; }
@@ -350,43 +380,55 @@
   100% { transform: scale(1); }
 }
 
-/* Oturma parıltısı */
+/* Oturma parıltısı — JS'ten sparkSVG() basılır (emoji yok) */
 .asm-spark {
   position: absolute;
   left: 50%;
   top: 50%;
+  width: 64px;
+  height: 64px;
   transform: translate(-50%, -50%);
   font-style: normal;
   pointer-events: none;
   animation: spark-pop .6s ease forwards;
 }
-.asm-spark::before { content: '✨'; font-size: 42px; }
+.asm-spark svg { width: 100%; height: 100%; }
 @keyframes spark-pop {
   0%   { transform: translate(-50%, -50%) scale(.3); opacity: 0; }
   35%  { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
 }
 
+/* Yönerge: sticker hap */
 .asm-hint {
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 15px;
-  font-weight: bold;
-  color: var(--ink-soft);
+  color: var(--ink);
   text-align: center;
+  background: var(--card);
+  border: 2.5px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 18px;
+  box-shadow: var(--halo-sm), var(--shadow);
 }
 
-/* Alt raf */
+/* Alt raf: beyaz sticker şerit (BRAND §5) */
 .asm-shelf {
   display: flex;
   gap: 14px;
   justify-content: center;
   align-items: flex-end;
   width: 100%;
-  min-height: 116px;
+  min-height: 118px;
   padding: 10px;
-  background: rgba(255, 255, 255, .55);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF6E6 100%);
+  border: 2.5px solid var(--line);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--halo-sm), 0 4px 0 rgba(62, 42, 28, .16), var(--shadow-lift);
 }
+
+/* Parça: sticker çip (kontur + beyaz hale + vinil kenar); 92px ≥ 64px hedef */
 .asm-piece {
   width: 92px;
   height: 92px;
@@ -394,18 +436,24 @@
   touch-action: none;
   cursor: grab;
   position: relative;
-  padding: 4px;
-  background: rgba(255, 255, 255, .9);   /* tutamaç plakası: minik parça da kutu gibi tutulur */
-  border: 3px dashed rgba(74, 59, 42, .22);
-  border-radius: 18px;
-  filter: drop-shadow(0 4px 6px rgba(74, 59, 42, .2));
+  padding: 6px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF1DB 100%);
+  border: 2.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .9), 0 3px 0 rgba(62, 42, 28, .16),
+    0 6px 10px rgba(122, 74, 32, .16);
 }
 .asm-piece svg { width: 100%; height: 100%; pointer-events: none; }
-.asm-piece.dragging { z-index: 30; cursor: grabbing; filter: drop-shadow(0 10px 14px rgba(74, 59, 42, .3)); }
+.asm-piece.dragging {
+  z-index: 30;
+  cursor: grabbing;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .9), 0 6px 0 rgba(62, 42, 28, .14),
+    0 12px 18px rgba(122, 74, 32, .3);
+}
 .asm-piece.returning { transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
 .asm-piece.placed { opacity: 0; pointer-events: none; }
 
-/* Bitiş: oyuncak + sevinç dansı */
+/* Bitiş: güneş ışıması + konfeti + oyuncak + sevinç dansı */
 .asm-done {
   position: absolute;
   inset: 0;
@@ -416,20 +464,58 @@
   gap: 14px;
   animation: pop-in .3s ease;
 }
-.asm-toy { width: min(50vw, 200px); animation: fill-pop .5s ease; }
+.asm-done::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 42%, rgba(255, 221, 102, .55), transparent 70%);
+  animation: asm-glow 1.6s ease-in-out infinite alternate;
+}
+@keyframes asm-glow {
+  from { opacity: .55; }
+  to   { opacity: 1; }
+}
+.asm-confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.asm-confetti i {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1.5px solid rgba(62, 42, 28, .35);
+  transform: translate(-50%, -50%);
+  animation: asm-confetti-fly 1.2s cubic-bezier(.16, .84, .44, 1) both;
+}
+@keyframes asm-confetti-fly {
+  0%   { transform: translate(-50%, -50%) scale(.6) rotate(0deg); opacity: 1; }
+  70%  { opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px) + 60px)) rotate(var(--rot, 180deg));
+    opacity: 0;
+  }
+}
+.asm-toy { position: relative; z-index: 1; width: min(50vw, 200px); animation: fill-pop .5s ease; }
 .asm-toy svg { width: 100%; height: auto; }
-.asm-dance { width: min(38vw, 150px); animation: joy-dance .55s ease-in-out infinite alternate; }
+.asm-dance { position: relative; z-index: 1; width: min(38vw, 150px); animation: joy-dance .55s ease-in-out infinite alternate; }
 .asm-dance svg { width: 100%; height: auto; }
 @keyframes joy-dance {
   from { transform: translateY(0) rotate(-7deg); }
   to   { transform: translateY(-16px) rotate(7deg); }
 }
 .asm-banner {
-  font-size: 24px;
-  font-weight: bold;
-  background: var(--card);
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--ink);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF3DF 100%);
+  border: 2.5px solid var(--line);
   border-radius: 999px;
   padding: 12px 26px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--halo-sm), 0 4px 0 rgba(62, 42, 28, .18), var(--shadow-lift);
   animation: pop-in .4s ease .2s both;
 }
+.asm-banner svg { width: 26px; height: 26px; vertical-align: -5px; display: inline-block; }

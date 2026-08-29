@@ -19,6 +19,8 @@ const IGNORE = [
   /AudioContext/i,
   /autoplay/i,
   /user gesture/i,
+  /Failed to load resource/i, // ağ-kısıtlı headless ortamda Google Fonts istekleri (route ile abort ediliyor)
+  /fonts\.g(oogleapis|static)/i,
 ];
 
 const errors = [];
@@ -44,6 +46,9 @@ try {
     hasTouch: true,
   });
   const page = await context.newPage();
+
+  // Headless ortamda dış font isteklerini kes (fonksiyonel akışı etkilemez; fallback yığını devrede)
+  await page.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
 
   page.on('console', (msg) => {
     if (msg.type() === 'error') noteError('console', msg.text());

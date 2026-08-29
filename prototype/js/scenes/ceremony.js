@@ -292,7 +292,7 @@
       ? '<span class="cere-badge cere-badge-new">Yeni! ✨</span>'
       : '<span class="cere-badge cere-badge-copy">+' + (result.kabukGained || 0) + ' 🐚</span>';
     var btn = result.isNew
-      ? '<button class="btn btn-primary" id="cere-next">Oyuncağını Birleştir! 🧸</button>'
+      ? '<button class="btn btn-primary" id="cere-next">Oyuncağını Birleştir!</button>'
       : '<button class="btn btn-primary" id="cere-next">Devam ▶</button>';
 
     if (fxEl) {

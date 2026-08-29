@@ -12,7 +12,14 @@ Tasarım kaynakları: `docs/06` (tören §2, birleştirme §3), `docs/v2/02` (or
 listesi, Kabuk), `docs/v2/04` (FTUE duygusu), `docs/10` (görsel dil).
 
 Teknik kurallar:
-- Saf vanilla JS + CSS + inline SVG. **Hiçbir dış kaynak yok** (CDN, görsel, font — CSP nedeniyle).
+- Saf vanilla JS + CSS + inline SVG. **Dış kaynak istisnası yalnızca Google Fonts** (Baloo 2 +
+  Nunito; fonts.googleapis.com/fonts.gstatic.com artifact CSP allowlist'inde — index.html'de
+  bağlı, build script https link'leri aynen geçirir, tam fallback yığını zorunlu). Onun dışında
+  hiçbir dış kaynak yok (CDN görsel/ses yasak).
+- Marka katmanı (v2): `BRAND.md` bağlayıcı marka kitabıdır; `js/ui-icons.js` (Yuvo.icons — logo +
+  ikon seti, marka-lideri), `js/art/pufi-kinds-1..3.js` (karakter kayıtları, ressamlar) ve
+  `js/art/env.js` (çevre sanatı) script sırasına eklenmiştir (data → pufi-svg → kinds-1..3 →
+  env → ui-icons → audio → engine → sahneler → main).
 - ES module YOK. Her dosya IIFE: `(function(){ ... })();` ve `window.Yuvo` altına takılır.
 - Tüm UI metinleri Türkçe. Emoji ikon serbest.
 - Tüm etkileşimler **pointer event** ile; her jestin dokunma-dışı fallback'i olmalı
