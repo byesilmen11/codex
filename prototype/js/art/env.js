@@ -12,10 +12,10 @@
    ÜRETİCİLER (viewBox / preserveAspectRatio / kullanım):
 
    sky()        0 0 360 240 / xMidYMax slice
-     Gök bandı: dikey #8AD9F7->#CFF0FE gradyan, ufukta #FFE9A8 gün doğumu
-     ışıması, sağda ışın taçlı güneş (#FFC734/#F2A400). ALT kenara
-     çapalıdır (YMax): dar-yüksek kutuda üstten kırpılır; kritik içerik
-     (ufuk + güneş, y>=44) alt bantta durur. Öneri: sahnenin üst yarısı,
+     Gök bandı: dikey #8AD9F7->#CFF0FE gradyan + ufukta #FFE9A8 gün doğumu
+     ışıması. ALT kenara çapalıdır (YMax): dar-yüksek kutuda üstten
+     kırpılır. Güneş meadow() katmanındadır (dar ekranda kenar kırpması
+     güneşi yarım bırakmasın diye). Öneri: sahnenin üst yarısı,
      position:absolute; top:0; left:0; width:100%; height:~45%.
 
    clouds()     0 0 360 120 / xMidYMin slice
@@ -25,10 +25,12 @@
      sky() üzerine AYRI katman olarak, üst kenara hizalı basılır.
 
    meadow()     0 0 360 200 / xMidYMax slice
-     3 katman yuvarlak tepe (#A5E36B / #8ED94F / #55B944) + seeded çiçek
-     (#FF8FB0/beyaz taç, #FFC734 merkez) ve çim serpme + beyaz benekler.
-     Ekranın alt bandı: position:absolute; left:0; right:0; bottom:0;
-     height:~42%. Kritik içerik alt yarıda (YMax güvenli).
+     Ufukta ışın halkalı gün doğumu güneşi (#FFC734/#F2A400, cx 190 —
+     dar ekran bandında daima kadraj içinde; tepeler önüne biner, güneş
+     tepelerin ARKASINDAN yükselir) + 3 katman yuvarlak tepe (#A5E36B /
+     #8ED94F / #55B944) + seeded çiçek (#FF8FB0/beyaz taç, #FFC734
+     merkez) ve çim serpme + beyaz benekler. Ekranın alt bandı:
+     position:absolute; left:0; right:0; bottom:0; height:~42-46%.
 
    rays(renk)   0 0 240 240 / xMidYMid slice
      Tören huzmeleri: 12 huzme (uzun/kısa dönüşümlü), merkezden dışa
@@ -73,9 +75,9 @@
      height:28-32px önerilir.
 
    RENK KAYNAĞI: yalnız BRAND.md §1 + §5 hexleri; yeni ton türetilmez.
-   Çevre kontur mürekkebi DAİMA #3E2A1C (--line); pufi-svg'nin #4A3653
-   INK'i karaktere özeldir, burada KULLANILMAZ. Id alanları: "ye-" bu
-   dosyanın, "yv-" pufi-svg'nin, "yi-" ui-icons'undur.
+   Kontur mürekkebi DAİMA #3E2A1C (--line) — pufi-svg/ritual-svg de artık
+   aynı mürekkebi kullanır (BRAND §1.1 tek mürekkep kuralı). Id alanları:
+   "ye-" bu dosyanın, "yv-" pufi-svg'nin, "yi-" ui-icons'undur.
    ===================================================================== */
 (function () {
   window.Yuvo = window.Yuvo || { data: {}, art: {}, audio: {}, engine: {}, scenes: {}, test: {} };
@@ -155,28 +157,20 @@
            stops(list) + '</radialGradient>';
   }
 
-  /* ---------- sky: gök bandı + gün doğumu ışıması + ışın taçlı güneş ---------- */
+  /* ---------- sky: gök bandı + gün doğumu ışıması ----------
+     NOT: Güneş artık meadow() katmanındadır — dar ekranda "slice" kırpması
+     kenardaki güneşi yarım bırakıyordu; gün doğumu güneşi tepelerin
+     arkasından, daima kadraj içinde yükselir (BRAND §5). ---------- */
 
   function sky () {
     var u = uid('sky');
-    var gSky = u + '-g', gHz = u + '-h', gSun = u + '-s', ray = u + '-r';
-    var SX = 264, SY = 100;
+    var gSky = u + '-g', gHz = u + '-h';
     var defs =
       lin(gSky, [[0, '#8AD9F7'], [1, '#CFF0FE']], 0, 0, 0, 1) +
-      rad(gHz, [[0, '#FFE9A8', 0.9], [1, '#FFE9A8', 0]], 0.5, 0.5, 0.5) +
-      rad(gSun, [[0, '#FFC734'], [0.68, '#FFC734'], [1, '#F2A400']], 0.38, 0.32, 0.95) +
-      E('rect', { id: ray, x: -4, y: -56, width: 8, height: 20, rx: 4, fill: '#FFC734', opacity: 0.85 });
-    var i, beams = '';
-    for (i = 0; i < 10; i++) beams += use(ray, 'rotate(' + (i * 36) + ')');
+      rad(gHz, [[0, '#FFE9A8', 0.9], [1, '#FFE9A8', 0]], 0.5, 0.5, 0.5);
     var s =
       E('rect', { x: 0, y: 0, width: 360, height: 240, fill: 'url(#' + gSky + ')' }) +
-      E('ellipse', { cx: 180, cy: 236, rx: 240, ry: 80, fill: 'url(#' + gHz + ')' }) +
-      E('circle', { cx: SX, cy: SY, r: 46, fill: '#FFE9A8', opacity: 0.35 }) +
-      E('g', { transform: 'translate(' + SX + ' ' + SY + ')' }, beams) +
-      E('circle', { cx: SX, cy: SY, r: 30, fill: 'url(#' + gSun + ')' }) +
-      E('circle', { cx: SX, cy: SY, r: 25, fill: 'none', stroke: '#FFF9EC', 'stroke-width': 2, opacity: 0.45 }) +
-      E('ellipse', { cx: SX - 10, cy: SY - 12, rx: 8, ry: 4.6, fill: '#FFFFFF', opacity: 0.75,
-        transform: 'rotate(-18 ' + (SX - 10) + ' ' + (SY - 12) + ')' });
+      E('ellipse', { cx: 180, cy: 236, rx: 240, ry: 80, fill: 'url(#' + gHz + ')' });
     return wrap('0 0 360 240', 'xMidYMax slice', defs, s);
   }
 
@@ -201,7 +195,11 @@
 
   function meadow () {
     var u = uid('meadow'), p = u + '-p', f = u + '-f', g = u + '-g';
+    var gSun = u + '-s', ray = u + '-r';
     var defs =
+      rad(gSun, [[0, '#FFE79A'], [0.6, '#FFC734'], [1, '#F2A400']], 0.38, 0.32, 0.95) +
+      E('rect', { id: ray, x: -3.4, y: -46, width: 6.8, height: 15, rx: 3.4,
+        fill: '#FFC734', opacity: 0.8 }) +
       E('ellipse', { id: p, cx: 0, cy: -6, rx: 3.1, ry: 5.4, stroke: LINE, 'stroke-width': 1 }) +
       E('g', { id: f },
         E('path', { d: 'M0 14 Q-1.4 7 0 2', stroke: '#55B944', 'stroke-width': 2.4,
@@ -212,11 +210,21 @@
         E('circle', { cx: 0, cy: 0, r: 3, fill: '#FFC734', stroke: LINE, 'stroke-width': 1 })) +
       E('path', { id: g, d: 'M0 0 Q-1.6 -8 -5.4 -11 M0 0 Q0.4 -9 1.4 -13 M0 0 Q2.4 -7 6.2 -10',
         stroke: '#55B944', 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' });
+    // Gün doğumu güneşi (BRAND §5: ışın halkalı --sun): tepelerin ARKASINDAN
+    // yükselir; cx 190 dar ekran "slice" bandında da daima kadraj içindedir.
+    var i, beams = '';
+    for (i = 0; i < 10; i++) beams += use(ray, 'rotate(' + (i * 36) + ')');
     var s =
+      E('circle', { cx: 190, cy: 50, r: 38, fill: '#FFE9A8', opacity: 0.5 }) +
+      E('g', { transform: 'translate(190 50)' }, beams) +
+      E('circle', { cx: 190, cy: 50, r: 27, fill: 'url(#' + gSun + ')' }) +
+      E('circle', { cx: 190, cy: 50, r: 22, fill: 'none', stroke: '#FFF9EC', 'stroke-width': 2, opacity: 0.5 }) +
+      E('ellipse', { cx: 181, cy: 40, rx: 7, ry: 4, fill: '#FFFFFF', opacity: 0.7,
+        transform: 'rotate(-18 181 40)' }) +
       E('path', { d: 'M0 84 Q48 44 118 60 Q168 71 216 56 Q272 39 322 58 Q344 66 360 62 L360 200 L0 200 Z', fill: '#A5E36B' }) +
       E('path', { d: 'M0 126 Q56 92 136 106 Q206 118 262 102 Q316 88 360 104 L360 200 L0 200 Z', fill: '#8ED94F' }) +
       E('path', { d: 'M0 172 Q72 140 172 154 Q272 168 360 146 L360 200 L0 200 Z', fill: '#55B944' });
-    var rnd = seeded(hash('yuvo-meadow')), i, x, y, sc;
+    var rnd = seeded(hash('yuvo-meadow')), x, y, sc;
     for (i = 0; i < 7; i++) {
       x = N(18 + i * 47 + rnd() * 22);
       y = N(112 + rnd() * 64);

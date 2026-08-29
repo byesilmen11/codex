@@ -17,6 +17,16 @@
   var TIERS = ['yaygin', 'azbulunur', 'nadir', 'destansi', 'efsanevi', 'gizli'];
   var RANK = { yaygin:0, azbulunur:1, nadir:2, destansi:3, efsanevi:4, gizli:5 };
 
+  // Altın Folyo sabitleri (data/wrappers.js; veri yoksa güvenli varsayılanlar) — docs/v2/06 §2.f.
+  function ritualConst () {
+    var r = (Yuvo.data && Yuvo.data.RITUAL) || {};
+    return {
+      GOLDEN_ORAN: (typeof r.GOLDEN_ORAN === 'number') ? r.GOLDEN_ORAN : 0.02,
+      GOLDEN_HARD: (typeof r.GOLDEN_HARD === 'number') ? r.GOLDEN_HARD : 40
+    };
+  }
+  var forceGoldenNext = false;              // test kancası: sıradaki açılış kesin altın
+
   // ---------- RNG: mulberry32, tohum state'te kalıcı ----------
   function rand () {
     var s = Yuvo.engine.state;
@@ -104,11 +114,25 @@
   }
 
   // ---------- YUMURTA AÇ ----------
-  Yuvo.engine.openEgg = function () {
+  // openEgg(eggIdx): vitrindeki (state.todayEggs) yumurtayı açar — docs/v2/06 §5.3.
+  // eggIdx yalnız ambalaj görselini seçer, havuzu/oranı DEĞİŞTİRMEZ (proto tek aile;
+  // çok-biyomlu oyunda kaynakBiyom olur). Nadirlik burada, açılış anında çekilir (§1.3).
+  Yuvo.engine.openEgg = function (eggIdx) {
     var s = Yuvo.engine.state;
     if (!s || s.eggsAvailable <= 0) return { error:'no-egg' };
+    var vitrin = Array.isArray(s.todayEggs) ? s.todayEggs : (s.todayEggs = []);
+    var idx = (eggIdx === undefined || eggIdx === null) ? 0 : (eggIdx | 0);
+    if (idx < 0) return { error:'no-egg' };
+    var alinan = vitrin.splice(idx, 1);
+    if (!alinan.length) {
+      // vitrinde o yumurta yok — hayalet sayaç kendini onarır (elle bozulmuş
+      // state'te HUD bir sonraki load()'a dek var olmayan yumurta göstermesin)
+      s.eggsAvailable = vitrin.length;
+      return { error:'no-egg' };
+    }
+    var egg = alinan[0];
 
-    s.eggsAvailable -= 1;
+    s.eggsAvailable = vitrin.length;        // ZORUNLU senkron (main.js HUD / home okur)
     s.eggCounter += 1;
 
     var zorlaEksik = (s.eggCounter <= ONBOARDING) || (s.copyStreak >= KOPYA_SERI_ESIGI);
@@ -156,14 +180,35 @@
     s.pityD = (r >= RANK.destansi) ? 0 : s.pityD + 1;
     s.pityE = (r >= RANK.efsanevi) ? 0 : s.pityE + 1;
 
+    // ---- Altın Folyo (§2.f) — tören katmanı: çekiliş matematiğinden tamamen bağımsız ----
+    var G = ritualConst();
+    s.goldenPity += 1;
+    var golden = false;
+    if (forceGoldenNext || rand() < G.GOLDEN_ORAN || s.goldenPity >= G.GOLDEN_HARD) {
+      golden = true;
+      s.goldenPity = 0;
+      forceGoldenNext = false;
+    }
+    egg.golden = golden;
+
+    // Folyo Ambalaj Defteri'ne işlenir (saf kozmetik; commit'i aşağıdaki save yapar)
+    var seri = egg.seri || 'gunesbahcesi';
+    var variant = egg.variant | 0;
+    if (Yuvo.engine.registerFoil) Yuvo.engine.registerFoil(seri, variant, golden);
+
     Yuvo.engine.save();
     if (Yuvo.refresh) { try { Yuvo.refresh(); } catch (e) {} }
 
     var celebrationTier = (r >= RANK.efsanevi) ? 3 : (rarity === 'destansi') ? 2 : (rarity === 'nadir') ? 1 : 0;
-    return { pufi:pufi, rarity:rarity, isNew:isNew, kabukGained:kabukGained, celebrationTier:celebrationTier };
+    return {
+      pufi:pufi, rarity:rarity, isNew:isNew, kabukGained:kabukGained, celebrationTier:celebrationTier,
+      wrapper:{ seri:seri, variant:variant, golden:golden },  // tören görselleri buradan beslenir
+      chocolate:1                                             // her ambalajlı yumurtadan 1 çikolata
+    };
   };
 
-  // Test kancası (motor kısmı)
+  // Test kancaları (motor kısmı)
   Yuvo.test = Yuvo.test || {};
   Yuvo.test.openEggRaw = function () { return Yuvo.engine.openEgg(); };
+  Yuvo.test.forceGoldenNext = function () { forceGoldenNext = true; };
 })();

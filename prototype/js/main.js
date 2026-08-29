@@ -87,6 +87,7 @@
   var NAV = [
     { id:'home', icon:'yuva', emoji:'🏡', ad:'Yuva' },
     { id:'album', icon:'album', emoji:'📔', ad:'Albüm' },
+    { id:'foilbook', icon:'shell', emoji:'📔', ad:'Defter' },
     { id:'minigame', icon:'oyna', emoji:'🎮', ad:'Oyna' }
   ];
   function renderNav () {

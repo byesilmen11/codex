@@ -16,7 +16,8 @@
       - Uzuvlar kısa ve tıknaz; boyun yok (kafa gövdeye oturur).
 
    3) KONTUR (tek renk, yumuşak koyu)
-      - Renk: INK '#4A3653' (sıcak patlıcan-moru). Siyah YASAK.
+      - Renk: INK '#3E2A1C' (BRAND §1.1 --line sıcak kahve — tüm sticker
+        konturlarıyla TEK mürekkep; kabuk UI ile aynı). Siyah YASAK.
       - Kalınlık: dış formlarda LW=3.5, iç detayda LW2=2.4.
       - stroke-linejoin/linecap daima 'round'.
       - Primitifler (ball/blob/caps/drop/leaf/path) konturu otomatik basar;
@@ -67,8 +68,8 @@
   var Y = window.Yuvo;
   Y.art = Y.art || {};
 
-  var INK   = '#4A3653';   // tek kontur rengi (sıcak patlıcan moru)
-  var SIL   = '#4B3B60';   // silüet dolgusu
+  var INK   = '#3E2A1C';   // tek kontur rengi (BRAND --line sıcak kahve)
+  var SIL   = '#4A2E1D';   // silüet dolgusu (BRAND --ink)
   var CHEEK = '#FFA4B8';   // yanak pembesi
   var LW    = 3.5;         // dış kontur
   var LW2   = 2.4;         // iç detay konturu

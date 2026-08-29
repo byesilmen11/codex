@@ -254,12 +254,15 @@
 .cere-name { font-size: 26px; }
 .cere-tags { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
 .cere-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 13px;
   font-weight: bold;
 }
+.cere-badge .ys-ico { width: 16px; height: 16px; }
 .cere-badge-new { background: var(--sun); color: var(--ink); }
 .cere-badge-copy { background: var(--bg2); color: var(--ink); }
 .cere-bio { color: var(--ink-soft); font-size: 15px; line-height: 1.45; }
@@ -519,3 +522,302 @@
   animation: pop-in .4s ease .2s both;
 }
 .asm-banner svg { width: 26px; height: 26px; vertical-align: -5px; display: inline-block; }
+
+/* ================== GERÇEK YUMURTA RİTÜELİ (docs/v2/06) ==================
+   Aşama makinesi katmanları: folyo şeritleri, altın ışık, çikolata, kapsül,
+   defter uçuşu. BRAND §3 sticker reçetesi: kontur + beyaz hale + şeker-vinil
+   dolgu + vinil kenar + bası hissi. Dokunma hedefleri ≥ 64px. */
+
+/* Sahne ışığı (BRAND §5 Tören): merkezde sıcak radyal parlama + kenarlarda
+   hafif vinyet — düz gradyan "boş sayfa" hissi yasak. Tier aurası ayrıca
+   #rit-glow katmanından nadirlik rengiyle beslenir (JS). */
+.rit-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 44%,
+      rgba(255, 233, 168, .75) 0%, rgba(255, 233, 168, .3) 30%, rgba(255, 233, 168, 0) 62%),
+    radial-gradient(140% 120% at 50% 46%,
+      rgba(122, 74, 32, 0) 60%, rgba(122, 74, 32, .1) 88%, rgba(122, 74, 32, .16) 100%);
+}
+
+/* Ritüel sahnesinde nesne dokunulabilir (eski törenin pointer-events:none kuralı kalkar);
+   dairesel "ovala" eli folyoda anlamsız — gizlenir (jest: şerit çekme + kulakçık) */
+.rit-stage .cere-egg-wrap { pointer-events: auto; }
+.rit-stage .cere-egg-wrap .cere-hand { display: none; }
+.rit-obj { cursor: pointer; }
+.rit-obj svg { width: 100%; height: auto; display: block; }
+
+/* Işık katmanı: altın folyo / nadirlik aurası (arka plan JS'ten boyanır) */
+.rit-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+.rit-glow.show { opacity: 1; animation: rit-breathe 1.6s ease-in-out infinite alternate; }
+@keyframes rit-breathe {
+  from { opacity: .7; }
+  to   { opacity: 1; }
+}
+.rit-flash-gold {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, #FFF7DF 0%, rgba(255, 199, 52, .75) 40%, transparent 72%);
+  animation: flash-out .9s ease forwards;
+}
+
+/* Folyo kulakçığı — sticker buton, ≥64px hedef, perforasyon üst kenar */
+.rit-tab {
+  position: relative;
+  z-index: 5;
+  margin-top: 12px;
+  min-width: 118px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--ink);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF1DB 100%);
+  border: 2.5px solid var(--line);
+  border-top-style: dashed;
+  border-radius: 18px 18px 999px 999px;
+  box-shadow: var(--halo-sm), 0 4px 0 rgba(62, 42, 28, .18), var(--shadow);
+  cursor: pointer;
+  animation: rit-tab-wiggle 1.6s ease-in-out infinite;
+}
+.rit-tab:active { transform: translateY(3px); box-shadow: var(--halo-sm), 0 1px 0 rgba(62, 42, 28, .18), var(--shadow); }
+.rit-tab[hidden] { display: none; }
+.rit-tab svg { width: 26px; height: 26px; }
+@keyframes rit-tab-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  30%      { transform: rotate(-3deg) translateY(2px); }
+  60%      { transform: rotate(3deg); }
+}
+
+/* Düşen folyo parçaları — CSS fizik: yay eğrisi + dönerek süzülme; itince hışırdar */
+.rit-scraps { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.rit-scrap {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 74px;
+  pointer-events: auto;
+  cursor: pointer;
+  filter: drop-shadow(0 5px 6px rgba(74, 59, 42, .28));
+  animation: rit-scrap-fall 1.5s cubic-bezier(.25, .7, .35, 1) both;
+}
+.rit-scrap svg { width: 100%; height: auto; }
+@keyframes rit-scrap-fall {
+  0%   { transform: translate(-50%, -50%) rotate(0deg) scale(.8); opacity: 0; }
+  12%  { opacity: 1; }
+  55%  { transform: translate(calc(-50% + var(--mx, 44px)), 6dvh) rotate(var(--mr, 50deg)) scale(1); }
+  100% { transform: translate(calc(-50% + var(--dx, 90px)), 32dvh) rotate(var(--rot, 140deg)) scale(1); }
+}
+.rit-scrap.nudge svg { animation: rit-scrap-nudge .45s ease; }
+@keyframes rit-scrap-nudge {
+  0%   { transform: none; }
+  40%  { transform: translateX(9px) rotate(9deg); }
+  100% { transform: none; }
+}
+
+/* Çikolata aşaması: iki büyük buton (Filiz modu) — hedef ≥ 64px */
+.rit-actions {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  gap: 14px;
+  margin-top: 14px;
+  justify-content: center;
+}
+.rit-actions:empty { display: none; }
+.rit-actions .rit-btn { min-height: 64px; min-width: 132px; font-size: 21px; justify-content: center; }
+
+/* Kumbaraya uçuş (çikolata bütün hâlde kavanoza) */
+.cere-egg-wrap.to-jar { animation: rit-to-jar .7s cubic-bezier(.5, -.2, .7, 1) forwards; }
+@keyframes rit-to-jar {
+  30%  { transform: translateY(-30px) scale(.92) rotate(-6deg); opacity: 1; }
+  100% { transform: translate(-36vw, -32dvh) scale(.22) rotate(-22deg); opacity: .15; }
+}
+
+/* Yıldız kazanım baloncuğu (glif Yuvo.icons.star — emoji yok) */
+.rit-star-float {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  left: 58%;
+  top: 32%;
+  z-index: 6;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 19px;
+  color: var(--ink);
+  background: var(--card);
+  border: 2.5px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 14px;
+  box-shadow: var(--halo-sm), var(--shadow);
+  animation: rit-float-up 1s ease both;
+}
+@keyframes rit-float-up {
+  from { transform: translateY(10px) scale(.8); opacity: 0; }
+  25%  { opacity: 1; }
+  to   { transform: translateY(-48px) scale(1); opacity: 0; }
+}
+
+/* Kapsül jest geri bildirimleri */
+.cere-egg-wrap.twist-wobble { animation: rit-twist .45s ease-in-out infinite; }
+@keyframes rit-twist {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(4deg); }
+}
+.cere-egg-wrap.hold-shake { animation: egg-shake .3s linear infinite; }
+.cere-egg-wrap.thrown { animation: rit-throw .55s cubic-bezier(.3, .7, .4, 1.2) forwards; }
+@keyframes rit-throw {
+  0%   { transform: none; }
+  45%  { transform: translateY(-30dvh) scale(.9) rotate(10deg); }
+  100% { transform: translateY(0) scale(1.05); }
+}
+.cere-egg-wrap.opened { animation: rit-open-pop .5s ease; }
+@keyframes rit-open-pop {
+  0%   { transform: scale(.94); }
+  55%  { transform: scale(1.12); }
+  100% { transform: none; }
+}
+/* Alt yarım yuva çanağı olur: karşılaşmada küçülüp aşağı iner (çöp değil, sevgi nesnesi) */
+.cere-egg-wrap.nest-cup {
+  transition: transform .6s cubic-bezier(.22, 1, .36, 1);
+  transform: translateY(16dvh) scale(.55);
+}
+
+/* Sihirli dokunuş ışığı (ölçek/opaklık JS ilerlemesiyle) */
+.rit-magic {
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 247, 214, .95) 0%, rgba(255, 199, 52, .55) 45%, transparent 72%);
+  transform: scale(.2);
+  opacity: 0;
+  transition: transform .12s linear, opacity .12s linear;
+}
+
+/* Kiki'nin nazik freni — tek satır sticker hap ("Bunu kaçırma!") */
+.rit-kiki {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+  max-width: 86%;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--ink);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFE9F0 100%);
+  border: 2.5px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 18px;
+  box-shadow: var(--halo-sm), 0 3px 0 rgba(62, 42, 28, .16), var(--shadow);
+  animation: pop-in .3s ease;
+}
+.rit-kiki[hidden] { display: none; }
+
+/* Ambalaj Defteri hedefi + koda uçuşu */
+.rit-book {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top));
+  right: 14px;
+  z-index: 6;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF6E6 100%);
+  border: 2.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--halo-sm), 0 3px 0 rgba(62, 42, 28, .16), var(--shadow);
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+}
+.rit-book.show { opacity: 1; }
+.rit-book.slap { animation: rit-slap .45s ease; }
+@keyframes rit-slap {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.28) rotate(-6deg); }
+  100% { transform: none; }
+}
+.rit-book svg { width: 34px; height: 34px; }
+.rit-book .ico-fallback { font-size: 30px; line-height: 1; }
+
+.rit-stamp {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 88px;
+  z-index: 8;
+  pointer-events: none;
+  animation: rit-stamp-fly 1.25s cubic-bezier(.45, .05, .55, .95) forwards;
+}
+.rit-stamp svg { width: 100%; height: auto; filter: drop-shadow(0 6px 8px rgba(74, 59, 42, .3)); }
+@keyframes rit-stamp-fly {
+  0%   { transform: translate(-50%, -50%) scale(1.05) rotate(-5deg); opacity: 0; }
+  16%  { opacity: 1; transform: translate(-50%, -58%) scale(1.12) rotate(4deg); }
+  100% { transform: translate(calc(-50% + var(--tx, 120px)), calc(-50% + var(--ty, -240px))) scale(.42) rotate(8deg); opacity: 1; }
+}
+
+/* Kopya karşılaşması: Pufi el sallar, parça Kabuk rozetine dönüşür (boş katman hissi yasak) */
+.cere-pufi.rit-wave { animation: pufi-bounce .7s cubic-bezier(.34, 1.56, .64, 1) both, rit-wave-tilt .5s ease-in-out .7s 2 alternate; }
+@keyframes rit-wave-tilt {
+  from { transform: rotate(-5deg); }
+  to   { transform: rotate(6deg) translateY(-6px); }
+}
+.rit-shell-fly {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  left: 50%;
+  top: 34%;
+  transform: translateX(-50%);
+  z-index: 6;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 21px;
+  color: var(--ink);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF1DB 100%);
+  border: 2.5px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 18px;
+  box-shadow: var(--halo-sm), 0 3px 0 rgba(62, 42, 28, .16), var(--shadow);
+  animation: rit-shell-rise 1.2s ease .35s both;
+}
+.rit-shell-fly .ys-ico { width: 22px; height: 22px; }
+@keyframes rit-shell-rise {
+  from { transform: translateX(-50%) translateY(18px) scale(.7); opacity: 0; }
+  30%  { opacity: 1; }
+  to   { transform: translateX(-50%) translateY(-34px) scale(1); opacity: 1; }
+}
+
+/* Altın folyo rozeti (sonuç kartında) — nadirlikten bağımsız statü çipi */
+.cere-badge-gold {
+  background: linear-gradient(180deg, #FFE9A8 0%, var(--sun) 100%);
+  color: var(--ink);
+  border: 2px solid var(--line);
+}

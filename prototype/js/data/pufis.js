@@ -20,7 +20,7 @@
   // id/kind eşlemesi ARCHITECTURE.md'de sabit.
   Yuvo.data.PUFIS = [
     // Yaygın (12)
-    { id:'cikcik',   ad:'Cikcik',   tur:'Civciv',               kind:'civciv',        rarity:'yaygin',    bio:'Horoz çırağı; güneşten önce ötmeye çalışır, hep esner' },
+    { id:'cikcik',   ad:'Cikcik',   tur:'Civciv',               kind:'civciv',        rarity:'yaygin',    bio:'Horoz çırağı. Güneşten önce ötmeye çalışır, hep esner.' },
     { id:'pamus',    ad:'Pamuş',    tur:'Kuzu',                 kind:'kuzu',          rarity:'yaygin',    bio:'Bulutları koyun sanıp gökyüzüne "mee" der' },
     { id:'vizbiz',   ad:'Vızbız',   tur:'Bal arıcığı',          kind:'ari',           rarity:'yaygin',    bio:'Bütün çiçeklerin adresini bilir, kendi kovanını unutur' },
     { id:'molu',     ad:'Mölü',     tur:'Buzağı',               kind:'buzagi',        rarity:'yaygin',    bio:'Papatya koklamayı sever; her seferinde hapşırır' },
@@ -43,19 +43,19 @@
     { id:'findik',   ad:'Fındık',   tur:'Çoban köpeği yavrusu', kind:'kopek',         rarity:'azbulunur', bio:'Kuzular yerine kelebekleri güder' },
     { id:'kirinti',  ad:'Kırıntı',  tur:'Karınca',              kind:'karinca',       rarity:'azbulunur', bio:'Yüz kat büyük yük taşır; teşekkür bekler' },
     // Nadir (6)
-    { id:'petek',    ad:'Petek',    tur:'Arı kraliçesi',        kind:'arikralice',    rarity:'nadir',     bio:'Baldan tacı güneşte parlar; Vızbız\'ın tek hatırladığı adres' },
-    { id:'ibik',     ad:'İbik',     tur:'Horoz',                kind:'horoz',         rarity:'nadir',     bio:'Sesini sezonda bir kez tam ayarında bulur; o gün bayramdır' },
+    { id:'petek',    ad:'Petek',    tur:'Arı kraliçesi',        kind:'arikralice',    rarity:'nadir',     bio:'Baldan tacı güneşte parlar. Vızbız\'ın tek hatırladığı adres!' },
+    { id:'ibik',     ad:'İbik',     tur:'Horoz',                kind:'horoz',         rarity:'nadir',     bio:'Sesini sezonda bir kez tam ayarında bulur. O gün bayramdır!' },
     { id:'yele',     ad:'Yele',     tur:'Midilli',              kind:'midilli',       rarity:'nadir',     bio:'Koşarken yelesinden altın toz savrulur' },
     { id:'makas',    ad:'Makas',    tur:'Kırlangıç',            kind:'kirlangic',     rarity:'nadir',     bio:'Kuyruğuyla bulutları ikiye böler' },
     { id:'tavus',    ad:'Tavus',    tur:'Tavuskuşu',            kind:'tavuskusu',     rarity:'nadir',     bio:'Kuyruğunu yalnızca içten bir iltifat duyunca açar' },
     { id:'ipekce',   ad:'İpekçe',   tur:'İpek örümceği',        kind:'orumcek',       rarity:'nadir',     bio:'Çayıra sabah çiyinden dantel örer' },
     // Destansı (2)
-    { id:'bogac',    ad:'Boğaç',    tur:'Güneş buzağısı',       kind:'gunesbuzagisi', rarity:'destansi',  bio:'Boynuzları gün doğumu ışığı saçar; kışın çayırı o ısıtır' },
-    { id:'safak',    ad:'Şafak',    tur:'Altın tarlakuşu',      kind:'tarlakusu',     rarity:'destansi',  bio:'Sabahı onun şarkısı getirir; geç kalkarsa sis basar' },
+    { id:'bogac',    ad:'Boğaç',    tur:'Güneş buzağısı',       kind:'gunesbuzagisi', rarity:'destansi',  bio:'Boynuzları gün doğumu ışığı saçar. Kışın çayırı o ısıtır.' },
+    { id:'safak',    ad:'Şafak',    tur:'Altın tarlakuşu',      kind:'tarlakusu',     rarity:'destansi',  bio:'Sabahı onun şarkısı getirir. Geç kalkarsa sis basar!' },
     // Efsanevi (1)
-    { id:'gundogan', ad:'Gündoğan', tur:'Güneş kuşu',           kind:'guneskusu',     rarity:'efsanevi',  bio:'Kanat çırpınca altın polen yağar; adanın ilk sabahının şarkısını hatırlayan tek Pufi' },
+    { id:'gundogan', ad:'Gündoğan', tur:'Güneş kuşu',           kind:'guneskusu',     rarity:'efsanevi',  bio:'Kanat çırpınca altın polen yağar. Adanın ilk sabahının şarkısını hatırlayan tek Pufi!' },
     // Gizli (1)
-    { id:'hisir',    ad:'Hışır',    tur:'Korkuluk Pufisi',      kind:'korkuluk',      rarity:'gizli',     bio:'Herkes onu cansız sanır; ay ışığında tek başına dans eder' }
+    { id:'hisir',    ad:'Hışır',    tur:'Korkuluk Pufisi',      kind:'korkuluk',      rarity:'gizli',     bio:'Herkes onu cansız sanır. Ay ışığında tek başına dans eder!' }
   ];
 
   // Yardımcı: id → Pufi kaydı (bulunamazsa null).

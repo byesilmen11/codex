@@ -307,11 +307,11 @@
         try { close(); } catch (e) {}
         render();
       }, 1700);
-      toast('🎉 ' + p.ad + ' aileye katıldı!');
+      toast(p.ad + ' aileye katıldı!');
     } else {
       var reason = r && r.reason;
-      if (reason === 'kabuk-yetersiz') toast('🐚 Kabuk yetersiz — kopyalar Kabuk kazandırır!');
-      else if (reason === 'gizli-kilitli') toast('🔒 Önce 30 dostu yuvaya getirmelisin.');
+      if (reason === 'kabuk-yetersiz') toast('Kabuk yetersiz — kopyalar Kabuk kazandırır!');
+      else if (reason === 'gizli-kilitli') toast('Önce 30 dostu yuvaya getirmelisin.');
       else if (reason === 'sahipli') toast('Bu dost zaten albümde!');
       else toast('Atölye şu an çalışmıyor.');
     }

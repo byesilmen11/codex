@@ -98,7 +98,9 @@ Bundan dört bağlayıcı kural çıkar:
 **Genel atlama grameri (tüm aşamalarda aynı):** tek dokunuş = mevcut aşamayı anında tamamla;
 çift dokunuş = sonraki aşamaya geç (prototipteki mevcut kuralın devamı). Hiçbir aşama kilitli
 bekletmez; Destansı+ açılışlarda Kiki tek satırlık nazik fren koyar ("Bunu kaçırma!") ama atlama
-yine mümkündür.
+yine mümkündür. *Tek istisna — çekiç yöntemi (§2.d #2): jestin kendisi tap olduğundan bu aşamada
+her dokunuş ritim vuruşu sayılır ("kaçırmak imkânsız" ilkesi tek-tap-tamamla kuralına baskındır);
+çift dokunuş = anında POP atlaması her yöntemde aynen geçerli kalır.*
 
 ### 2.a Vitrin / Seçim — "Postan geldi!"
 
