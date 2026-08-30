@@ -1,0 +1,140 @@
+{
+  "_meta": {
+    "uretici": "tools/export-content.mjs",
+    "not": "ELLE DÜZENLEMEYİN — kaynak prototip JS dosyalarıdır; `node tools/export-content.mjs` yeniden üretir."
+  },
+  "packs": [
+    {
+      "id": "tekli",
+      "ad": "Çıtlat Bakalım",
+      "adet": 1,
+      "tl": 9.99,
+      "usd": 0.49,
+      "garanti": "Standart oranlar",
+      "garantiKisa": "—",
+      "persona": "\"Bir kere deneyelim\" — dürtü alt sınırı, merdivenin çapası"
+    },
+    {
+      "id": "cep",
+      "ad": "Cep Sepeti",
+      "adet": 5,
+      "tl": 24.99,
+      "usd": 0.99,
+      "garanti": "En az 1 Az Bulunur",
+      "garantiKisa": "1 Az Bulunur",
+      "persona": "Haftalık harçlık — küçük ödül anı"
+    },
+    {
+      "id": "haftalik",
+      "ad": "Haftalık Sepet",
+      "adet": 10,
+      "tl": 39.99,
+      "usd": 1.99,
+      "garanti": "En az 1 Nadir + kopya koruması",
+      "garantiKisa": "1 Nadir",
+      "persona": "\"Her cumartesi\" ritüeli",
+      "populer": true
+    },
+    {
+      "id": "kesif",
+      "ad": "Keşif Kolisi",
+      "adet": 25,
+      "tl": 79.99,
+      "usd": 3.99,
+      "garanti": "En az 3 Nadir",
+      "garantiKisa": "3 Nadir",
+      "persona": "Karne / ara ödül"
+    },
+    {
+      "id": "kasa",
+      "ad": "Koleksiyoncu Kasası",
+      "adet": 50,
+      "tl": 129.99,
+      "usd": 5.99,
+      "garanti": "En az 1 Destansı + 5 Nadir",
+      "garantiKisa": "1 Destansı",
+      "persona": "Doğum günü hediyesi"
+    },
+    {
+      "id": "kumbara",
+      "ad": "Sezon Kumbarası",
+      "adet": 100,
+      "tl": 199.99,
+      "usd": 8.99,
+      "garanti": "1 seçmeli parça + 2 Destansı + 10 Nadir",
+      "garantiKisa": "Seçmeli parça",
+      "persona": "Bayram / büyük hediye"
+    },
+    {
+      "id": "hosgeldin",
+      "ad": "Hoş Geldin Sepeti",
+      "adet": 5,
+      "tl": 14.99,
+      "usd": 0.69,
+      "garanti": "En az 1 Nadir",
+      "garantiKisa": "1 Nadir",
+      "persona": "Tek seferlik başlangıç — acele ettirmez, süresi yok",
+      "tekSeferlik": true
+    }
+  ],
+  "club": {
+    "ad": "Yuvo Club",
+    "fiyat": 79.99,
+    "bonusYuzde": 10,
+    "gunlukYumurta": 1,
+    "kilerEk": 1,
+    "ozet": "Her pakette +%10 bonus yumurta · günde 1 Club yumurtası · kilerden +1 açma hakkı"
+  },
+  "odds": [
+    {
+      "ad": "Yaygın",
+      "oran": "%55",
+      "garanti": "—"
+    },
+    {
+      "ad": "Az Bulunur",
+      "oran": "%25",
+      "garanti": "5'li ve üzeri: en az 1"
+    },
+    {
+      "ad": "Nadir",
+      "oran": "%14",
+      "garanti": "10'lu ve üzeri: en az 1"
+    },
+    {
+      "ad": "Destansı",
+      "oran": "%4,6",
+      "garanti": "50'li ve üzeri: en az 1"
+    },
+    {
+      "ad": "Efsanevi",
+      "oran": "%0,9 + kötü şans koruması",
+      "garanti": "Vaat olarak SATILMAZ",
+      "satilmaz": true
+    },
+    {
+      "ad": "Gizli Pufi",
+      "oran": "%0,5",
+      "garanti": "Hiçbir pakette garanti yok — saf sürpriz"
+    }
+  ],
+  "oddsNotlar": [
+    "Kopya koruması: aynı parçanın tekrar gelme olasılığı her kopyada düşer.",
+    "Kötü şans koruması: 15 yumurtada Nadir çıkmazsa 16.'da garantidir.",
+    "Efsanevi vaat olarak satılmaz — hiçbir pakette Efsanevi garantisi veya seçimi yoktur; her yumurta (kazanılmış ya da satın alınmış) aynı oranı ve aynı kötü şans korumasını taşır."
+  ],
+  "storeLimits": {
+    "varsayilanAylik": 400,
+    "secenekler": [
+      0,
+      100,
+      400,
+      750,
+      1500
+    ],
+    "yumusakOnayEsigi": 750,
+    "sogumaSaat": 24,
+    "kilerGunluk": 5
+  },
+  "demoUyari": "DEMO — gerçek ödeme alınmaz"
+}

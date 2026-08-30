@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "uretici": "tools/export-content.mjs",
+    "not": "ELLE DÜZENLEMEYİN — kaynak prototip JS dosyalarıdır; `node tools/export-content.mjs` yeniden üretir."
+  },
+  "dialog": {
+    "anlatici": {
+      "giris": [
+        "Ovalya’nın renkleri uyuyor.",
+        "Onları yalnızca sen uyandırabilirsin, Yumurta Bekçisi."
+      ]
+    },
+    "kiki": {
+      "ad": "Kiki",
+      "albumHediye": [
+        "Bu senin albümün! Her sayfa bir aile.",
+        "Bak — ilk kartın yerine yapıştı bile. Kalanlar da seni bekliyor!"
+      ],
+      "karsilama": [
+        "Tamam tamam tamam — bugün üç işimiz var: yumurta, yumurta ve… dur, listeme bakayım… YUMURTA!",
+        "Çayır dedi ki — yani demedi de, çayırlar konuşmaz ama konuşsaydı KESİN derdi ki — bugün harika görünüyorsun!"
+      ],
+      "sakoIpucu": [
+        "Şako mu? Yaramazdır, evet. Ama bak, tüy bırakmış. İz bırakıyorsa, bulunmak istiyordur."
+      ],
+      "ormanAcilis": [
+        "Sisli kapı açıldı! Fısıltı Ormanı’nda yepyeni bir aile yaşıyormuş — hadi bakalım!"
+      ],
+      "gunSonu": [
+        "Bugünlük bu kadar! Yarını söylersem sürpriz olmaz ki. Sadece şunu diyeyim: erken gel!"
+      ]
+    },
+    "luna": {
+      "ad": "Luna",
+      "ninni": [
+        "Şşş… duydun mu? Yumurtalar da rüya görür.",
+        "Albümünü kapat, gözlerini de. Renkler bu gece senin rüyanda dinlensin. Yarın… çıt."
+      ],
+      "teselli": [
+        "Gece grilik daha koyu görünür, biliyorum. Ama yıldızları gündüz göremezsin."
+      ]
+    },
+    "ustakabuk": {
+      "ad": "Usta Kabuk",
+      "sabir": [
+        "Acele eden yumurta… yok öyle bir şey. Yumurtalar acele etmez. Biz de etmeyelim.",
+        "Kopyalar çöp değildir, küçük bekçi. Sabrın kabuğudur onlar."
+      ]
+    },
+    "sako": {
+      "ad": "Şako",
+      "saklambac": [
+        "Parlak şeyler parlak olanlara gider. Kural bu. Kuralı ben koydum.",
+        "Fena değilsin… bir bekçiye göre. Yarın aynı saatte? Yani — istersen. Bana ne."
+      ],
+      "kaybetti": [
+        "Buldun demek. Şans. Kesinlikle şans. …Bir daha oynayalım mı?"
+      ]
+    },
+    "pufiSelam": [
+      "Merhaba!",
+      "Cik cik!",
+      "Bugün ne güzel!",
+      "Beraber oynayalım mı?",
+      "Seni görünce sevindim!",
+      "Hihi, gıdıklandım!"
+    ]
+  }
+}

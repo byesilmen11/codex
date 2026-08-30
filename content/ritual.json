@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "uretici": "tools/export-content.mjs",
+    "not": "ELLE DÜZENLEMEYİN — kaynak prototip JS dosyalarıdır; `node tools/export-content.mjs` yeniden üretir."
+  },
+  "ritual": {
+    "GOLDEN_ORAN": 0.02,
+    "GOLDEN_HARD": 40,
+    "KUMBARA_ESIK": 15,
+    "KUMBARA_GUNLUK": 1,
+    "ISIRIK": 4,
+    "ISIRIK_YILDIZ": 2,
+    "CIKOLATA_YILDIZ_TAVAN": 40,
+    "SERIT": 3,
+    "HIZLI_SERIT": 1
+  },
+  "engine": {
+    "dailyEggs": 3,
+    "eggStackMax": 9,
+    "streakGoal": 7,
+    "streakKabuk": 25,
+    "gorevAcHedef": 3,
+    "gorevOyunHedef": 1,
+    "extraEggCost": 120,
+    "extraEggMax": 2,
+    "milestones": [
+      {
+        "at": 10,
+        "key": "m10",
+        "kabuk": 15
+      },
+      {
+        "at": 20,
+        "key": "m20",
+        "kabuk": 30
+      },
+      {
+        "at": 27,
+        "key": "m27",
+        "kabuk": 60
+      },
+      {
+        "at": 30,
+        "key": "m30",
+        "kabuk": 100
+      }
+    ]
+  },
+  "gacha": {
+    "softPityE": 35,
+    "softArtis": 0.06,
+    "hardPityE": 50,
+    "pityDestansi": 40,
+    "pityNadir": 15,
+    "onboarding": 10,
+    "kopyaSeriEsigi": 6,
+    "wEksik": 4,
+    "wEksikSon3": 12
+  },
+  "ceremony": {
+    "hushMs": 420,
+    "celebrationMsByTier": [
+      900,
+      1300,
+      2200,
+      2600
+    ]
+  }
+}

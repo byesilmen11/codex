@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "uretici": "tools/export-content.mjs",
+    "not": "ELLE DÜZENLEMEYİN — kaynak prototip JS dosyalarıdır; `node tools/export-content.mjs` yeniden üretir."
+  },
+  "rarities": {
+    "yaygin": {
+      "ad": "Yaygın",
+      "renk": "#9AA5B1",
+      "simge": "●",
+      "kabuk": 1,
+      "uretim": 5,
+      "oran": 0.55
+    },
+    "azbulunur": {
+      "ad": "Az Bulunur",
+      "renk": "#58B368",
+      "simge": "▲",
+      "kabuk": 2,
+      "uretim": 10,
+      "oran": 0.25
+    },
+    "nadir": {
+      "ad": "Nadir",
+      "renk": "#4FB8D8",
+      "simge": "◆",
+      "kabuk": 4,
+      "uretim": 25,
+      "oran": 0.14
+    },
+    "destansi": {
+      "ad": "Destansı",
+      "renk": "#B266E8",
+      "simge": "★",
+      "kabuk": 10,
+      "uretim": 80,
+      "oran": 0.046
+    },
+    "efsanevi": {
+      "ad": "Efsanevi",
+      "renk": "#F2A61B",
+      "simge": "✹",
+      "kabuk": 25,
+      "uretim": 200,
+      "oran": 0.009
+    },
+    "gizli": {
+      "ad": "Gizli",
+      "renk": "#5C4A9E",
+      "simge": "☾",
+      "kabuk": 60,
+      "uretim": 300,
+      "oran": 0.005
+    }
+  }
+}

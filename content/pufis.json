@@ -1,0 +1,566 @@
+{
+  "_meta": {
+    "uretici": "tools/export-content.mjs",
+    "not": "ELLE DÜZENLEMEYİN — kaynak prototip JS dosyalarıdır; `node tools/export-content.mjs` yeniden üretir."
+  },
+  "pufis": [
+    {
+      "id": "cikcik",
+      "ad": "Cikcik",
+      "tur": "Civciv",
+      "kind": "civciv",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Horoz çırağı. Güneşten önce ötmeye çalışır, hep esner."
+    },
+    {
+      "id": "pamus",
+      "ad": "Pamuş",
+      "tur": "Kuzu",
+      "kind": "kuzu",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Bulutları koyun sanıp gökyüzüne \"mee\" der"
+    },
+    {
+      "id": "vizbiz",
+      "ad": "Vızbız",
+      "tur": "Bal arıcığı",
+      "kind": "ari",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Bütün çiçeklerin adresini bilir, kendi kovanını unutur"
+    },
+    {
+      "id": "molu",
+      "ad": "Mölü",
+      "tur": "Buzağı",
+      "kind": "buzagi",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Papatya koklamayı sever; her seferinde hapşırır"
+    },
+    {
+      "id": "gidak",
+      "ad": "Gıdak",
+      "tur": "Tavukçuk",
+      "kind": "tavuk",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Sürpriz yumurta görünce heyecandan gıdaklar"
+    },
+    {
+      "id": "badi",
+      "ad": "Badi",
+      "tur": "Ördek yavrusu",
+      "kind": "ordek",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Sıra olmayı hep şaşırır, hep en önde biter"
+    },
+    {
+      "id": "hophop",
+      "ad": "Hophop",
+      "tur": "Çekirge",
+      "kind": "cekirge",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Zıplayışlarını sayar, hep \"üç\"te kaybolur"
+    },
+    {
+      "id": "fistik",
+      "ad": "Fıstık",
+      "tur": "Yer sincabı",
+      "kind": "sincap",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Yanaklarında tohum saklar; yerini asla hatırlamaz"
+    },
+    {
+      "id": "boncuk",
+      "ad": "Boncuk",
+      "tur": "Uğur böceği",
+      "kind": "ugurbocegi",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Sırtındaki puanları sayarken uyuyakalır"
+    },
+    {
+      "id": "kivrik",
+      "ad": "Kıvrık",
+      "tur": "Solucancık",
+      "kind": "solucan",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Toprak altı tünellerin haritasını çizer"
+    },
+    {
+      "id": "toprik",
+      "ad": "Toprik",
+      "tur": "Tarla faresi",
+      "kind": "fare",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Hasat şarkıları mırıldanır"
+    },
+    {
+      "id": "cigdem",
+      "ad": "Çiğdem",
+      "tur": "Çayır çiçeği perisi",
+      "kind": "peri",
+      "rarity": "yaygin",
+      "biome": "cayir",
+      "bio": "Sabah çiyinden kendine minicik taçlar yapar"
+    },
+    {
+      "id": "pirpir",
+      "ad": "Pırpır",
+      "tur": "Kelebek",
+      "kind": "kelebek",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Her sabah kanat desenini değiştirir; ikisi asla eş olmaz"
+    },
+    {
+      "id": "zipzip",
+      "ad": "Zıpzıp",
+      "tur": "Yavru tavşan",
+      "kind": "tavsan",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Havuç değil çilek delisi; kimseye söylemeyin"
+    },
+    {
+      "id": "civil",
+      "ad": "Cıvıl",
+      "tur": "Serçe",
+      "kind": "serce",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Her melodiyi ezberler — hep yanlış"
+    },
+    {
+      "id": "evcik",
+      "ad": "Evcik",
+      "tur": "Salyangoz",
+      "kind": "salyangoz",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Kabuğunu misafire açar, papatya çayı ikram eder"
+    },
+    {
+      "id": "dikenik",
+      "ad": "Dikenik",
+      "tur": "Kirpi",
+      "kind": "kirpi",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Sarılmayı çok ister; herkes uzaktan sarılır"
+    },
+    {
+      "id": "kosti",
+      "ad": "Kösti",
+      "tur": "Köstebek",
+      "kind": "kostebek",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Gözlüğünü toprakta unutur, yine de yolu bulur"
+    },
+    {
+      "id": "meke",
+      "ad": "Meke",
+      "tur": "Oğlak",
+      "kind": "oglak",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Kafa tokuşturmayı selamlaşma sanır"
+    },
+    {
+      "id": "findik",
+      "ad": "Fındık",
+      "tur": "Çoban köpeği yavrusu",
+      "kind": "kopek",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Kuzular yerine kelebekleri güder"
+    },
+    {
+      "id": "kirinti",
+      "ad": "Kırıntı",
+      "tur": "Karınca",
+      "kind": "karinca",
+      "rarity": "azbulunur",
+      "biome": "cayir",
+      "bio": "Yüz kat büyük yük taşır; teşekkür bekler"
+    },
+    {
+      "id": "petek",
+      "ad": "Petek",
+      "tur": "Arı kraliçesi",
+      "kind": "arikralice",
+      "rarity": "nadir",
+      "biome": "cayir",
+      "bio": "Baldan tacı güneşte parlar. Vızbız'ın tek hatırladığı adres!"
+    },
+    {
+      "id": "ibik",
+      "ad": "İbik",
+      "tur": "Horoz",
+      "kind": "horoz",
+      "rarity": "nadir",
+      "biome": "cayir",
+      "bio": "Sesini sezonda bir kez tam ayarında bulur. O gün bayramdır!"
+    },
+    {
+      "id": "yele",
+      "ad": "Yele",
+      "tur": "Midilli",
+      "kind": "midilli",
+      "rarity": "nadir",
+      "biome": "cayir",
+      "bio": "Koşarken yelesinden altın toz savrulur"
+    },
+    {
+      "id": "makas",
+      "ad": "Makas",
+      "tur": "Kırlangıç",
+      "kind": "kirlangic",
+      "rarity": "nadir",
+      "biome": "cayir",
+      "bio": "Kuyruğuyla bulutları ikiye böler"
+    },
+    {
+      "id": "tavus",
+      "ad": "Tavus",
+      "tur": "Tavuskuşu",
+      "kind": "tavuskusu",
+      "rarity": "nadir",
+      "biome": "cayir",
+      "bio": "Kuyruğunu yalnızca içten bir iltifat duyunca açar"
+    },
+    {
+      "id": "ipekce",
+      "ad": "İpekçe",
+      "tur": "İpek örümceği",
+      "kind": "orumcek",
+      "rarity": "nadir",
+      "biome": "cayir",
+      "bio": "Çayıra sabah çiyinden dantel örer"
+    },
+    {
+      "id": "bogac",
+      "ad": "Boğaç",
+      "tur": "Güneş buzağısı",
+      "kind": "gunesbuzagisi",
+      "rarity": "destansi",
+      "biome": "cayir",
+      "bio": "Boynuzları gün doğumu ışığı saçar. Kışın çayırı o ısıtır."
+    },
+    {
+      "id": "safak",
+      "ad": "Şafak",
+      "tur": "Altın tarlakuşu",
+      "kind": "tarlakusu",
+      "rarity": "destansi",
+      "biome": "cayir",
+      "bio": "Sabahı onun şarkısı getirir. Geç kalkarsa sis basar!"
+    },
+    {
+      "id": "gundogan",
+      "ad": "Gündoğan",
+      "tur": "Güneş kuşu",
+      "kind": "guneskusu",
+      "rarity": "efsanevi",
+      "biome": "cayir",
+      "bio": "Kanat çırpınca altın polen yağar. Adanın ilk sabahının şarkısını hatırlayan tek Pufi!"
+    },
+    {
+      "id": "hisir",
+      "ad": "Hışır",
+      "tur": "Korkuluk Pufisi",
+      "kind": "korkuluk",
+      "rarity": "gizli",
+      "biome": "cayir",
+      "bio": "Herkes onu cansız sanır. Ay ışığında tek başına dans eder!"
+    },
+    {
+      "id": "tostos",
+      "ad": "Tostoş",
+      "tur": "Yavru ayı",
+      "kind": "ayicik",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Bal kavanozunu kokusundan bulur; kapağını bir türlü açamaz"
+    },
+    {
+      "id": "mantus",
+      "ad": "Mantuş",
+      "tur": "Mantar cini",
+      "kind": "mantarcin",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Şapkası yağmurda büyür; onu gururla taşır"
+    },
+    {
+      "id": "tikirti",
+      "ad": "Tıkırtı",
+      "tur": "Ağaçkakan yavrusu",
+      "kind": "agackakan",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Ağaçlara tık tık selam verir; cevap bekler"
+    },
+    {
+      "id": "yosun",
+      "ad": "Yosun",
+      "tur": "Yosun topu",
+      "kind": "yosuntopu",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Yuvarlanarak gezer; durduğu yerde uyuyakalır"
+    },
+    {
+      "id": "purtuk",
+      "ad": "Pürtük",
+      "tur": "Kozalak pufisi",
+      "kind": "kozalak",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Cebinde çam fıstığı biriktirir; hepsi hep dökülür"
+    },
+    {
+      "id": "benek",
+      "ad": "Benek",
+      "tur": "Geyik yavrusu",
+      "kind": "geyikyavru",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Beneklerini yıldız sanır; her gece tek tek sayar"
+    },
+    {
+      "id": "fisfis",
+      "ad": "Fısfıs",
+      "tur": "Fısıltı böceği",
+      "kind": "fisiltibocegi",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Kanatları fısıltı sesi çıkarır; bütün sırlar ona emanet"
+    },
+    {
+      "id": "zuzu",
+      "ad": "Zuzu",
+      "tur": "Yusufçuk",
+      "kind": "yusufcuk",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Cam kanatlarında bütün orman yansır"
+    },
+    {
+      "id": "pitpit",
+      "ad": "Pıtpıt",
+      "tur": "Kurbağacık",
+      "kind": "kurbaga",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Yağmur damlalarıyla ritim tutar"
+    },
+    {
+      "id": "kestane",
+      "ad": "Kestane",
+      "tur": "Kestane kirpisi",
+      "kind": "kestanepufi",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Dikenli kabuğunu yatak yapar; kimse inanmaz"
+    },
+    {
+      "id": "cizgi",
+      "ad": "Çizgi",
+      "tur": "Burunduk",
+      "kind": "burunduk",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Yanağında üç fındık, aklında dört uyku"
+    },
+    {
+      "id": "mismis",
+      "ad": "Mışmış",
+      "tur": "Uyur fare",
+      "kind": "uyurfare",
+      "rarity": "yaygin",
+      "biome": "orman",
+      "bio": "Her mevsimi kış sanır; esneyerek selam verir"
+    },
+    {
+      "id": "puhu",
+      "ad": "Puhu",
+      "tur": "Baykuş yavrusu",
+      "kind": "baykus",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Gündüz bir türlü uyuyamaz — her şeyi merak eder"
+    },
+    {
+      "id": "kizil",
+      "ad": "Kızıl",
+      "tur": "Tilki yavrusu",
+      "kind": "tilki",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Saklambaçta kuyruğu hep ele verir"
+    },
+    {
+      "id": "pofur",
+      "ad": "Pofur",
+      "tur": "Porsuk",
+      "kind": "porsuk",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Yer altı kilerinde herkese bir raf ayırır"
+    },
+    {
+      "id": "semsi",
+      "ad": "Şemsi",
+      "tur": "Yarasa yavrusu",
+      "kind": "yarasa",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Gündüzü hiç görmedi; çok merak ediyor"
+    },
+    {
+      "id": "pufla",
+      "ad": "Pufla",
+      "tur": "Rakun yavrusu",
+      "kind": "rakun",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Her şeyi derede yıkar; şekerini de yıkadı, hâlâ üzgün"
+    },
+    {
+      "id": "cini",
+      "ad": "Cini",
+      "tur": "Ateşböceği",
+      "kind": "atesbocegi",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Fenerini kapatmayı unutur; orman ona \"harita\" der"
+    },
+    {
+      "id": "huthut",
+      "ad": "Hüthüt",
+      "tur": "İbibik kuşu",
+      "kind": "ibibik",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Tarağını kimseyle paylaşmaz ama herkesi tarar"
+    },
+    {
+      "id": "topak",
+      "ad": "Topak",
+      "tur": "Su samuru yavrusu",
+      "kind": "susamuru",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Göbeğinde çakıl koleksiyonu taşır; en parlağı sana ayırdı"
+    },
+    {
+      "id": "mirra",
+      "ad": "Mırra",
+      "tur": "Vaşak yavrusu",
+      "kind": "vasak",
+      "rarity": "azbulunur",
+      "biome": "orman",
+      "bio": "Kulak püskülleriyle (kendince) radyo çeker"
+    },
+    {
+      "id": "golge",
+      "ad": "Gölge",
+      "tur": "Gece kelebeği",
+      "kind": "gecekelebegi",
+      "rarity": "nadir",
+      "biome": "orman",
+      "bio": "Ay ışığını kanatlarında taşır; karanlık ondan korkar"
+    },
+    {
+      "id": "recine",
+      "ad": "Reçine",
+      "tur": "Kehribar böceği",
+      "kind": "kehribarbocegi",
+      "rarity": "nadir",
+      "biome": "orman",
+      "bio": "Damlayan güneş ışığını şekerleme sanıp sırtında saklar"
+    },
+    {
+      "id": "boynuz",
+      "ad": "Boynuz",
+      "tur": "Genç geyik",
+      "kind": "geyik",
+      "rarity": "nadir",
+      "biome": "orman",
+      "bio": "Boynuzlarında kuşlar mola verir; o da sabırla bekler"
+    },
+    {
+      "id": "flut",
+      "ad": "Flüt",
+      "tur": "Bülbül",
+      "kind": "bulbul",
+      "rarity": "nadir",
+      "biome": "orman",
+      "bio": "En güzel şarkısını yalnız ay dinlerken söyler"
+    },
+    {
+      "id": "sarmasik",
+      "ad": "Sarmaşık",
+      "tur": "Orman perisi",
+      "kind": "ormanperi",
+      "rarity": "nadir",
+      "biome": "orman",
+      "bio": "Saçları sarmaşıktan; her sabah taze çiçek takar"
+    },
+    {
+      "id": "puskul",
+      "ad": "Püskül",
+      "tur": "Çam samuru",
+      "kind": "camsamuru",
+      "rarity": "nadir",
+      "biome": "orman",
+      "bio": "Daldan dala uçuşunu bütün orman alkışlar"
+    },
+    {
+      "id": "mese",
+      "ad": "Meşe",
+      "tur": "Yürüyen meşe fidanı",
+      "kind": "mesecani",
+      "rarity": "destansi",
+      "biome": "orman",
+      "bio": "Kökleriyle yürür. Durduğu yerde orman büyür!"
+    },
+    {
+      "id": "simsim",
+      "ad": "Şimşim",
+      "tur": "Işıl geyiği",
+      "kind": "isilgeyik",
+      "rarity": "destansi",
+      "biome": "orman",
+      "bio": "Boynuzları gece feneridir. Kaybolan herkes yolunu onunla bulur."
+    },
+    {
+      "id": "bilge",
+      "ad": "Bilge",
+      "tur": "Orman ruhu baykuşu",
+      "kind": "bilgebaykus",
+      "rarity": "efsanevi",
+      "biome": "orman",
+      "bio": "Ormanın bütün fısıltılarını ezbere bilir. İlk tohumun düştüğü günü hatırlayan tek Pufi!"
+    },
+    {
+      "id": "kutuk",
+      "ad": "Kütük",
+      "tur": "Kütük Pufisi",
+      "kind": "kutukpufi",
+      "rarity": "gizli",
+      "biome": "orman",
+      "bio": "Herkes onu devrik bir kütük sanır. Mantarlar şapkasında parti verir!"
+    }
+  ]
+}

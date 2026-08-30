@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "uretici": "tools/export-content.mjs",
+    "not": "ELLE DÜZENLEMEYİN — kaynak prototip JS dosyalarıdır; `node tools/export-content.mjs` yeniden üretir."
+  },
+  "series": {
+    "gunesbahcesi": {
+      "ad": "Güneş Bahçesi",
+      "renk1": "#F6B93B",
+      "renk2": "#F8E3A1",
+      "desen": "papatya"
+    },
+    "masalormani": {
+      "ad": "Masal Ormanı",
+      "renk1": "#2E6B3C",
+      "renk2": "#C9A94E",
+      "desen": "yaprak"
+    },
+    "sedefdalgalar": {
+      "ad": "Sedef Dalgalar",
+      "renk1": "#4FB8D8",
+      "renk2": "#EDE7F6",
+      "desen": "dalga"
+    },
+    "yildiztozu": {
+      "ad": "Yıldız Tozu Gecesi",
+      "renk1": "#28356B",
+      "renk2": "#C7CBE8",
+      "desen": "yildiz"
+    },
+    "karisiltisi": {
+      "ad": "Kar Işıltısı",
+      "renk1": "#8FD3E8",
+      "renk2": "#FFFFFF",
+      "desen": "kristal"
+    },
+    "senlikfenerleri": {
+      "ad": "Şenlik Fenerleri",
+      "renk1": "#D9483B",
+      "renk2": "#F2C14E",
+      "desen": "fener"
+    }
+  },
+  "variants": 8,
+  "tools": {
+    "burgu": {
+      "ad": "Temel Burgu",
+      "ucretsiz": true
+    },
+    "cekic": {
+      "ad": "Tahta Çekiç",
+      "ucretsiz": true
+    },
+    "firlat": {
+      "ad": "Salla-Fırlat",
+      "ucretsiz": true
+    },
+    "sihir": {
+      "ad": "Sihirli Dokunuş",
+      "otomatik": "destansi+"
+    },
+    "sedefburgu": {
+      "ad": "Sedef Burgu",
+      "kabuk": 40
+    }
+  }
+}
