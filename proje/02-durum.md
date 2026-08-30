@@ -2,7 +2,7 @@
 
 > **Yaşayan dosya.** Her iş bloğunun sonunda güncellenir; oturuma dönünce İLK bu okunur.
 
-**Son güncelleme:** 2026-08-30 · oturum O-06 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: proje yönetim katmanı (`ecbe560`) + export-art v1
+**Son güncelleme:** 2026-08-30 · oturum O-07 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: export-audio v1 (U0 ihraç boru hatları TAMAM)
 
 ## Tek paragraf özet
 
@@ -15,13 +15,15 @@ ihraç araçlarındayız.
 
 ## Sıradaki adım (buradan devam et)
 
-➡️ **`tools/export-audio.mjs` v1** — ses ihracı kanıtı: `audio.js` SOUNDS tanımlarından
-seçili sesleri (tap/crack/pop/fanfare + 3-5 örnek pufiChirp) offline render edip WAV olarak
-`content/audio/` altına yaz + manifest + `--check` (docs/v2/07 §6). Zorluk notu: node'da
-OfflineAudioContext yok — ya `node-web-audio-api` paketi denenir ya da WebAudio grafiği
-Chromium içinde (playwright, export-art deseni) OfflineAudioContext ile render edilip WAV
-kodlanır (önerilen: Chromium yolu, yeni bağımlılık gerektirmez). Sonrası: Unity proje
-iskeleti (`/client`, v2·07 §13/1).
+➡️ **Unity LTS proje iskeleti** (v2·07 §13/1): `/client` klasörü (docs/11 §7 depo yapısı —
+açık konu 2'deki "aynı repo" önerisiyle), 4 assembly (`Yuvo.Core` UnityEngine'siz /
+`Yuvo.Data` / `Yuvo.Game` / `Yuvo.Services`), Unity Test Runner (editmode NUnit) kurulumu.
+İlk hedef: `Yuvo.Core.GachaEngine` + `GameState` C# portu + `content/golden/*.json`
+fikstürlerini okuyan `GachaEngineGoldenTests` — 5 senaryo / 3.800 vektör bire bir.
+NOT: bu ortamda Unity editor yok — iskelet + saf C# Core + testler dosya düzeyinde yazılır,
+derleme/koşum Unity kurulu makinede yapılır (kabulü orada bekler); `.meta` üretimini Unity'ye
+bırakmak için önce yalnız `Assets/`-dışı Core kütüphane + `dotnet test` ile koşan NUnit
+projesi kurmak da geçerli alternatif (öneri: ikincisi — Unity'siz doğrulanabilir).
 
 ## Ne bitti (kanıtlarıyla)
 
@@ -34,6 +36,7 @@ iskeleti (`/client`, v2·07 §13/1).
 | Unity taşıma planı | `docs/v2/07-unity-tasima-plani.md` |
 | U0: içerik ihracı + altın vektörler (`--check` CI kapılarıyla) | `tools/export-content.mjs`, `tools/export-golden-vectors.mjs`, `content/` |
 | U0: sanat ihracı v1 kanıtı — 78 PNG + manifest (Chromium render, bağımlılıksız) | `tools/export-art.mjs`, `content/art/` |
+| U0: ses ihracı v1 kanıtı — 19 WAV + manifest (OfflineAudioContext şimi, 5 benzersiz cıvıltı) | `tools/export-audio.mjs`, `content/audio/` |
 | Proje yönetim katmanı | `proje/` (bu klasör) |
 
 ## Canlı referanslar
@@ -43,7 +46,8 @@ iskeleti (`/client`, v2·07 §13/1).
 - **Test komutları:** `node tools/proto-engine-test.mjs` · `node tools/proto-smoke.mjs`
   (önce `node tools/build-proto.mjs`)
 - **İhraç güncellik kapıları:** `node tools/export-content.mjs --check` ·
-  `node tools/export-golden-vectors.mjs --check` · `node tools/export-art.mjs --check`
+  `node tools/export-golden-vectors.mjs --check` · `node tools/export-art.mjs --check` ·
+  `node tools/export-audio.mjs --check`
 - **Ekran görüntüleri:** `prototype/screenshots/01-18*.png` (duman testi her koşuda tazeler)
 
 ## Açık konular / bekleyen kararlar

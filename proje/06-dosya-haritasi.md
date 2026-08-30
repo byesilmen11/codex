@@ -94,8 +94,10 @@
 | `tools/export-content.mjs` | Prototip verisi → `content/*.json` (`--check` = CI kapısı) |
 | `tools/export-golden-vectors.mjs` | Gacha altın vektörleri → `content/golden/` (`--check`) |
 | `tools/export-art.mjs` | SVG→PNG sanat ihracı v1 (Chromium render) → `content/art/` (`--check` = manifest↔disk) |
+| `tools/export-audio.mjs` | WebAudio→WAV ses ihracı v1 (OfflineAudioContext şimi) → `content/audio/` (`--check`) |
 | `tools/economy-sim/collection_sim.py` | Monte Carlo koleksiyon simülatörü (v2·02 eğrileri) |
 | `content/*.json` | pufis / rarities / wrappers / dialogue / packs / ritual — Unity'nin okuyacağı tek kaynak |
 | `content/golden/*.json` | 5 senaryo × deterministik açılış dizileri (C# port doğrulama fikstürü) |
 | `content/art/` | Sanat ihracı: `proof/*.png` (v1 kanıt seti, 78 dosya) + `manifest.json` |
+| `content/audio/` | Ses ihracı: `proof/*.wav` (v1 kanıt seti, 19 dosya) + `manifest.json` |
 | `package.json` | Node bağımlılıkları (playwright-core vb.) |

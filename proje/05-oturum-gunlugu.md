@@ -211,3 +211,30 @@ açılışına bırakıldı (git şişmesin — `03-yapilacaklar.md` notu).
 **Doğrulama:** üretim + `--check` yeşil; 78/78 manifest tutarlı.
 **Sıradaki:** `02-durum.md` → `tools/export-audio.mjs` v1 (Chromium içinde
 OfflineAudioContext yolu önerildi).
+
+---
+
+## O-07 · 2026-08-30 · Ses İhracı v1 (U0 boru hatları tamam)
+
+**İstek:** "uygulama kapandı. devam ettiğin bir işlemin yarım kaldıysa devam et."
+
+**Yapılanlar:**
+- Durum kontrolü: çalışma ağacı temiz, dal origin ile senkron, son commit `aebe62a` —
+  yarım iş YOK (oturum ritüeli ilk gerçek kesintisinde işini yaptı). `02-durum.md`'deki
+  sıradaki adımdan devam edildi.
+- `tools/export-audio.mjs` v1: 19 WAV (çekirdek sesler + ritüel dorukları — foilTear/bite/
+  capsulePop/goldenFanfare — + shakeRattle çayır/orman + 5 örnek pufiChirp; mono 16-bit
+  44,1 kHz) + `content/audio/manifest.json` + `--check`.
+- Yöntem: `audio.js` kaynağı DEĞİŞMEDEN Chromium'da değerlendirildi; `window.AudioContext`
+  → OfflineAudioContext şimi (state/resume yamalı), her ses taze bağlamda render;
+  Math.random render başına sabit tohumlu mulberry32.
+
+**Doğrulama:** 19/19 sessiz-değil (peak eşiği); 5 cıvıltının 5'i benzersiz imza (id-hash
+çalışıyor); çift koşum: 17/19 bit-özdeş — yalnız en uzun iki graf (fanfareBig,
+goldenFanfare) son-bit kayan nokta oynaması gösterdi (peak/boyut aynı, duyulmaz) →
+araç yorumu dürüstçe güncellendi; `--check` bu yüzden manifest↔disk doğrular (yeniden
+render etmez — export-art ile aynı bilinçli karar).
+
+**Kayıt:** U0 ihraç boru hatlarının dördü de tamam (content / golden / art / audio).
+**Sıradaki:** `02-durum.md` → Unity proje iskeleti + `Yuvo.Core` C# portu (önce Unity'siz
+`dotnet test` ile koşan NUnit yolu önerildi).

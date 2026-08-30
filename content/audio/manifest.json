@@ -1,0 +1,214 @@
+{
+  "_meta": {
+    "uretici": "tools/export-audio.mjs",
+    "not": "ELLE DÜZENLEMEYİN — `node tools/export-audio.mjs` yeniden üretir. Render sabit tohumlu; baytlar Chromium sürümüne bağlı olabilir, --check manifest↔disk doğrular.",
+    "kapsam": "v1 KANIT: çekirdek + ritüel doruk sesleri + 5 örnek pufiChirp (mono 16-bit 44,1 kHz WAV). Tam kapsam: docs/v2/07 §6.",
+    "adSozlesmesi": "sfx_{sesAdi}[_varyant].wav · chirp_{pufiId}.wav — Unity ses varlığı adları bu sözleşmeyi izler; pufiChirp imzası kaynaktaki FNV-1a hash ile birebir."
+  },
+  "dosyalar": [
+    {
+      "dosya": "proof/sfx_tap.wav",
+      "ses": "tap",
+      "opts": null,
+      "sure": 0.5,
+      "ornekleme": 44100,
+      "peak": 0.055,
+      "bayt": 48556,
+      "sha256": "bba7ca4f89e94b8437908f8c3b58813c711d2c2b18ad5a53a487de54a916cba2"
+    },
+    {
+      "dosya": "proof/sfx_crack1.wav",
+      "ses": "crack1",
+      "opts": null,
+      "sure": 0.5,
+      "ornekleme": 44100,
+      "peak": 0.049,
+      "bayt": 48556,
+      "sha256": "d836923c8d65be5bdbfbe58f78bf8dae8620ef8090f9cd5f8b6bd76bb419d315"
+    },
+    {
+      "dosya": "proof/sfx_crackBig.wav",
+      "ses": "crackBig",
+      "opts": null,
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.074,
+      "bayt": 92654,
+      "sha256": "ba0aa40846a81be03b3d84d2d8ad34ca81ea03447a86f6cfa052dfcfba443050"
+    },
+    {
+      "dosya": "proof/sfx_pop.wav",
+      "ses": "pop",
+      "opts": null,
+      "sure": 0.8,
+      "ornekleme": 44100,
+      "peak": 0.093,
+      "bayt": 75016,
+      "sha256": "197b19936d27fbd0fc4234ed01eee38cffc12d559ccf5320788751972e13f950"
+    },
+    {
+      "dosya": "proof/sfx_chime.wav",
+      "ses": "chime",
+      "opts": null,
+      "sure": 1.2,
+      "ornekleme": 44100,
+      "peak": 0.075,
+      "bayt": 110294,
+      "sha256": "5c6a7b8a666451a1e3d70c3895735506881c5587271f54cd33fab4f95f0def11"
+    },
+    {
+      "dosya": "proof/sfx_star.wav",
+      "ses": "star",
+      "opts": null,
+      "sure": 0.8,
+      "ornekleme": 44100,
+      "peak": 0.055,
+      "bayt": 75016,
+      "sha256": "1bfd3eb9cab7c4b664f57af4230bdccb17cea1583fe36f888735779ed3d37c93"
+    },
+    {
+      "dosya": "proof/sfx_fanfare.wav",
+      "ses": "fanfare",
+      "opts": null,
+      "sure": 1.6,
+      "ornekleme": 44100,
+      "peak": 0.069,
+      "bayt": 145574,
+      "sha256": "2f98b3227dbf039dd2dc7e0ca6af5bb62d6eb8a052683a467cdcef1f1136e1f9"
+    },
+    {
+      "dosya": "proof/sfx_fanfareBig.wav",
+      "ses": "fanfareBig",
+      "opts": null,
+      "sure": 2.4,
+      "ornekleme": 44100,
+      "peak": 0.113,
+      "bayt": 216134,
+      "sha256": "ab4273686091392a226110a76b369edbadc20b0b39d870d2a13d99cc9f90e4ac"
+    },
+    {
+      "dosya": "proof/sfx_foilTear.wav",
+      "ses": "foilTear",
+      "opts": null,
+      "sure": 0.6,
+      "ornekleme": 44100,
+      "peak": 0.053,
+      "bayt": 57374,
+      "sha256": "a2fb105c9e1e0215afaef062d9df229ee28261e3b316bba7071561aecc467308"
+    },
+    {
+      "dosya": "proof/sfx_bite.wav",
+      "ses": "bite",
+      "opts": null,
+      "sure": 0.5,
+      "ornekleme": 44100,
+      "peak": 0.063,
+      "bayt": 48556,
+      "sha256": "8520647101a9aa76558ba4438ad06978187856daf689435244387e27df0f7f49"
+    },
+    {
+      "dosya": "proof/sfx_capsulePop.wav",
+      "ses": "capsulePop",
+      "opts": null,
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.12,
+      "bayt": 92654,
+      "sha256": "f92159380c61ce6d634771821204f65d9e3896d8c2367255432ad8b5c11e1e71"
+    },
+    {
+      "dosya": "proof/sfx_goldenFanfare.wav",
+      "ses": "goldenFanfare",
+      "opts": null,
+      "sure": 2.4,
+      "ornekleme": 44100,
+      "peak": 0.156,
+      "bayt": 216134,
+      "sha256": "b4c653ffe92e8d1d255f52eb3063283c20702ef323194689d640fba9875f2b2d"
+    },
+    {
+      "dosya": "proof/sfx_shakeRattle_cayir.wav",
+      "ses": "shakeRattle",
+      "opts": {
+        "family": "cayir"
+      },
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.026,
+      "bayt": 92654,
+      "sha256": "8a4e0ed6e722cf9133773216c0e615bd7db0f6aaff7c522b1977833541c9863f"
+    },
+    {
+      "dosya": "proof/sfx_shakeRattle_orman.wav",
+      "ses": "shakeRattle",
+      "opts": {
+        "family": "orman"
+      },
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.032,
+      "bayt": 92654,
+      "sha256": "1ea8604f4e447ae3eaaea25ccae2140d17828b7ddee9b6c01cf4eafe03871ef0"
+    },
+    {
+      "dosya": "proof/chirp_cikcik.wav",
+      "ses": "pufiChirp",
+      "opts": {
+        "id": "cikcik"
+      },
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.044,
+      "bayt": 92654,
+      "sha256": "d823cae202a5ffeb2fd4787c775fdce7c9a9ff81b8b43126abcf8834a9a51cb8"
+    },
+    {
+      "dosya": "proof/chirp_pirpir.wav",
+      "ses": "pufiChirp",
+      "opts": {
+        "id": "pirpir"
+      },
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.045,
+      "bayt": 92654,
+      "sha256": "fad98eabf7e14b6a8dd653e857f5fe126dc71c7bfb13ffe830972854758e790f"
+    },
+    {
+      "dosya": "proof/chirp_petek.wav",
+      "ses": "pufiChirp",
+      "opts": {
+        "id": "petek"
+      },
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.044,
+      "bayt": 92654,
+      "sha256": "9214a99b437073356bcb96a99a7dc27d0aa3d88aea4a80e7907474a6dae67bde"
+    },
+    {
+      "dosya": "proof/chirp_safak.wav",
+      "ses": "pufiChirp",
+      "opts": {
+        "id": "safak"
+      },
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.043,
+      "bayt": 92654,
+      "sha256": "68cc5fb1b9958c741c236ccdcd52684db11c62e1ddb2489dd9929baaf2a98f9d"
+    },
+    {
+      "dosya": "proof/chirp_gundogan.wav",
+      "ses": "pufiChirp",
+      "opts": {
+        "id": "gundogan"
+      },
+      "sure": 1,
+      "ornekleme": 44100,
+      "peak": 0.044,
+      "bayt": 92654,
+      "sha256": "c8bbc0fe901affbad3db69d7be1b140f0435251d09d4bf74c627ee145e79f892"
+    }
+  ]
+}

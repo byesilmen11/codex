@@ -11,14 +11,18 @@
 - ✅ `tools/export-golden-vectors.mjs` → `content/golden/` 5 senaryo / 3.800 vektör — commit `22d1eda`
 - ✅ `tools/export-art.mjs` v1 (kanıt) — 78 PNG (yumurta 6×crack0-3 + 5 Pufi × 3 hâl, @2x/@3x)
   + manifest + `--check`; Chromium ile render, yeni bağımlılık yok
-- 🔄 **`tools/export-audio.mjs` v1** — SOUNDS offline render kanıtı + pufiChirp örnekleri
-  (v2·07 §6) ← SIRADAKİ
+- ✅ `tools/export-audio.mjs` v1 (kanıt) — 19 WAV (çekirdek + ritüel dorukları + salla ×2 aile
+  + 5 pufiChirp; mono 16-bit 44,1 kHz) + manifest + `--check`; OfflineAudioContext şimi,
+  sabit tohumlu PRNG, bağımlılıksız
+- 🔄 **Unity LTS proje iskeleti** — `/client`, 4 assembly, CI (test + bağımlılık denetimi)
+  (v2·07 §13/1) ← SIRADAKİ
 - 🔵 `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar
   (6 seri × 8 varyant × yırtılma) + kapsül/çevre/UI/portreler. NOT: ~1.300 PNG / 15-30 MB —
   Unity projesi açılırken üretilmesi daha doğru (git şişmesin; gerekirse LFS kararı o gün)
-- ⬜ Unity LTS proje iskeleti: `/client`, 4 assembly, CI (test + bağımlılık denetimi) (v2·07 §13/1)
 - ⬜ `Yuvo.Core` C# portu: GachaEngine + GameState + SaveService; NUnit altın vektör +
   davranış asertleri (v2·07 §3, §7)
+- 🔵 `export-audio` tam kapsam: tüm SOUNDS + 62 pufiChirp (Unity açılışında, export-art tam
+  kapsamla birlikte)
 
 ## F8-F10 · Unity U1-U3 (sırada — ayrıntı v2·07 §10)
 
