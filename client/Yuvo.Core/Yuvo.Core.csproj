@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Saf C# çekirdek — UnityEngine YOK (docs/v2/07 §1 assembly düzeni).
+       netstandard2.1 = Unity 2021+ uyumu; LangVersion 9 (Unity C# 9 destekler).
+       JSON/IO BU pakette YASAK: içerik dışarıdan GameContent olarak verilir. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Yuvo.Core</RootNamespace>
+  </PropertyGroup>
+</Project>
