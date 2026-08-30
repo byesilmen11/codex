@@ -1,0 +1,7 @@
+# Yerel UPM paketi — Unity'nin ürettiği .meta dosyaları (K-20)
+#
+# Bu klasör Unity dışında da derlenir (dotnet test), o yüzden .cs dosyalarına
+# DOKUNULMAZ: onlar zaten izleniyor ve autocrlf ile çalışıyor; `-text` işaretlemek
+# mevcut çalışma kopyalarını "değişmiş" gösterirdi. Yalnız Unity'nin yazdığı
+# .meta dosyalarında dönüşüm kapatılır (Unity LF yazar, öyle kalsın).
+*.meta -text

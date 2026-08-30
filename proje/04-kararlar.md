@@ -134,6 +134,10 @@ kalır; ikili varlıklar `binary` işaretlidir. (c) Üretilen içerik (`Library/
 *Kaynak:* O-13'te `client/.gitignore`'daki blanket `*.meta` kalıbının UnityProject'in tüm
 `.meta`'larını yuttuğu, proje depoya girmeden önce yakalandı.
 
-**K-19 · süregelen · Depo/işbirliği sabitleri.** Dal: `claude/surprise-egg-collection-game-eycqiq`
-(başkasına push yok); commit mesajları Türkçe ve içerik odaklı; artifact HEP aynı URL'ye
-republish; model kimliği repo çıktılarının hiçbirine yazılmaz; tüm doküman ve UI dili Türkçe.
+**K-19 · süregelen · Depo/işbirliği sabitleri.** Depo: **`byesilmen/codex`**
+(2026-08-30'da `byesilmen11/codex`'ten taşındı — O-14; eski hesap kullanıcının terk edilmiş
+hesabıydı, eski depo yedek olarak duruyor ama kullanılmıyor). Dal:
+`claude/surprise-egg-collection-game-eycqiq` (başkasına push yok); commit mesajları Türkçe ve
+içerik odaklı; artifact HEP aynı URL'ye republish; model kimliği repo çıktılarının hiçbirine
+yazılmaz; tüm doküman ve UI dili Türkçe. Yerel git kimliği: `byesilmen`
+<yesilmenonline@gmail.com>.

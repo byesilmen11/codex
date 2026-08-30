@@ -29,9 +29,11 @@
 - ✅ Unity sürüm kontrol kuralları — `client/.gitignore`'daki blanket `*.meta` kalıbının
   UnityProject'in tüm `.meta`'larını yuttuğu commit atılmadan yakalandı (O-13);
   `client/UnityProject/.gitattributes` ile satır sonu dönüşümü kapatıldı (K-20)
-- 🔄 **U1 başlangıcı** — (a) kullanıcı: `git pull` → `git add` → UnityProject commit/push
-  (proje ayarları bitti); (b) bu taraf: içerik yükleyici (`content/*.json` → StreamingAssets
-  + GameContent), sanat/ses tam ihracı, sonra Home/Ceremony/Assembly/Album ← SIRADAKİ
+- ✅ Unity projesi depoda — `client/UnityProject` commit `6e8eb69` (61 dosya, `.meta`'lar
+  dahil); depo `byesilmen/codex`'e taşındı, git kimliği düzeltildi (O-14)
+- 🔄 **U1** — içerik yükleyici (`content/*.json` → StreamingAssets + `GameContent`
+  doldurucu, `Yuvo.Data` katmanı), sanat/ses tam ihracı, sonra Home/Ceremony/Assembly/Album
+  ekranları (22 adım ritüel paritesi) ← SIRADAKİ
 - 🔵 `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar
   (6 seri × 8 varyant × yırtılma) + kapsül/çevre/UI/portreler. NOT: ~1.300 PNG / 15-30 MB —
   Unity projesi açılırken üretilmesi daha doğru (git şişmesin; gerekirse LFS kararı o gün)

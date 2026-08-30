@@ -450,3 +450,36 @@ Commit atılmadan yakalandığı için hiçbir bozuk geçmiş oluşmadı.
 hâlâ ignore EDİLİYOR (exit 0), `bin/`–`obj/` korumaları bozulmadı.
 
 **Sıradaki:** kullanıcı `git pull` → `git add` → commit/push; sonra U1 (içerik boru hattı).
+
+## O-14 · 2026-08-30 · Unity projesi depoya girdi + depo asıl hesaba taşındı
+
+**1) Unity projesi commit edildi.** O-13'teki `.meta` düzeltmesinden sonra
+`client/UnityProject` depoya girdi: commit `6e8eb69`, **61 dosya / 6.482 satır** —
+`Assets/Editor/`, `Assets/Scenes/`, `Assets/Settings/` (URP 2D şablonu), `Packages/manifest.json`
++ `packages-lock.json`, `ProjectSettings/*` ve **tüm `.meta` dosyaları**. `Library/`, `Temp/`,
+`UserSettings/` doğru şekilde dışarıda kaldı.
+
+**2) İki git engeli aşıldı.**
+- `Author identity unknown` → makinede git kimliği hiç ayarlanmamıştı.
+- `Permission to byesilmen11/codex.git denied to byesilmen` (403) → makinedeki giriş **doğru**
+  hesaptaydı (`byesilmen`), depo **yanlış** hesaptaydı (`byesilmen11`).
+
+**3) Depo taşındı.** Kullanıcı: `byesilmen11` terk edilmiş eski hesabı, asıl hesap `byesilmen`
+(<yesilmenonline@gmail.com>). Transfer yerine **yeni depo + tam geçmiş push** seçildi: eski
+hesaba giriş gerektirmez, depo private ve issue/PR/yıldız yok, sonuç birebir aynı.
+`github.com/byesilmen/codex` (private, boş) açıldı → `git remote set-url` → `git push --all`:
+**670 nesne / 20,6 MB, iki dal da (`main` + `claude/…`) yerleşti.** Eski depo yedek olarak
+duruyor, kullanılmıyor. Git kimliği `byesilmen` <yesilmenonline@gmail.com> olarak ayarlandı.
+
+**4) Oturum sınırı (önemli).** Bu Claude oturumunun GitHub bağlantısı `byesilmen11` hesabına
+sabitlenmiş (`get_me` → byesilmen11); `add_repo` ile `byesilmen/codex`'e bağlanamadı. Yani
+taşımadan sonraki değişiklikler bu oturumdan doğrudan push edilemedi — yama dosyasıyla
+devredildi. **Ders:** yeni oturum `byesilmen` hesabına bağlı GitHub bağlayıcısıyla açılmalı.
+
+**5) Bu kayıtla birlikte gelen temizlik:** `UnityProject/*.slnx` ignore'a eklendi (VS'in yeni
+çözüm dosyası biçimi commit'e sızmıştı), `UnityProject/.gitattributes`'a `*.scenetemplate`
+`*.txt` `*.slnx` eklendi, `client/Yuvo.Core/.gitattributes` (yalnız `*.meta -text`; `.cs`
+dosyalarına bilinçli olarak dokunulmadı — izlenen dosyaları "değişmiş" gösterirdi).
+
+**Sıradaki:** U1 — içerik boru hattı (`content/*.json` → StreamingAssets + `GameContent`
+yükleyici, `Yuvo.Data` katmanı), sanat/ses tam ihracı, Home/Ceremony/Assembly/Album ekranları.

@@ -23,5 +23,6 @@ UnityProject/[Bb]uild[Ss]/
 # Unity'nin ürettiği IDE dosyaları (bizim Yuvo.Core.csproj'u etkilemesin diye yol kısıtlı)
 UnityProject/*.csproj
 UnityProject/*.sln
+UnityProject/*.slnx
 UnityProject/*.unityproj
 UnityProject/.vsconfig

@@ -39,6 +39,9 @@
 *.uxml          -text
 *.uss           -text
 *.inputactions  -text
+*.scenetemplate -text
+*.txt           -text
+*.slnx          -text
 
 # --- İkili varlıklar (dönüşüm de diff de yapılmaz) ---
 *.png          binary

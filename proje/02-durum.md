@@ -2,7 +2,7 @@
 
 > **Yaşayan dosya.** Her iş bloğunun sonunda güncellenir; oturuma dönünce İLK bu okunur.
 
-**Son güncelleme:** 2026-08-30 · oturum O-13 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: **Unity sürüm kontrol kuralları düzeltildi** (`.meta` kapanı + `.gitattributes`; K-20)
+**Son güncelleme:** 2026-08-30 · oturum O-14 · depo **`byesilmen/codex`** · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: **Unity projesi depoya girdi + depo asıl hesaba taşındı**
 
 ## Tek paragraf özet
 
@@ -20,11 +20,9 @@ paritesi) + SaveService/kalıcılık (11 altın migrasyon fikstürü) + kültür
 ➡️ **U1 — İçerik boru hattı + ilk ekranlar** (v2·07 §10). Unity kurulumu bitti; çekirdek
 Unity içinde çalıştığı KANITLANDI (duman testi 9/9, O-12).
 
-**Önce kullanıcıda (küçük):** `client/UnityProject`'in commit+push edilmesi — proje depoya
-girmeden bu taraftan Unity kodu yazılamaz (`proje/07` adım 8). Proje ayarları (Portrait,
-Linear, 390×844) yapıldı. Sıra: `git reset` → `git pull` (K-20 düzeltmesini alır) →
-`git add client/UnityProject client/Yuvo.Core` → `git status --short` ile **`.meta` VAR /
-`Library/` YOK** kontrolü → commit + push.
+**Kullanıcı tarafı BİTTİ:** proje ayarları yapıldı, `client/UnityProject` commit `6e8eb69`
+ile depoya girdi (61 dosya; `.meta`'lar dahil, `Library/` hariç) ve depo `byesilmen/codex`'e
+taşındı (O-14). Artık Unity projesi bu taraftan da okunabilir/yazılabilir.
 
 **Sonra bu tarafta (U1 sırası):**
 1. **İçerik yükleyici:** `content/*.json` → StreamingAssets kopyalama adımı + `GameContent`
