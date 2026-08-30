@@ -33,6 +33,24 @@ Ama kumarhane mantığıyla değil, **oyuncak kutusu** mantığıyla.
 | 10 | [Sanat Yönü, UX & Ses](docs/10-sanat-ux-ses.md) | Görsel dil, çocuk UX kuralları, ses tasarımı |
 | 11 | [Teknik Mimari & Yol Haritası](docs/11-teknik-mimari-ve-yol-haritasi.md) | Motor seçimi, backend, 12 aylık plan, KPI hedefleri |
 
+## 🗂️ Proje Yönetimi — buradan devam edilir
+
+Planlama, durum takibi, karar günlüğü ve oturum kayıtları **[proje/](proje/README.md)**
+klasöründe yaşar. Yeni bir çalışma oturumu HER ZAMAN [`proje/02-durum.md`](proje/02-durum.md)
+("kaldığımız yer") ile başlar; çalışma disiplini [`proje/README.md`](proje/README.md)'deki
+oturum ritüelidir.
+
+## 🕹️ Oynanabilir Prototip
+
+`prototype/` — tam oyun döngüsünü içeren HTML5 prototip (**oynanabilir spesifikasyon**):
+FTUE, 6 aşamalı gerçek yumurta ritüeli, 2 biyom / 62 Pufi, albüm + Ambalaj Defteri, mini
+oyunlar, oturum döngüsü (kuluçka/görev/takvim), ebeveyn paneli (PIN + DEMO mağaza).
+Sözleşmeler: [`prototype/ARCHITECTURE.md`](prototype/ARCHITECTURE.md) ·
+[`prototype/BRAND.md`](prototype/BRAND.md). Derleme: `node tools/build-proto.mjs` ·
+testler: `node tools/proto-engine-test.mjs` + `node tools/proto-smoke.mjs`.
+Unity'ye taşıma: [docs/v2/07](docs/v2/07-unity-tasima-plani.md); ihraç edilmiş içerik +
+altın vektörler: `content/`.
+
 ## 📦 v2 — Doğrudan Satın Alma Senaryosu (derin araştırma, 5 paralel ajan)
 
 Yumurtaların oyunla kazanılmaya ek olarak **mikro fiyatla satın alınabildiği** senaryonun
@@ -45,6 +63,9 @@ birleşik kılavuzu: **[docs/v2/README.md](docs/v2/README.md)**
 | v2·03 | [Hikâye & Karakterler](docs/v2/03-hikaye-ve-karakterler.md) | 3 dünya senaryosu + story bible + replikler + S2-3 tohumları |
 | v2·04 | [Oyun Akışı & Zorluk](docs/v2/04-oyun-akisi-ve-zorluk.md) | Dakika dakika FTUE, 7 gün planı, 12 hafta takvimi, Altın Yumurta storyboard'u |
 | v2·05 | [Mağaza & Paketler](docs/v2/05-magaza-ve-yumurta-paketleri.md) | 6 kademeli paket merdiveni (₺9,99-₺199,99), Kiler, Dilek Kavanozu, hediye kanalı, gelir projeksiyonu |
+| v2·06 | [Gerçek Yumurta Ritüeli](docs/v2/06-gercek-yumurta-ritueli.md) | 6 aşamalı ritüel (folyo→çikolata→kapsül→birleştirme), Ambalaj Defteri, Altın Folyo, dürüstlük sözleşmesi |
+| v2·07 | [Unity Taşıma Planı](docs/v2/07-unity-tasima-plani.md) | Prototip→Unity köprüsü: altın vektörler, ihraç boru hatları, U0-U3 fazları |
+| v2·08 | [Yayın Öncesi Araştırma](docs/v2/08-yayin-oncesi-arastirma.md) | Psikolojik kancalar araştırması + bulgu→özellik izlenebilirliği (P1-P6) |
 | — | [Ekonomi simülatörü](tools/economy-sim/collection_sim.py) | v2·02'nin eğrilerini üreten çalıştırılabilir Monte Carlo kodu |
 
 ## ⚖️ Etik Manifesto (Bu projenin anayasası)

@@ -18,6 +18,7 @@
 | 05 | [Mağaza & Yumurta Paketleri](05-magaza-ve-yumurta-paketleri.md) | 6 kademeli paket merdiveni, Kiler mekaniği, Dilek Kavanozu, Şeffaflık Kartı, hediye kanalı (bayram/karne), harcama limiti UX, 100K DAU gelir projeksiyonu, ters whale alarmı |
 | 06 | [Gerçek Yumurta Ritüeli](06-gercek-yumurta-ritueli.md) | Sürpriz yumurta simülasyonu: 6 aşamalı ritüel (vitrin+salla-dinle → folyo yırtma → çikolata/kumbara → Tomurcuk Kapsülü + 4 açma yöntemi → birleştirme → Ambalaj Defteri), Altın Folyo (FOMO'suz Wonka), tempo merdiveni (tam/hızlı/sepet akışı), araç kozmetikleri + sponsorlu seri gelir mimarisi, prototip uygulama planı |
 | 07 | [Unity Taşıma Planı](07-unity-tasima-plani.md) | Prototip → yayın istemcisi: birebir port edilen çekirdek (gacha + state, altın vektör testleriyle), içerik/sanat/ses ihraç boru hatları, kayıt/migrasyon, DEMO→gerçek IAP sıralaması, bildirim ilkeleri, U0-U3 faz planı + kabul ölçütleri, riskler |
+| 08 | [Yayın Öncesi Araştırma](08-yayin-oncesi-arastirma.md) | 3 paralel ajan: çocuk oyunları indirme/tutundurma psikolojisi, unboxing/gacha reveal sahnelemesi, monetizasyon etiği (JAMA/FTC emsalleri); geliştirici teşhisi + bulgu→özellik izlenebilirlik tablosu (P1-P6) + mağaza sayfası notları |
 | — | [`tools/economy-sim/collection_sim.py`](../../tools/economy-sim/collection_sim.py) | 02'deki tüm eğrileri üreten Monte Carlo simülatörü (çalıştırılabilir) |
 
 ## Kanonik Kararlar (ajanlar arası uyumlaştırma)

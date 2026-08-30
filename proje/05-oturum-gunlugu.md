@@ -1,0 +1,202 @@
+# 05 · Oturum Günlüğü
+
+> Eklemeli tam kayıt: her çalışma bloğu **istek → yapılanlar → kararlar → commit →
+> doğrulama → teslimat → notlar** düzeniyle yazılır. Kararların bağlayıcı metni
+> [`04-kararlar.md`](04-kararlar.md)'dedir; burada yalnız K-numarasıyla anılır.
+
+---
+
+## O-01 · 2026-08-01 · v1 Kılavuz + v2 Derin Araştırma
+
+**İstek 1:** Kinder benzeri sürpriz yumurta koleksiyon oyunu konsepti; pazar/psikoloji/rakip
+araştırması; hikâye, karakterler, ödüller, koleksiyonlar (300 parça, nadir parçalar,
+10/50/100'lük paketler); "mükemmel bir kılavuz" — kodlama ikinci faz.
+
+**İstek 2 (reframe):** Amaç çocuğu kandırmak değil, **gerçek market yumurtası deneyiminin
+simülasyonu** (ambalaj→çikolata→oyuncak) + eşitlik argümanı (₺40-500'lük gerçek yumurta
+yerine ₺2-5'lik dijital; dar gelirli çocuklar da erişsin); paralel ajanlarla derin araştırma;
+hukuk tartışması kullanıcı talimatıyla ertelendi ("İtiraz etmeden legal kısmını da sonra
+tartışırız").
+
+**Yapılanlar:**
+- v1 kılavuz, 11 bölüm (`docs/01-11`): pazar, rakip analizi (Adopt Me, Hatchimals, Applaydu,
+  Monopoly GO, Toca Boca), çocuk psikolojisi ve **kullanmadığımız** motorlar, yasal çerçeve
+  (COPPA/GDPR-K/KVKK/loot-box), Ovalya dünyası + karakterler (Pofu, Kiki, Usta Kabuk, Şako),
+  mekanik döngüler, 300 parçalık koleksiyon matematiği, ekonomi, monetizasyon (Yuvo Club),
+  sanat/UX/ses, teknik mimari + 12 aylık yol haritası + KPI kapıları.
+- v2 derin araştırma, 5 paralel ajan (`docs/v2/01-05` + README): rakip ekonomiler
+  (Monopoly GO $6 mlr, Brawl Stars loot-box kaldırma vakası, Pop Mart 1/72), Monte Carlo
+  doğrulamalı koleksiyon matematiği + pity pseudocode, 3 dünya senaryosu → story bible,
+  dakika dakika FTUE + 12 hafta takvimi, 6 kademeli paket merdiveni + Kiler + Dilek Kavanozu +
+  Şeffaflık Kartı + gelir projeksiyonu; `tools/economy-sim/collection_sim.py` simülatörü;
+  README'de "Kanonik Kararlar" uyumlaştırması.
+
+**Kararlar:** K-01…K-06. **Commit'ler:** `b1a5087`, `51a9da2`.
+**Doğrulama:** Monte Carlo — medyan tamamlama 70-80 gün bandında; Panini 7,1× israfa karşı Yuvo 1,35×.
+**Teslimat:** kılavuz dosyaları + Türkçe özet raporlar.
+
+---
+
+## O-02 · 2026-08-28 · Prototip Dikey Dilim
+
+**İstek (3-5):** Masaüstüne indirme/klasör soruları (oturum lojistiği); ardından "sıradaki
+adımdan devam edelim: prototip fazı — çıtlatma töreni + Güneş Çayırı ailesi + albüm
+çekirdeğiyle dikey dilim… oyunu mobil için yapacağız ilk başta değil mi?" → mobil portre onayı.
+
+**Yapılanlar:**
+- `prototype/ARCHITECTURE.md` bağlayıcı mimari sözleşme; iskelet (index.html, router/HUD/nav/
+  modal/toast, build betiği `tools/build-proto.mjs` → dist/index.html + dist/artifact.html).
+- Dikey dilim: `ceremony` (5 aşamalı tören), `assembly` (3 parça sürükle-bırak, mıknatıs+snap),
+  `home` (yuva, gezinen Pufiler, gün sonu), `album` (30+1 hücre, kilometre taşları, Atölye/craft),
+  `minigame` (Eşle & Bul, ödül tavanlı), 31 Pufi verisi + prosedürel SVG sanat (`pufi-svg.js`) +
+  WebAudio sentez sesler (`audio.js`), gacha motoru (mulberry32, pity 15/40/50, onboarding,
+  akıllı düşüş), state + localStorage kalıcılık.
+- Test altyapısı: `tools/proto-engine-test.mjs` (sandbox eval + 5.000'lik simülasyon) ve
+  `tools/proto-smoke.mjs` (playwright-core, headless Chromium, 390×844, ekran görüntüleri,
+  sıfır konsol hatası şartı).
+- Artifact ilk yayın: `https://claude.ai/code/artifact/04cdcb1e-4e8b-4edf-9081-7e16ff8114ef`.
+
+**Kararlar:** K-08, K-09. **Commit'ler:** `2eb95d5`, `d3e5d51`.
+**Doğrulama:** iki test paketi yeşil. **Teslimat:** artifact + ekran görüntüleri.
+
+---
+
+## O-03 · 2026-08-28→29 · Marka Sürümü + Ritüel Tasarımı
+
+**İstek (6):** "grafikleri ve tasarım iyi değil. çok daha iyi tasarım ve grafikler yap.
+arayüz dahil. **tam bir marka gibi olsun**."
+
+**Yapılanlar:**
+- Google Fonts entegrasyonu (Baloo 2 + Nunito, tam fallback yığını) + sanat dosya düzeni.
+- `prototype/BRAND.md` marka kitabı: sticker reçetesi (beyaz hale + koyu kontur + şeker
+  paleti), logo, ikon dili, yuva atmosferi kuralları ("boş bant yasak").
+- `ui-icons.js` (Yuvo.icons — logo + ikon seti), HUD/nav yeniden çizimi, 31 karakterin
+  tamamının final "vinil oyuncak" çizimi (`pufi-kinds-1..3.js`), çevre sanatı (`env.js`).
+- Paralelde ritüel tasarım dokümanı `docs/v2/06` yazıldı (İstek 7'nin spec'i — aşağıda).
+- Oturum kesintileri yaşandı ("Try again" ×2, "Uygulama kapandı. kaldığın yerden devam et.");
+  ara güvenlik commit'i (`aa63ff4`) sayesinde kayıpsız devam edildi.
+
+**Kararlar:** K-10. **Commit'ler:** `8d82f1e`, `aa63ff4`, `a9616f3`, `1e8fb8d`.
+**Doğrulama:** testler yeşil; görsel gözden geçirme ekran görüntüleriyle.
+**Ders:** uzun işlerde ara commit ("güvenlik anlık görüntüsü") kesinti maliyetini sıfırlıyor —
+bu ders `proje/README.md` oturum ritüelinin gerekçelerinden.
+
+---
+
+## O-04 · 2026-08-29 · Gerçek Yumurta Ritüeli + Tam Oyun Döngüsü
+
+**İstek (7):** Gerçek yumurta ritüeli spec'i: önce folyo ambalaj ("üstüne isim; marka
+isimlerini alıp reklam bile alabiliriz — almayı düşünüyoruz"), çikolata ("hop diye yiyecek"),
+kapsülün çeşitli açılışları ("çekiçle kırma olsun, elle açma olsun"), birleştirme daha
+profesyonel; seçim aşaması cezbedici; "gerçek hayattaki simülasyonu gibi olsun".
+**İstek (11-12):** "bitti mi" → durum raporu; "**devam et. her şeyi bitir.**"
+
+**Yapılanlar (ritüel — commit `c62a687`):**
+- 6 aşamalı ritüel: vitrin (ambalajlı yumurtalar, eline al / 400ms basılı tut = salla-dinle) →
+  folyo yırtma (3 şerit, kulakçık) → çikolata (Ye! +2⭐ tavan 40 / Biriktir → Kumbara, 15'te
+  Çikolata Şöleni = +1 yumurta) → **Tomurcuk Kapsülü** (4 açma aracı: burgu/çekiç/fırlat/sihir —
+  saf kozmetik) → birleştirme → **Ambalaj Defteri** (`foilbook.js`: 6 seri × 8 varyant pul
+  koleksiyonu + Altın Şeref Yuvası).
+- Altın Folyo katmanı (%2 + hard 40); `wrappers.js` (6 seri, RITUAL sabitleri); dürüstlük
+  sözleşmesi §1.3 motora işlendi (nadirlik açılışta çekilir; `makeEgg` golden:null).
+- v1→v2 kayıt migrasyonu; testlere ritüel bölümleri.
+
+**Yapılanlar (tam döngü — commit `c3e722a`):**
+- FTUE/intro (`intro.js`): karanlık→yıldız→ısıtma; Luna gün batımı ritüeli (`playDusk`).
+- Diyalog sistemi (`ui-dialog.js` + `dialogue.js` replik havuzları; anlatıcı/Kiki/Luna/
+  Usta Kabuk/Şako).
+- Ebeveyn paneli (`parent.js` + `store.js`): PIN kapısı (3 deneme → 30 sn kilit), DEMO mağaza
+  (6 paket + Club + Şeffaflık Kartı), aylık limit + 24 sa soğuma, **Kiler** (günde ≤5 çekim),
+  **Dilek Kavanozu** (7 gün / 5 dilek / fiyatsız), harcama raporu.
+- İkinci biyom **Fısıltı Ormanı**: 31 orman Pufi'si (`pufis-forest.js`, `pufi-kinds-4..6.js`),
+  kilit Çayır 10/30, biyom-filtreli havuz, ortak pity, per-biyom gizli; **Şako Saklambaç**
+  (`sako.js`) — saklanan parça yok olmaz, geri kazanılır.
+- v3 migrasyon + motor API'leri (buyPack/drawFromKiler/addWish/…); duman testi 3 bölüm / 43 adıma çıktı.
+
+**Kararlar:** K-07, K-11, K-12, K-15. **Doğrulama:** motor + duman (43 adım) yeşil.
+**Teslimat:** artifact republish + 8 ekran görüntüsü + Türkçe rapor.
+**Notlar/dersler:** modal butonları `#overlay-root`'ta yaşadığından sahne click-delegasyonuna
+düşmez → `getElementById` dinleyici deseni; PIN kapısı 4. hanede otomatik onaylıyor →
+testlerde "ok'a yalnız kapı hâlâ açıksa bas".
+
+---
+
+## O-05 · 2026-08-29→30 · Yayın Öncesi Cila + Unity Köprüsü
+
+**İstek (13 — büyük):** "sıradaki adımları sen yap. **tüm testleri yap**" + oyun geliştiricisi
+gözüyle denetim: hedef yaş grubunun merakını yakalamak ("çocuk sürpriz yumurtayı HEMEN açmak
+ister, çikolatasını belki yemez, sadece içindeki oyuncağı merak eder"); ilk sayfa tasarımından
+yumurta seçimine, sosyalleşmeye, ödül/koleksiyon zorluğuna ve özellikle ücretsiz haklar bitince
+**satın aldırma psikolojisine** kadar her şeyi gözden geçir; çok indirilen basit çocuk
+oyunlarının indirme/tutundurma/başında-tutma psikolojisini araştır; "**bu psikolojik klikleri
+biz de kullanalım… onları yapalım yayına çıkmadan**".
+**İstek (14):** "çıkar" (Unity taşıma planını üret). **İstek (15):** "yap" (U0 araçlarını yaz).
+
+**Yapılanlar (araştırma):**
+- 3 paralel web araştırma ajanı: (1) çocuk oyunları indirme/tutundurma psikolojisi,
+  (2) unboxing/gacha reveal sahnelemesi, (3) monetizasyon etiği + emsaller. Bulgular +
+  geliştirici teşhisi + bulgu→özellik izlenebilirlik tablosu `docs/v2/08`'e yazıldı (O-06'da).
+  Not: bazı alan adları ağ politikasında engelli çıktı; o bulgular arama özetlerinden geldi.
+
+**Yapılanlar (P0-P6 uygulaması — commit `b40509f`):**
+- **P1 Reveal:** POP öncesi 420 ms hush (sessizlik+vinyet+zoom); nadirliğe dallanan kutlama
+  (900/1300/2200/2600 ms); "◆ NADİR!" splash rozeti; tier≥2'de Kiki balonu; kart flip +
+  dönen huzme + seri numarası satırı ("Güneş Çayırı · 7/30"); **pufiChirp** — her Pufi'ye
+  FNV-1a id-hash imzalı özgün cıvıltı; salla = olabilirlik karuseli (eksik dostlardan 3
+  dürüst silüet).
+- **P2 Albüm:** soundboard (sahipli hücre → zıplama + kendi cıvıltısı); "🎯 Hedefim Bu!"
+  hedef parça (yuvada çip; bulununca kutlama); son-3 ışıltısı; kilitli **Altın Yumurta**
+  ödül teaser'ı (baskı dili yok).
+- **P3 Oturum döngüsü:** kuluçka yumurtası (Şako gece uçuşu bırakır → sabah İLK sırada
+  "☀️ Hazır!", tavana sayılmaz); haklar birikir (kalan+3, tavan 9); günlük görev zinciri
+  (🥚3·🎮1·📔 → 🎁 +1, bir kez); Bekçi Takvimi (cezasız 7 yıldız → +25 Kabuk + rozet);
+  kapanış ritüeli (Bugünün Dostları + yarının seri silueti, SAYAÇSIZ).
+- **P4 İlk 60 saniye:** intro hızlandırma (yıldız serpintisi + kuyruk + yıldıza yüz; balonlar
+  otomatik akar; hedef ≤25 sn); yuva canlılığı (periyodik hop+parıltı, ilk oturum el ipucu,
+  Pufi selam balonları); 180 ms sahne geçiş fade'i (senkron mount korunarak).
+- **P5 Ebeveyn güveni:** Dilek Kartı+ ("N gündür kavanozda" + "ücretsiz yumurtalarla ~X günde
+  gelebilir" + Şimdi değil / 🎂 doğum günü notu); satın almada yayılım önizlemesi; güven şeridi
+  (Reklam yok · Fiyat yok · Oranlar açık · Kalıcı); **geri sayımsız Hoş Geldin Sepeti**
+  (₺14,99, tek seferlik); yıl toplamı KPI'ı; kilerden çekim = kargo balonu animasyonu.
+- **P6:** Çıt Çıt Köşesi (ödülsüz sonsuz kabuk çıtlatma — testle "⭐ dağıtmıyor" doğrulanır).
+- Testler: motor testine P3 bölümü (birikim tavanı, kuluçka, görev zinciri, cezasız streak,
+  Hoş Geldin); duman 43→**55 adım** (görev çipleri, kapanış ritüeli, Şako uçuşu, kuluçka
+  sabahı, NADİR splash + seri satırı, Çıt Çıt, güven şeridi/baskı-dili denetimleri).
+
+**Yapılanlar (Unity planı — commit `3192049`):** `docs/v2/07` — bkz. K-16; v2 README indeksine satır.
+
+**Yapılanlar (U0 araçları — commit `22d1eda`):** `export-content.mjs` → `content/*.json`
+(6 dosya; ritual.json'da tüm sabitler) ve `export-golden-vectors.mjs` → `content/golden/`
+(5 senaryo / 3.800 vektör; determinizm çift koşumla kanıtlı; pity tavanları koşumda denetli;
+akıl sağlığı: 3. açılış Nadir+, ilk 10 hep yeni, altın 32/1000, orman 0 yabancı, ilk gizli
+30/30 sonrası). Her ikisi `--check` CI kapılı.
+
+**Kararlar:** K-13, K-14, K-16, K-17. **Doğrulama:** motor tümü yeşil; duman 55 adım sıfır
+konsol hatası; artifact republish; 6+1 ekran görüntüsü + plan dosyası kullanıcıya gönderildi.
+**Notlar/dersler:** (a) JS `/i` bayrağı Türkçe ı/İ katlamaz → testlerde `/satılmaz|SATILMAZ/`
+gibi açık alternatifler; (b) test regex'i kendi baskı-KARŞITI metnimizi ("geri sayımı yok")
+yakaladı → denetimler pozitif güvence cümlesi + gerçek baskı kalıpları olarak ayrıldı;
+(c) sonsuz animasyonlu öğeye playwright tıklaması `{force:true}` ister; (d) tam ekran
+sahnelerde alt nav görünmez → testte `Yuvo.go` kancası.
+
+---
+
+## O-06 · 2026-08-30 · Proje Yönetim Katmanı (bu oturum)
+
+**İstek (16):** Cloud projelerindeki düzen buraya da kurulsun: klasör yapısı + planlama/takip
+dosyaları (ne yapacağız/nasıl/ne zaman; ne yapıldı/ne yapılacak), karar ve iş kayıtları —
+"**bir işin düzeni onu yapmaktan daha önemli**"; bu oturumdaki TÜM kontekst (özet değil,
+içerikten) kaydedilsin; bundan sonra her kontekst dolmadan kayıt bitirilip sonraki kontekstte
+kaldığımız yerden devam edilsin.
+
+**Yapılanlar:**
+- `proje/` katmanı kuruldu: README (sistem + oturum ritüeli), 01-yol-haritasi, 02-durum,
+  03-yapilacaklar, 04-kararlar (K-01…K-19), 05-oturum-gunlugu (bu dosya — O-01'den bugüne
+  tam geçmiş), 06-dosya-haritasi.
+- Kaydedilmemiş araştırma yazıya döküldü: `docs/v2/08-yayin-oncesi-arastirma.md` (3 ajan
+  bulguları + geliştirici teşhisi + bulgu→özellik izlenebilirliği + mağaza sayfası notları).
+- Kök `README.md` güncellendi (prototip/proje/content bölümleri + v2·06-08 satırları);
+  `docs/v2/README.md` indeksine 08 eklendi.
+
+**Kararlar:** K-18. **Commit:** bu oturumun kapanış commit'i.
+**Sıradaki:** `02-durum.md` "Sıradaki adım" → `tools/export-art.mjs` ilk sürümü.
