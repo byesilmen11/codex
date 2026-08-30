@@ -96,10 +96,26 @@ VS Code) ile aç ve `"dependencies"` bloğunun İÇİNE, ilk satır olarak şunu
 }
 ```
 Kaydet ve Unity'ye geri dön (pencereye tıkla) — paketi otomatik alır, birkaç saniye sürer.
+Unity açıkken düzenlediysen ve paket görünmüyorsa Editor'ü kapatıp yeniden aç.
 
-> ⚠️ **En sık hata: JSON virgülü.** Eklediğin satırın sonunda virgül OLMALI (arkasından
-> başka satırlar geliyor). Console'da `manifest.json` / `Failed to parse` hatası çıkarsa
-> ilk bakılacak yer budur.
+> ⚠️ **Tuzak 1 — JSON virgülü.** Eklediğin satırın sonunda virgül OLMALI (arkasından başka
+> satırlar geliyor). Console'da `Failed to parse` çıkarsa ilk bakılacak yer budur.
+>
+> ⚠️ **Tuzak 2 — BOM (Windows).** PowerShell ile otomatik düzenleme yapacaksan
+> `Set-Content -Encoding UTF8` KULLANMA: PowerShell 5.1 dosyanın başına görünmez bir BOM
+> işareti (U+FEFF) koyar ve Unity `Failed to resolve packages … Non-whitespace before {[.
+> Char: 65279` hatası verir. BOM'suz yazan doğru komut:
+> ```powershell
+> $m = "$HOME\Documents\codex\client\UnityProject\Packages\manifest.json"
+> $j = Get-Content $m -Raw | ConvertFrom-Json
+> $j.dependencies | Add-Member -Name "com.yuvo.core" -Value "file:../../Yuvo.Core" -MemberType NoteProperty -Force
+> [System.IO.File]::WriteAllText($m, ($j | ConvertTo-Json -Depth 20), (New-Object System.Text.UTF8Encoding $false))
+> ```
+> Zaten BOM'lu yazdıysan onarım: baştaki 3 baytı sil —
+> ```powershell
+> $b = [System.IO.File]::ReadAllBytes($m)
+> if ($b[0] -eq 0xEF) { [System.IO.File]::WriteAllBytes($m, $b[3..($b.Length-1)]) }
+> ```
 
 > **Neden kopyalamıyoruz?** Kaynak tek yerde (`client/Yuvo.Core`) kalır; `dotnet test`
 > ve Unity aynı dosyaları derler, ikizlenme/sürüklenme olmaz.
@@ -174,6 +190,8 @@ git push
 | Duman testinde **RNG satırları hatalı** | CİDDİ: Unity çalışma zamanı `uint` aritmetiğinde sapıyor demektir; altın vektör paritesi bozulur. Ekran görüntüsüyle haber ver — `Rng.cs` ve IL2CPP ayarları birlikte incelenir. |
 | Duman testinde **JSON/kayıt satırı hatalı** | Cihaz kültürü sızmış olabilir. Hangi satırın düştüğünü ilet. |
 | Console'da URP/shader uyarıları | Zararsız; U1'de görsel boru hattı kurulurken düzelir. |
+| `Failed to resolve packages … Char: 65279` (Package Manager Error) | manifest.json BOM'lu yazılmış (PowerShell `Set-Content -Encoding UTF8`). Adım 4'teki BOM onarım komutunu çalıştır, Unity'yi yeniden aç. |
+| `The type or namespace 'ISaveStore'/'GameState' … could not be found` | Paket yüklenmemiş demektir (yukarıdaki iki madde). Console'un tamamına bak: hatalar tek tip değil, tüm `Yuvo.Core` tiplerini kapsıyordur. |
 
 ## Bundan sonrası (U1 — ekranlar)
 
