@@ -12,7 +12,21 @@
 /prototype/         ← HTML5 prototip = oynanabilir spesifikasyon
 /content/           ← Unity için ihraç edilen içerik JSON'ları + altın vektörler (ÜRETİLİR, elle düzenlenmez)
 /tools/             ← build, test ve ihraç araçları (node) + ekonomi simülatörü (python)
+/client/            ← Unity istemcisinin C# çekirdeği (aşağıda)
 ```
+
+## client/ — Yuvo.Core (Unity'siz doğrulanan çekirdek)
+
+| Dosya | Rol |
+|---|---|
+| `PORT-CONTRACT.md` | BAĞLAYICI port sözleşmesi: API imzaları, JS→C# anlam kuralları, test kapsamı |
+| `Yuvo.Core/Yuvo.Core.csproj` | Saf C# çekirdek (netstandard2.1, UnityEngine/JSON YOK) |
+| `Yuvo.Core/GameState.cs` | state.js defaults() şemasının POCO karşılığı |
+| `Yuvo.Core/GameContent.cs` | content/*.json modeli (sıra sözleşmeleriyle) |
+| `Yuvo.Core/Rng.cs` | mulberry32 — JS rand() ile bit düzeyinde özdeş |
+| `Yuvo.Core/StateEngine.cs` | state.js API'lerinin portu (newDay/ekonomi/görev/mağaza/biyom) |
+| `Yuvo.Core/GachaEngine.cs` | gacha.js portu (OpenEgg — rand tüketim sırası korunmuş) |
+| `Yuvo.Core.Tests/` | NUnit: altın vektörler (5 senaryo bit-düzeyi) + davranış + içerik testleri — `dotnet test client/Yuvo.Core.Tests` |
 
 ## docs/ — v1 kılavuz (2026-08-01)
 

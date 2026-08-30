@@ -74,7 +74,7 @@ namespace Yuvo.Core
 
     public sealed class GameState
     {
-        public int Version = 3;
+        public int Version = 2;   // JS defaults() birebir (state.js: version:2); 3'ü load() migrasyonu damgalar — SaveService işi
         public int Stardust = 40;
         public int Kabuk;
         public int Day = 1;

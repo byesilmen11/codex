@@ -14,15 +14,21 @@
 - ✅ `tools/export-audio.mjs` v1 (kanıt) — 19 WAV (çekirdek + ritüel dorukları + salla ×2 aile
   + 5 pufiChirp; mono 16-bit 44,1 kHz) + manifest + `--check`; OfflineAudioContext şimi,
   sabit tohumlu PRNG, bağımlılıksız
-- 🔄 **Unity LTS proje iskeleti** — `/client`, 4 assembly, CI (test + bağımlılık denetimi)
-  (v2·07 §13/1) ← SIRADAKİ
+- ✅ `Yuvo.Core` C# portu — GachaEngine + StateEngine + NUnit katmanı (altın vektörler 5
+  senaryo bit-düzeyi bire bir; parite denetimi 4 avcı + çürütücü panel: doğrulanan sapma 0;
+  `dotnet test` 26/26) — `client/`, PORT-CONTRACT.md
+- 🔄 **SaveService + migrasyon fuzz** — ISaveStore arayüzü, atomik yazım, çift yuva,
+  v1/v2→v3 migrasyon portu (v2·07 §7; saf C#, dotnet test ile) ← SIRADAKİ
+- ⬜ Unity LTS proje kabuğu — `/client` Unity projesi + assembly bağları (v2·07 §13/1)
+  — UNITY KURULU MAKİNE İŞİ (bu ortamda editor yok)
 - 🔵 `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar
   (6 seri × 8 varyant × yırtılma) + kapsül/çevre/UI/portreler. NOT: ~1.300 PNG / 15-30 MB —
   Unity projesi açılırken üretilmesi daha doğru (git şişmesin; gerekirse LFS kararı o gün)
-- ⬜ `Yuvo.Core` C# portu: GachaEngine + GameState + SaveService; NUnit altın vektör +
-  davranış asertleri (v2·07 §3, §7)
 - 🔵 `export-audio` tam kapsam: tüm SOUNDS + 62 pufiChirp (Unity açılışında, export-art tam
   kapsamla birlikte)
+- 🔵 Test iyileştirme notları (parite denetimi önerileri, düşük öncelik): Sim B tamamlama
+  medyanı (çoklu-seed), Sim C zorlaEksik bağımsız invaryantı, vitrin-boşken no-egg savunma
+  üçlüsü, RITUAL UI sabitleri (ISIRIK/SERIT) içerik aserti
 
 ## F8-F10 · Unity U1-U3 (sırada — ayrıntı v2·07 §10)
 

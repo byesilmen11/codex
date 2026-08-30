@@ -100,8 +100,11 @@ namespace Yuvo.Core.Tests
             }
         }
 
-        // Sim A pity parçası (js satır 96-124): Reset(202) → 5.000 açılışta pity ihlali yok.
-        // Vektör kuralı: açılış SONRASI pityN>15 / pityD>40 / pityE>50 hiç görülmemeli.
+        // Sim A pity parçası (js satır 96-153): Reset(202) → 5.000 açılışta pity ihlali yok.
+        // Parite denetimi güçlendirmesi: boşluklar JS gibi ÇIKTIDAN (res.Rarity dizisinden)
+        // ölçülür — portun kendi sayaçlarıyla döngüsel doğrulama yapılmaz; sayaç sınırları
+        // ek kontrol olarak kalır. Ayrıca JS Sim A'nın gizli kapısı, altın folyo pity/oran,
+        // wrapper kaydı bütünlüğü ve Ambalaj Defteri muhasebesi asertleri de burada.
         [Test]
         public void PityIhlaliYok5000Acilis()
         {
@@ -109,18 +112,78 @@ namespace Yuvo.Core.Tests
             var gacha = new GachaEngine(eng);
             eng.Reset(202);
             int maxN = 0, maxD = 0, maxE = 0;
+            int gapN = 0, gapD = 0, gapE = 0, maxGapN = 0, maxGapD = 0, maxGapE = 0;
+            int sinceGolden = 0, maxGoldenGap = 0, goldenSayisi = 0;
+            int gizliErken = 0, wrapperBozuk = 0;
             for (var i = 1; i <= 5000; i++)
             {
+                var pre = eng.OwnedCount("cayir");
                 TekYumurtaKur(eng);
                 var res = gacha.OpenEgg();
                 Assert.That(res.Error, Is.Null, $"pity simülasyonu {i}. açılışta beklenmedik hata: {res.Error}");
+                // Boşluk ölçümü ÇIKTIDAN (js 107-119 birebir): rank eşiği geçen sonuç boşluğu kapatır
+                var r = Rank(res.Rarity);
+                if (r >= Rank("nadir")) { maxGapN = Math.Max(maxGapN, gapN); gapN = 0; } else gapN += 1;
+                if (r >= Rank("destansi")) { maxGapD = Math.Max(maxGapD, gapD); gapD = 0; } else gapD += 1;
+                if (r >= Rank("efsanevi")) { maxGapE = Math.Max(maxGapE, gapE); gapE = 0; } else gapE += 1;
+                if (res.Wrapper != null && res.Wrapper.Golden) { maxGoldenGap = Math.Max(maxGoldenGap, sinceGolden); sinceGolden = 0; goldenSayisi += 1; }
+                else sinceGolden += 1;
+                if (res.Rarity == "gizli" && pre < 30) gizliErken += 1;
+                if (res.Wrapper == null || string.IsNullOrEmpty(res.Wrapper.Seri) ||
+                    res.Wrapper.Variant < 0 || res.Wrapper.Variant >= _content.WrapperVariants ||
+                    res.Chocolate != 1) wrapperBozuk += 1;
                 maxN = Math.Max(maxN, eng.S.PityN);
                 maxD = Math.Max(maxD, eng.S.PityD);
                 maxE = Math.Max(maxE, eng.S.PityE);
             }
-            Assert.That(maxN, Is.LessThanOrEqualTo(15), $"Nadir+ pity ihlali yok: pityN hiç 15'i aşmamalı (ölçülen {maxN})");
-            Assert.That(maxD, Is.LessThanOrEqualTo(40), $"Destansı+ pity ihlali yok: pityD hiç 40'ı aşmamalı (ölçülen {maxD})");
-            Assert.That(maxE, Is.LessThanOrEqualTo(50), $"Efsanevi+ pity ihlali yok: pityE hiç 50'yi aşmamalı (ölçülen {maxE})");
+            // JS 122-124: çıktı-tabanlı boşluk tavanları (taban-yükseltme pity'lerinin kanıtı)
+            Assert.That(maxGapN, Is.LessThanOrEqualTo(14), $"Nadir+ boşluğu ≤14 olmalı (ölçülen {maxGapN})");
+            Assert.That(maxGapD, Is.LessThanOrEqualTo(39), $"Destansı+ boşluğu ≤39 olmalı (ölçülen {maxGapD})");
+            Assert.That(maxGapE, Is.LessThanOrEqualTo(49), $"Efsanevi+ boşluğu ≤49 olmalı (ölçülen {maxGapE})");
+            // Sayaç sınırları (ek iç-tutarlılık kontrolü)
+            Assert.That(maxN <= 15 && maxD <= 40 && maxE <= 50, Is.True,
+                $"pity sayaçları tavanları aşmamalı (N{maxN}/D{maxD}/E{maxE})");
+            // JS 125: gizli kapısı — 30/30'dan önce gizli asla düşmez
+            Assert.That(gizliErken, Is.EqualTo(0), $"gizli 30/30'dan önce düşmemeli ({gizliErken} erken düşüş)");
+            // JS 133-136: altın folyo pity + oran taban sanity
+            Assert.That(maxGoldenGap <= 40 && sinceGolden < 40, Is.True,
+                $"altın folyo pity: aralık ihlali olmamalı (maxGap {maxGoldenGap}, kuyruk {sinceGolden})");
+            Assert.That(goldenSayisi, Is.GreaterThanOrEqualTo(100),
+                $"altın oranı taban sanity: 5.000 açılışta ≥100 altın beklenir (ölçülen {goldenSayisi})");
+            // JS 138: her açılış tam wrapper kaydı + 1 çikolata döndürür
+            Assert.That(wrapperBozuk, Is.EqualTo(0), $"her açılış tam wrapper kaydı döndürmeli ({wrapperBozuk} bozuk)");
+            // JS 140-153: Ambalaj Defteri muhasebesi — toplam pul = açılış sayısı, altın eşleşir
+            int foilToplam = 0, foilAltin = 0;
+            foreach (var kv in eng.S.FoilBook)
+            {
+                Assert.That(_content.SeriesKeys.Contains(kv.Key), Is.True,
+                    $"defterdeki seri anahtarı tanımlı olmalı ({kv.Key})");
+                foilAltin += kv.Value.Golden;
+                foilToplam += kv.Value.Golden;
+                foreach (var v in kv.Value.Variants) foilToplam += v.Value;
+            }
+            Assert.That(foilToplam, Is.EqualTo(5000), $"Ambalaj Defteri toplamı 5.000 olmalı (ölçülen {foilToplam})");
+            Assert.That(foilAltin, Is.EqualTo(goldenSayisi), $"defterdeki altın sayısı gözlenenle eşleşmeli ({foilAltin} vs {goldenSayisi})");
+        }
+
+        // js satır 266-278: forceGoldenNext test kancası + setTool (saf kozmetik araç seçimi)
+        [Test]
+        public void ForceGoldenNextVeSetTool()
+        {
+            var eng = YeniMotor();
+            var gacha = new GachaEngine(eng);
+            eng.Reset(777);
+            gacha.ForceGoldenNext();
+            TekYumurtaKur(eng);
+            var rg = gacha.OpenEgg();
+            Assert.That(rg.Error == null && rg.Wrapper.Golden && eng.S.GoldenPity == 0, Is.True,
+                "forceGoldenNext → sıradaki açılış altın olmalı, goldenPity sıfırlanmalı");
+            Assert.That(eng.S.FoilBook.ContainsKey("gunesbahcesi") && eng.S.FoilBook["gunesbahcesi"].Golden == 1, Is.True,
+                "altın folyo Ambalaj Defteri'ne Altın Şeref Yuvası olarak işlenmeli");
+            Assert.That(eng.SetTool("cekic") && eng.S.ActiveTool == "cekic", Is.True,
+                "sahipli araç seçilebilmeli (cekic)");
+            Assert.That(!eng.SetTool("sedefburgu") && eng.S.ActiveTool == "cekic", Is.True,
+                "sahipsiz araç reddedilmeli, seçim değişmemeli");
         }
 
         // js satır 234-247: çikolata ⭐ tavanı + kumbaraya atma + newDay sayaç sıfırlama
@@ -287,6 +350,13 @@ namespace Yuvo.Core.Tests
             Assert.That(s.Parent.SpentTL == 0 && s.Parent.Ay == "2026-02" &&
                         s.Purchases.Count == 3 && s.Kiler.Adet == 112, Is.True,
                 "ay devri: harcama sayacı sıfırlanmalı, makbuz geçmişi ve kiler korunmalı");
+            // JS 386-388: aynı senaryo spendReport() ÇIKTISI üzerinden de doğrulanır
+            // (parite denetimi: BuildSpendReport portunun bağımsız kapsamı)
+            var rep = eng.BuildSpendReport();
+            Assert.That(rep.SpentTL == 0 && rep.Ay == "2026-02" && rep.PaketAdet == 3 &&
+                        rep.KilerAdet == 112 && rep.Yumurta == 112 && rep.Pufi == 0 && rep.ClubActive,
+                Is.True,
+                $"spendReport: ay devri raporu (spent {rep.SpentTL}, paket {rep.PaketAdet}, kiler {rep.KilerAdet}, yumurta {rep.Yumurta})");
             Assert.That(eng.BuyPack("kumbara").Ok && s.Parent.SpentTL == 199.99, Is.True,
                 "yeni ayda limit tazelenmeli");
         }
@@ -340,6 +410,17 @@ namespace Yuvo.Core.Tests
             saat.Now += 8L * 24 * 3600 * 1000;
             Assert.That(eng.AddWish(ids[5]) && s.Wishes.Count == 1 && s.Wishes[0].PufiId == ids[5], Is.True,
                 "7 günden eski dilekler kendiliğinden düşmeli, yenisi eklenmeli");
+            // Parite denetimi güçlendirmesi: budama SEÇİCİ olmalı — yalnız süresi dolan düşer,
+            // taze dilekler KALIR (js 492-495'in tek-dilek-eskitme özelliği farklı yaşlarla)
+            saat.Now += 4L * 24 * 3600 * 1000;            // ids[5] şimdi 4 günlük
+            Assert.That(eng.AddWish(ids[0]), Is.True, "4 gün sonra ikinci taze dilek eklenebilmeli");
+            saat.Now += 4L * 24 * 3600 * 1000;            // ids[5] 8 günlük (düşer), ids[0] 4 günlük (kalır)
+            Assert.That(eng.AddWish(ids[1]), Is.True, "eski dilek budanırken yeni dilek eklenebilmeli");
+            Assert.That(s.Wishes.Count == 2 &&
+                        s.Wishes.Exists(w => w.PufiId == ids[0]) &&
+                        s.Wishes.Exists(w => w.PufiId == ids[1]) &&
+                        !s.Wishes.Exists(w => w.PufiId == ids[5]), Is.True,
+                "budama seçici olmalı: yalnız 7 günü aşan düşer, taze dilekler korunur");
         }
 
         // js satır 499-512: setLimit soğuması yalnız ARTIRIMDA + setPin format kontrolü

@@ -238,3 +238,42 @@ render etmez — export-art ile aynı bilinçli karar).
 **Kayıt:** U0 ihraç boru hatlarının dördü de tamam (content / golden / art / audio).
 **Sıradaki:** `02-durum.md` → Unity proje iskeleti + `Yuvo.Core` C# portu (önce Unity'siz
 `dotnet test` ile koşan NUnit yolu önerildi).
+
+---
+
+## O-08 · 2026-08-30 · Yuvo.Core C# Portu (U1 çekirdeği — dotnet test yolu)
+
+**İstek:** "devam" (+ ultracode modu: her önemli iş workflow'la, çekişmeli doğrulamayla).
+
+**Yapılanlar:**
+- Ortam kapıları: dotnet-sdk-8.0 apt'ten kuruldu (8.0.130); NuGet proxy'den erişilebilir doğrulandı.
+- `client/` iskeleti ELLE kuruldu (ajanlara ortak zemin): Yuvo.Core (netstandard2.1,
+  UnityEngine'siz) + Yuvo.Core.Tests (net8.0/NUnit) csproj'ları, `GameState.cs` (state.js
+  defaults şeması), `GameContent.cs` (içerik modeli; Core JSON okumaz), `Rng.cs` (mulberry32 —
+  bit düzeyi eşleme notlarıyla), `PORT-CONTRACT.md` (BAĞLAYICI: API imzaları, JS→C# anlam
+  kuralları, rand tüketim sırası, test kapsamı).
+- **Workflow 1 (port, 4 paralel ajan):** `StateEngine.cs` (state.js API'lerinin tamamı),
+  `GachaEngine.cs` (openEgg birebir), `Fixtures.cs`+`GoldenVectorTests.cs` (content yükleyici +
+  5 senaryo), `ContentTests.cs`+`BehaviorTests.cs` (proto-engine-test çevirisi).
+  Doğrulama: `dotnet test` → **25/25** (5 altın senaryo / 3.800 açılış BİT DÜZEYİNDE bire bir
+  + 13 davranış + 7 içerik).
+- **Workflow 2 (parite denetimi, 4 avcı + bulgu başına 2 çürütücü, 20 ajan):**
+  GachaEngine → SIFIR bulgu. Doğrulanan davranışsal sapma YOK; tüm yüksek/orta bulgular
+  "test-kapsamı önerisi, sapma değil" gerekçesiyle çürütüldü. Düşük-önem sadakat notları
+  ve değerli test önerileri UYGULANDI:
+  * `Round2` NaN/∞ koruması (JS `Number(n)||0` paritesi — SetLimit(NaN) kapıyı ters
+    etkisizleştirebilirdi), `Craft` null-rarity koruması (JS fırlatmaz), `Version=2`
+    (JS defaults birebir; 3'ü migrasyon damgalar).
+  * 5.000'lik pity testi ÇIKTIDAN ölçer hale getirildi (döngüsellik giderildi: boşluklar
+    res.Rarity dizisinden ≤14/39/49) + gizli kapısı sayacı + altın folyo pity/oran +
+    wrapper bütünlüğü + Ambalaj Defteri muhasebesi (5.000 pul) asertleri eklendi.
+  * `BuildSpendReport` çıktı asertleri, dilek budamasının SEÇİCİLİĞİ (taze kalır/eski düşer),
+    yeni `ForceGoldenNextVeSetTool` testi.
+- Not: 2 çürütücü ajan API güvenlik filtresine takıldı (workflow bunları null sayıp devam
+  etti); ilgili bulguyu (spendReport kapsamı) kendim hakem olarak değerlendirip uyguladım.
+
+**Doğrulama:** `dotnet test` → **26/26**; prototip motor testi + içerik/vektör `--check`
+kapıları değişmeden yeşil.
+**Commit'ler:** `cfad742` (iskelet+sözleşme), `52cfd82` (port 25/25), + bu kapanış commit'i.
+**Sıradaki:** SaveService (atomik JSON + çift yuva + migrasyon fuzz — saf C#, burada test
+edilebilir); Unity kabuğu (`/client` Unity projesi) Unity kurulu makine işi olarak notlandı.

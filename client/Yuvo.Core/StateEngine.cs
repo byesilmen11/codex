@@ -64,9 +64,12 @@ namespace Yuvo.Core
 
         /* ---------- yardımcılar ---------- */
 
-        // round2 — state.js satır 164; JS Math.round = floor(x+0.5) (sözleşme kural 3)
+        // round2 — state.js satır 164; JS Math.round = floor(x+0.5) (sözleşme kural 3).
+        // JS'teki `Number(n) || 0` koruması: NaN/±Inf 0'a iner (parite denetimi bulgusu —
+        // aksi hâlde SetLimit(NaN) limit kapısını ters yönde etkisizleştirirdi).
         private static double Round2(double n)
         {
+            if (double.IsNaN(n) || double.IsInfinity(n)) return 0;
             return Math.Floor(n * 100 + 0.5) / 100;
         }
 
@@ -379,8 +382,11 @@ namespace Yuvo.Core
                 return new CraftResult { Ok = false, Reason = "sahipli" };
             if (pufi.Rarity == "gizli" && OwnedCount(pufi.Biome ?? "cayir") != 30)
                 return new CraftResult { Ok = false, Reason = "gizli-kilitli" };
-            RarityDef rd;
-            var cost = (Content.Rarities.TryGetValue(pufi.Rarity, out rd) && rd != null) ? rd.Uretim : 0;
+            // JS `(RARITIES[pufi.rarity] || {}).uretim || 0` — rarity null/bilinmezse maliyet 0,
+            // asla fırlatmaz (parite denetimi bulgusu: TryGetValue(null) fırlatırdı)
+            RarityDef rd = null;
+            var cost = (pufi.Rarity != null &&
+                        Content.Rarities.TryGetValue(pufi.Rarity, out rd) && rd != null) ? rd.Uretim : 0;
             if (s.Kabuk < cost) return new CraftResult { Ok = false, Reason = "kabuk-yetersiz" };
             s.Kabuk -= cost;
             s.Owned[pufiId] = 1;
