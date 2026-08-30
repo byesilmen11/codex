@@ -2,7 +2,7 @@
 
 > **Yaşayan dosya.** Her iş bloğunun sonunda güncellenir; oturuma dönünce İLK bu okunur.
 
-**Son güncelleme:** 2026-08-30 · oturum O-09 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: SaveService + altın migrasyon fikstürleri (40/40)
+**Son güncelleme:** 2026-08-30 · oturum O-09 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: migrasyon fikstür kapsamı tamam (11 vaka, `dotnet test` 45/45)
 
 ## Tek paragraf özet
 
@@ -15,15 +15,13 @@ ihraç araçlarındayız.
 
 ## Sıradaki adım (buradan devam et)
 
-➡️ **SaveService** (v2·07 §7): `client/Yuvo.Core/` içine kalıcılık katmanı — JSON
-serileştirme (state.js şemasıyla alan adı uyumlu), **atomik yazım** (temp+rename),
-**çift yuva** (A/B, bozuk dosyada son sağlama düşme), `load()` migrasyon deseninin portu
-("yalnız bilinen anahtarları birleştir + tip onarımı"; v1/v2→v3 fikstürleri
-proto-engine-test.mjs'teki migrasyon bloklarından türetilebilir) + bozuk-kayıt fuzz testleri.
-Saf C# — burada `dotnet test` ile doğrulanabilir. NOT: dosya G/Ç'si Core'a girmesin —
-`ISaveStore` arayüzü (Core) + test/Unity uygulamaları deseni kullan.
-Sonrası: Unity kabuğu (`/client` Unity projesi + assembly bağları) — **Unity kurulu makine
-işi**; bu ortamda editor yok.
+➡️ **Unity kabuğu** — bu ortamda YAPILAMAZ (editor yok): kullanıcının Unity kurulu
+makinesinde `/client` Unity projesi açılır, `Yuvo.Core/*.cs` dosyaları `Yuvo.Core.asmdef`
+altına alınır (netstandard2.1 uyumlu, dokunmadan derlenir), Unity Test Runner'a
+GoldenVector/Behavior/Save testleri bağlanır (fikstür yolu: `content/`), sonra U1 ekranları
+(v2·07 §10). Bu ortamda kalan işler DÜŞÜK öncelikli: prototip kozmetik çip çakışması,
+test iyileştirme notları (`03-yapilacaklar.md`), export tam kapsamları (Unity açılışıyla).
+Kullanıcıya soru: Unity kurulumu/makine planı — U1'e geçiş zamanı.
 
 ## Ne bitti (kanıtlarıyla)
 

@@ -19,8 +19,8 @@
   `dotnet test` 26/26) — `client/`, PORT-CONTRACT.md
 - ✅ SaveService + migrasyon — SaveValue/JsonCodec (bağımlılıksız), load() portu, çift yuvalı
   zarf, JS load() gerçek çıktılarından 6 altın fikstür + fuzz (`dotnet test` 40/40)
-- 🔄 **Migrasyon fikstür kapsam tamamlama** — eleştirmen ajanın bulduğu kapsanmamış load()
-  onarım dalları için ek fikstür vakaları ← SIRADAKİ (sonuç bekleniyor)
+- ✅ Migrasyon fikstür kapsamı — eleştirmen haritası (57 dal) + 5 yeni vaka; 11/11 fikstür,
+  `dotnet test` 45/45
 - ⬜ Unity LTS proje kabuğu — `/client` Unity projesi + assembly bağları (v2·07 §13/1)
   — UNITY KURULU MAKİNE İŞİ (bu ortamda editor yok)
 - 🔵 `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar
