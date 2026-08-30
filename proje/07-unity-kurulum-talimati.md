@@ -154,10 +154,17 @@ masaüstü .NET ile JS prototipiyle **birebir aynı** sayıları üretiyor (oran
 de aynı davranacak).
 
 ### 7. Temel proje ayarları (U1 hazırlığı, 2 dakika)
-**Edit ▸ Project Settings**:
-- **Player ▸ Resolution and Presentation**: Default Orientation → **Portrait**
-- **Player ▸ Other Settings**: Color Space → **Linear** (sticker görsel dili için)
-- **Game** penceresi çözünürlüğü: **390×844** (prototiple aynı referans çerçeve)
+**Edit ▸ Project Settings ▸ Player**. Panelin üstünde **platform sekmeleri** vardır
+(🖥 Windows/Mac/Linux · 🤖 Android · 🍎 iOS) ve ayarların bir kısmı platforma özeldir:
+
+- **Default Orientation → Portrait**: bu ayar YALNIZ mobil sekmelerde bulunur.
+  **🤖 Android** sekmesine geç ▸ *Resolution and Presentation* ▸ **Default Orientation** →
+  `Portrait`. Aynısını **🍎 iOS** sekmesinde de yap. (Masaüstü sekmesinde bu alan hiç yoktur —
+  orada arama.)
+- **Color Space → Linear**: *Other Settings* ▸ **Rendering** başlığı altında. Universal 2D
+  şablonunda genelde zaten `Linear`'dır; değilse değiştir (proje yeniden derlenir, 1-2 dk).
+- **Game** penceresi çözünürlüğü: Editor'de **Game** sekmesi ▸ üstteki çözünürlük açılırı ▸
+  **+** ile `390×844` ekle (prototiple aynı referans çerçeve).
 
 ### 8. Commit et
 Depo klasöründe (PowerShell veya terminal, ikisinde de aynı):
