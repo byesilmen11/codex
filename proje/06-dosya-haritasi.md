@@ -31,6 +31,9 @@
 | `Directory.Build.props` | Derleme çıktılarını `client/.build/` altına yönlendirir (Unity import'u temiz kalsın) |
 | `unity-smoke/YuvoCoreSmokeTest.cs` | Unity Editor menü komutu: RNG paritesi + kayıt katmanı duman testi (kurulum doğrulaması) |
 | `Yuvo.Core.Tests/` | NUnit: altın vektörler (5 senaryo bit-düzeyi) + davranış + içerik + kayıt/migrasyon (11 fikstür) + kültür testleri — `dotnet test client/Yuvo.Core.Tests` (50 test) |
+| `UnityProject/` | Unity 6.3 LTS projesi (kullanıcı makinesinde üretilir). `Library/`, `Temp/`, `UserSettings/` ve üretilen `.csproj`/`.sln` izlenmez; `.meta` dosyaları **daima izlenir** (K-20) |
+| `UnityProject/.gitattributes` | Unity alt ağacında satır sonu dönüşümü kapalı (`-text`), ikili varlıklar `binary` — LF/CRLF gürültüsünü ve makineler arası farkı önler |
+| `.gitignore` | client alt ağacının ignore kuralları (bin/obj/.build + Unity üretilen içerik) |
 
 ## docs/ — v1 kılavuz (2026-08-01)
 

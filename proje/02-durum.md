@@ -2,7 +2,7 @@
 
 > **Yaşayan dosya.** Her iş bloğunun sonunda güncellenir; oturuma dönünce İLK bu okunur.
 
-**Son güncelleme:** 2026-08-30 · oturum O-12 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: **Unity kurulumu TAMAMLANDI** (duman testi 9/9, çekirdek Unity'de doğrulandı)
+**Son güncelleme:** 2026-08-30 · oturum O-13 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: **Unity sürüm kontrol kuralları düzeltildi** (`.meta` kapanı + `.gitattributes`; K-20)
 
 ## Tek paragraf özet
 
@@ -20,9 +20,11 @@ paritesi) + SaveService/kalıcılık (11 altın migrasyon fikstürü) + kültür
 ➡️ **U1 — İçerik boru hattı + ilk ekranlar** (v2·07 §10). Unity kurulumu bitti; çekirdek
 Unity içinde çalıştığı KANITLANDI (duman testi 9/9, O-12).
 
-**Önce kullanıcıda (küçük):** proje ayarları (Player ▸ Portrait, Linear renk uzayı, Game
-penceresi 390×844) ve `client/UnityProject`'in commit+push edilmesi — proje depoya girmeden
-bu taraftan Unity kodu yazılamaz (`proje/07` adım 7-8).
+**Önce kullanıcıda (küçük):** `client/UnityProject`'in commit+push edilmesi — proje depoya
+girmeden bu taraftan Unity kodu yazılamaz (`proje/07` adım 8). Proje ayarları (Portrait,
+Linear, 390×844) yapıldı. Sıra: `git reset` → `git pull` (K-20 düzeltmesini alır) →
+`git add client/UnityProject client/Yuvo.Core` → `git status --short` ile **`.meta` VAR /
+`Library/` YOK** kontrolü → commit + push.
 
 **Sonra bu tarafta (U1 sırası):**
 1. **İçerik yükleyici:** `content/*.json` → StreamingAssets kopyalama adımı + `GameContent`
@@ -49,6 +51,7 @@ bu taraftan Unity kodu yazılamaz (`proje/07` adım 7-8).
 | U1 çekirdeği: SaveService — bağımlılıksız JSON codec, load() migrasyon portu, çift yuvalı zarf; JS load() gerçek çıktılarından 11 altın fikstür + 200 girdilik fuzz | `client/Yuvo.Core/Save*.cs`, `tools/export-migration-fixtures.mjs`, `content/golden/migration/` |
 | U1 köprüsü: Unity paketleme (UPM manifesti + asmdef), derleme çıktısı yönlendirmesi, kültür bağımsızlığı düzeltmesi + 5 regresyon testi, Unity duman testi scripti, kurulum talimatı | `client/Yuvo.Core/package.json`, `*.asmdef`, `client/Directory.Build.props`, `client/unity-smoke/`, `proje/07-…md` |
 | U1 köprüsü DOĞRULANDI: Unity 6.3 LTS'te paket derlendi, RNG bit-paritesi + kayıt katmanı Unity içinde geçti | Kullanıcı makinesi, Console: "TÜMÜ GEÇTİ" (9/9) — O-12 |
+| Unity sürüm kontrol politikası: `.meta` daima izlenir, Unity alt ağacında satır sonu dönüşümü kapalı (O-13'te commit atılmadan yakalandı) | `client/.gitignore`, `client/UnityProject/.gitattributes` — K-20 |
 | Proje yönetim katmanı | `proje/` (bu klasör) |
 
 ## Canlı referanslar

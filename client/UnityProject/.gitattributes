@@ -1,0 +1,63 @@
+# Unity projesi — satır sonu ve ikili dosya kuralları (K-20)
+#
+# NEDEN: Unity ürettiği YAML/JSON dosyalarını LF ile yazar. Windows'ta git'in autocrlf
+# dönüşümü bunları CRLF'e çevirmek ister; bu da "warning: LF will be replaced by CRLF"
+# uyarılarına ve makineler arası gereksiz farklara yol açar.
+# ÇÖZÜM: bu alt ağaçta satır sonu dönüşümü kapalı (-text) — Unity ne yazdıysa o korunur.
+
+# --- Unity YAML varlıkları (sahne, prefab, materyal, ayar) ---
+*.unity              -text
+*.prefab             -text
+*.asset              -text
+*.meta               -text
+*.mat                -text
+*.anim               -text
+*.controller         -text
+*.overrideController -text
+*.playable           -text
+*.mask               -text
+*.preset             -text
+*.renderTexture      -text
+*.spriteatlas        -text
+*.terrainlayer       -text
+*.mixer              -text
+*.physicMaterial     -text
+*.physicsMaterial2D  -text
+*.shadervariants     -text
+*.guiskin            -text
+*.fontsettings       -text
+*.lighting           -text
+
+# --- Metin biçimli yapılandırma ve kod ---
+*.json          -text
+*.asmdef        -text
+*.asmref        -text
+*.cs            -text
+*.shader        -text
+*.hlsl          -text
+*.cginc         -text
+*.uxml          -text
+*.uss           -text
+*.inputactions  -text
+
+# --- İkili varlıklar (dönüşüm de diff de yapılmaz) ---
+*.png          binary
+*.jpg          binary
+*.jpeg         binary
+*.gif          binary
+*.psd          binary
+*.tga          binary
+*.exr          binary
+*.wav          binary
+*.mp3          binary
+*.ogg          binary
+*.ttf          binary
+*.otf          binary
+*.fbx          binary
+*.dll          binary
+*.so           binary
+*.unitypackage binary
+
+# NOT: Unity'nin YAML birleştiricisi (UnityYAMLMerge) istenirse yukarıdaki YAML
+# satırlarına `merge=unityyamlmerge` eklenip driver yerel git yapılandırmasına
+# tanımlanır. Tek geliştiricili çalışmada gerekmiyor — U2'de yeniden değerlendir.

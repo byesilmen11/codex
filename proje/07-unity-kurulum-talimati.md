@@ -169,17 +169,33 @@ de aynı davranacak).
   Universal 2D şablonunda genelde zaten `Linear`'dır; değilse değiştir (proje yeniden
   derlenir, 1-2 dk).
 - **Game** penceresi çözünürlüğü: Editor'de **Game** sekmesi ▸ üstteki çözünürlük açılırı ▸
-  **+** ile `390×844` ekle (prototiple aynı referans çerçeve).
+  **+** ile `390×844` ekle (prototiple aynı referans çerçeve). NOT: bu ayar `UserSettings/`
+  altında tutulur ve depoya **girmez** — makine başına bir kez yapılır.
 
 ### 8. Commit et
-Depo klasöründe (PowerShell veya terminal, ikisinde de aynı):
+Depo klasöründe (PowerShell veya terminal, ikisinde de aynı). **Önce `git pull`** — Unity'ye
+özel sürüm kontrol kuralları (`.gitattributes` + `.meta` izleme düzeltmesi) depoda:
 ```powershell
-git add client/UnityProject
+git reset          # varsa önceki hazırlığı bırakır — DOSYA SİLMEZ
+git pull
+git add client/UnityProject client/Yuvo.Core
+git status --short
+```
+`git status` çıktısında görmen gerekenler:
+- ✅ `.meta` dosyaları **VAR** (`SampleScene.unity.meta` gibi) — Unity'de her varlığın kimliği
+  bunlarda durur, eksik olurlarsa temiz bir klonda referanslar kopar
+- ❌ `Library/`, `Temp/`, `UserSettings/`, üretilen `.csproj`/`.sln` **YOK** (`.gitignore`
+  bunları zaten dışarıda tutar; görünüyorlarsa commit etme, haber ver)
+
+Doğruysa:
+```powershell
 git commit -m "Unity projesi iskeleti (U1 baslangici)"
 git push
 ```
-`.gitignore` `Library/`, `Temp/`, üretilen `.csproj`/`.sln` dosyalarını zaten dışarıda tutar —
-`git status` bunları göstermemeli (gösteriyorsa commit etme, haber ver).
+
+> **`warning: … LF will be replaced by CRLF …` satırları hata DEĞİLDİR.** Git'in Windows'ta
+> satır sonu dönüşümünü bildiren notudur; komut başarıyla çalışmıştır. `.gitattributes`
+> eklendikten sonra (yukarıdaki `git pull` ile gelir) bu uyarılar zaten kesilir.
 
 ## Doğrulama kontrol listesi
 
@@ -188,6 +204,7 @@ git push
 - [ ] Project ▸ Packages altında **Yuvo Core** var
 - [ ] **Yuvo ▸ Çekirdek Duman Testi** → "TÜMÜ GEÇTİ"
 - [ ] `git status` içinde `Library/` **yok**
+- [ ] `git status` içinde `.meta` dosyaları **var**
 
 ## Sorun giderme
 
@@ -202,6 +219,9 @@ git push
 | Duman testinde **RNG satırları hatalı**, ama gösterilen sayı beklenenle neredeyse aynı (ör. `0.97972826776094735` ↔ `0.9797282677609473`) | Bu ESKİ script sürümünün sahte alarmı: Mono ile .NET 8 sayıyı farklı basamakla YAZAR, değer aynıdır. Güncel scripti al: `git pull` sonra `Copy-Item client\unity-smoke\YuvoCoreSmokeTest.cs client\UnityProject\Assets\Editor\ -Force` (artık bit deseni karşılaştırıyor). |
 | Duman testinde **RNG satırları hatalı** ve bit desenleri farklı | CİDDİ: Unity çalışma zamanı `uint` aritmetiğinde sapıyor demektir; altın vektör paritesi bozulur. Ekran görüntüsüyle haber ver — `Rng.cs` ve IL2CPP ayarları birlikte incelenir. |
 | Duman testinde **JSON/kayıt satırı hatalı** | Cihaz kültürü sızmış olabilir. Hangi satırın düştüğünü ilet. |
+| `git add` onlarca **`warning: … LF will be replaced by CRLF …`** satırı basıyor | HATA DEĞİL — git'in Windows satır sonu dönüşümü notu; komut başarılıdır. Kalıcı çözüm depoda: `git pull` ile `client/UnityProject/.gitattributes` gelir, uyarılar kesilir. |
+| `git status` çıktısında **hiç `.meta` yok** | Eski `client/.gitignore` tüm `*.meta`'ları yutuyordu. `git pull` ile düzeltmeyi al, sonra `git add client/UnityProject client/Yuvo.Core` tekrarla. Kontrol: `git check-ignore -v client/UnityProject/Assets/Scenes/SampleScene.unity.meta` **çıktı vermemeli**. |
+| `git pull` "local changes would be overwritten" diyor | Hazırlanmış dosyalar var. `git reset` (dosya SİLMEZ, yalnız hazırlıktan çıkarır) sonra `git pull` tekrar. |
 | Console'da URP/shader uyarıları | Zararsız; U1'de görsel boru hattı kurulurken düzelir. |
 | `Failed to resolve packages … Char: 65279` (Package Manager Error) | manifest.json BOM'lu yazılmış (PowerShell `Set-Content -Encoding UTF8`). Adım 4'teki BOM onarım komutunu çalıştır, Unity'yi yeniden aç. |
 | `The type or namespace 'ISaveStore'/'GameState' … could not be found` | Paket yüklenmemiş demektir (yukarıdaki iki madde). Console'un tamamına bak: hatalar tek tip değil, tüm `Yuvo.Core` tiplerini kapsıyordur. |

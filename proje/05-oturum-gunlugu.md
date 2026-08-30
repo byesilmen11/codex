@@ -413,3 +413,40 @@ zamanında masaüstü .NET ve JS prototipiyle BİT DÜZEYİNDE aynı · kayıt k
 
 **Commit'ler:** `cafa607` (Windows uyarlaması), BOM belgelemesi, `72c866f` (bit-parite).
 **Sıradaki:** kullanıcı proje ayarları (portre) + Unity projesini commit/push → U1 ekranları.
+
+## O-13 · 2026-08-30 · `.meta` kapanı — Unity projesi depoya girmeden yakalandı
+
+**Tetikleyici:** Kullanıcı adım 8'de `git add client/UnityProject` çalıştırdı ve onlarca
+`warning: in the working copy of '…', LF will be replaced by CRLF the next time Git touches
+it` satırını "hata verdi" diye bildirdi.
+
+**Birinci tespit (yanlış alarm):** Bunlar `warning`, hata değil — Windows'ta git'in
+`core.autocrlf` dönüşüm notu. `git add` başarıyla tamamlanmıştı.
+
+**İkinci tespit (GERÇEK kusur):** Uyarı listesinde **hiç `.meta` dosyası yoktu.** Sebep:
+
+```
+$ git check-ignore -v client/UnityProject/Assets/Scenes/SampleScene.unity.meta
+client/.gitignore:10:*.meta   client/UnityProject/Assets/Scenes/SampleScene.unity.meta
+```
+
+`client/.gitignore`'daki blanket `*.meta` kalıbı (U0'da Yuvo.Core paket klasörü için
+konmuştu) `client/` altındaki TÜM ağaca uygulanıyordu ve Unity projesinin bütün `.meta`
+dosyalarını yutuyordu. Kuralın gerekçesi ("Unity projesi açılana dek girmesinler") O-12'de
+zaten geçersizleşmişti. `.meta`'sız commit edilen bir Unity projesi temiz bir klonda
+açıldığında Unity tüm GUID'leri yeniden üretir → sahne/prefab referansları kopar.
+Commit atılmadan yakalandığı için hiçbir bozuk geçmiş oluşmadı.
+
+**Düzeltme:**
+1. `client/.gitignore` — blanket `*.meta` kaldırıldı, yerine gerekçeli yorum (K-20).
+2. `client/UnityProject/.gitattributes` (YENİ) — Unity YAML/kod dosyaları `-text` (satır
+   sonu dönüşümü yok, Unity ne yazarsa o kalır), ikili varlıklar `binary`. Uyarılar
+   kaynağında kesildi. Renormalizasyon riski yok: depodaki izlenen dosyaların tamamı zaten
+   LF (`git grep -Il $'\r'` boş) ve dosya yalnız `UnityProject/` alt ağacını etkiliyor.
+3. `proje/07` adım 8 `git pull` ile başlayan sıraya çevrildi; "warning ≠ hata" notu,
+   `.meta` kontrol listesi maddesi ve 3 sorun giderme satırı eklendi.
+
+**Doğrulama:** `git check-ignore` — `.meta` artık ignore EDİLMİYOR (exit 1), `Library/`
+hâlâ ignore EDİLİYOR (exit 0), `bin/`–`obj/` korumaları bozulmadı.
+
+**Sıradaki:** kullanıcı `git pull` → `git add` → commit/push; sonra U1 (içerik boru hattı).

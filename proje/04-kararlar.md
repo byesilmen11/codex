@@ -124,6 +124,16 @@ dolmadan kayıtla kapanır; **kayıtsız iş bitmemiş iştir**; push edilmemiş
 *Kaynak:* kullanıcı: "bir işin düzeni onu yapmaktan daha önemli… veri kaybı olmasın".
 *Uygulama:* `proje/README.md` ritüeli.
 
+**K-20 · 2026-08-30 · Unity sürüm kontrol politikası.** (a) Unity `.meta` dosyaları
+**daima izlenir** — hem `client/UnityProject/` hem yerel UPM paketi `client/Yuvo.Core/`
+altında; her `.meta` bir varlığın GUID kimliğidir, eksikse Unity temiz bir klonda GUID'leri
+yeniden üretir ve sahne/prefab referansları kopar. (b) Unity alt ağacında satır sonu
+dönüşümü **kapalı** (`client/UnityProject/.gitattributes`, `-text`): Unity LF yazar, öyle
+kalır; ikili varlıklar `binary` işaretlidir. (c) Üretilen içerik (`Library/`, `Temp/`,
+`UserSettings/`, `.csproj`/`.sln`) asla commit edilmez.
+*Kaynak:* O-13'te `client/.gitignore`'daki blanket `*.meta` kalıbının UnityProject'in tüm
+`.meta`'larını yuttuğu, proje depoya girmeden önce yakalandı.
+
 **K-19 · süregelen · Depo/işbirliği sabitleri.** Dal: `claude/surprise-egg-collection-game-eycqiq`
 (başkasına push yok); commit mesajları Türkçe ve içerik odaklı; artifact HEP aynı URL'ye
 republish; model kimliği repo çıktılarının hiçbirine yazılmaz; tüm doküman ve UI dili Türkçe.
