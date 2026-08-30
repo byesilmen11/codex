@@ -21,8 +21,11 @@
   zarf, JS load() gerçek çıktılarından 6 altın fikstür + fuzz (`dotnet test` 40/40)
 - ✅ Migrasyon fikstür kapsamı — eleştirmen haritası (57 dal) + 5 yeni vaka; 11/11 fikstür,
   `dotnet test` 45/45
-- ⬜ Unity LTS proje kabuğu — `/client` Unity projesi + assembly bağları (v2·07 §13/1)
-  — UNITY KURULU MAKİNE İŞİ (bu ortamda editor yok)
+- ✅ Unity paketleme hazırlığı — UPM manifesti + asmdef (`noEngineReferences`), derleme
+  çıktısı yönlendirmesi, Unity `.gitignore`, kültür bağımsızlığı düzeltmesi + 5 test,
+  duman testi scripti (Unity API taklidiyle 9/9 koşuldu), kurulum talimatı (`proje/07`)
+- 🔄 **Unity kabuğu** — `client/UnityProject` oluşturma + paket bağlama + duman testi
+  ← **KULLANICIDA** (talimat: `proje/07-unity-kurulum-talimati.md`, ~20 dk)
 - 🔵 `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar
   (6 seri × 8 varyant × yırtılma) + kapsül/çevre/UI/portreler. NOT: ~1.300 PNG / 15-30 MB —
   Unity projesi açılırken üretilmesi daha doğru (git şişmesin; gerekirse LFS kararı o gün)

@@ -318,3 +318,40 @@ pass-through; `v3-sinir` — null→varsayılan, round2 çıktıda, kısmi gorev
 serisi). **11 fikstürün 11'i C#'ta İLK denemede geçti → dotnet test 45/45.**
 Sözleşmeye "tipli alan sıkılaştırması" notu eklendi (motor-imkânsız şekiller fikstür dışı;
 string-tipli geçersizler JS gibi taşınır ve kilitli). Tüm kapılar yeşil.
+
+---
+
+## O-10 · 2026-08-30 · Unity Kurulum Paketi (makine-tarafı işin hazırlanması)
+
+**Bağlam:** Konteyner yeniden başladı; kayıt ritüeli sayesinde kayıp yok (çalışma ağacı
+temiz, dal senkron). Kullanıcı isteği: Unity kurulum talimatının hazırlanması ("yap").
+
+**Yapılanlar — yalnız doküman değil, makinedeki işi 20 dakikaya indiren hazırlıklar:**
+- `client/Yuvo.Core/package.json` + `Yuvo.Core.asmdef`: çekirdek artık yerel bir **UPM
+  paketi**. `noEngineReferences: true` bilinçli kilit — paket içine UnityEngine kodu
+  sızarsa Unity derlemesi kırılır (çekirdek Unity'siz doğrulanabilir kalmalı).
+- `client/Directory.Build.props`: derleme çıktıları `client/.build/` altına yönlendirildi.
+  **Gerçek tuzak kapatıldı:** `obj/` içindeki üretilmiş `*.AssemblyInfo.cs` dosyalarını Unity
+  kaynak sanıp derlemeye alır ve "duplicate attribute" hatası verirdi.
+- `client/.gitignore`: `.build/`, `*.meta` ve Unity projesi kalıpları (`UnityProject/Library/`
+  vb.) — `Library/` gigabaytları depoya girmesin.
+- **Kültür sızıntısı denetimi ve düzeltmesi:** JSON codec tarafı zaten tamamen invariant'tı;
+  iki nokta açıktı — `MonthKeyFn` varsayılanı (`d.Year + "-" + Month.ToString("00")`) ve
+  SaveService özet hex'i. Arapça-Hint rakamlı bir yerelde ay anahtarı bozulup **SyncMonth her
+  açılışta ebeveyn harcama sayacını sıfırlardı**. İkisi de InvariantCulture'a çekildi.
+- `Yuvo.Core.Tests/CultureTests.cs` (YENİ, 5 test): tr-TR/de-DE'de sayı yazımı noktalı,
+  tr-TR/ar-SA'da ay anahtarı ASCII ve SyncMonth harcamayı silmiyor, Türkçe kültürde
+  kaydet→yükle çevrimi kararlı (sabit nokta; ilk turda Version 2→3 migrasyon damgası
+  beklenen davranış — testin ilk kurgusu bunu varsaymıyordu, düzeltildi).
+- `client/unity-smoke/YuvoCoreSmokeTest.cs`: Unity Editor menü komutu (RNG paritesi,
+  GameState varsayılanları, JSON round-trip, çift yuvalı kayıt). RNG beklenen değerleri
+  hem .NET hem Node ile ölçülüp **birebir aynı** çıktığı doğrulandıktan sonra gömüldü.
+  Script Unity API'leri taklit edilerek burada derlenip koşuldu: **9/9 geçti** — kullanıcı
+  Unity'de ilk seferde çalıştırabilecek.
+- `proje/07-unity-kurulum-talimati.md`: 8 adım (klon → proje → tek satırlık paket bağlama →
+  doğrulama → duman testi → ayarlar → commit), kontrol listesi, sorun giderme tablosu,
+  "yapılmaması gerekenler".
+
+**Doğrulama:** `dotnet test` **50/50** (45 + 5 kültür); prototip motor testi ve tüm ihraç
+`--check` kapıları yeşil.
+**Sıradaki:** Unity kurulumu kullanıcının makinesinde (talimat hazır) → U1 ekranları.

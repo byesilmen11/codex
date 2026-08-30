@@ -1,5 +1,28 @@
 bin/
 obj/
+.build/
 *.user
 .vs/
 TestResults/
+# Unity .meta dosyaları paket klasöründe Unity tarafından üretilir; Unity projesi
+# açılana dek depoya girmesinler (U1'de kararı gözden geçir — paket dağıtılacaksa
+# .meta'lar sabitlenmelidir).
+*.meta
+
+# --- Unity projesi (client/UnityProject) — proje/07-unity-kurulum-talimati.md ---
+# Library/ tek başına gigabaytlarca üretilmiş veridir; ASLA commit edilmez.
+UnityProject/Library/
+UnityProject/Temp/
+UnityProject/Obj/
+UnityProject/Logs/
+UnityProject/UserSettings/
+UnityProject/MemoryCaptures/
+UnityProject/Recordings/
+UnityProject/Build/
+UnityProject/Builds/
+UnityProject/[Bb]uild[Ss]/
+# Unity'nin ürettiği IDE dosyaları (bizim Yuvo.Core.csproj'u etkilemesin diye yol kısıtlı)
+UnityProject/*.csproj
+UnityProject/*.sln
+UnityProject/*.unityproj
+UnityProject/.vsconfig

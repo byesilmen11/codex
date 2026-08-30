@@ -52,7 +52,7 @@ namespace Yuvo.Core
                     h ^= s[i];          // char → uint: UTF-16 kod birimi değeri
                     h *= 16777619u;
                 }
-                return h.ToString("x8");
+                return h.ToString("x8", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
 

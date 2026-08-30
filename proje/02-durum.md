@@ -2,7 +2,7 @@
 
 > **Yaşayan dosya.** Her iş bloğunun sonunda güncellenir; oturuma dönünce İLK bu okunur.
 
-**Son güncelleme:** 2026-08-30 · oturum O-09 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: migrasyon fikstür kapsamı tamam (11 vaka, `dotnet test` 45/45)
+**Son güncelleme:** 2026-08-30 · oturum O-10 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: Unity kurulum paketi hazır (paket+asmdef+duman testi+talimat; `dotnet test` 50/50)
 
 ## Tek paragraf özet
 
@@ -15,13 +15,17 @@ ihraç araçlarındayız.
 
 ## Sıradaki adım (buradan devam et)
 
-➡️ **Unity kabuğu** — bu ortamda YAPILAMAZ (editor yok): kullanıcının Unity kurulu
-makinesinde `/client` Unity projesi açılır, `Yuvo.Core/*.cs` dosyaları `Yuvo.Core.asmdef`
-altına alınır (netstandard2.1 uyumlu, dokunmadan derlenir), Unity Test Runner'a
-GoldenVector/Behavior/Save testleri bağlanır (fikstür yolu: `content/`), sonra U1 ekranları
-(v2·07 §10). Bu ortamda kalan işler DÜŞÜK öncelikli: prototip kozmetik çip çakışması,
-test iyileştirme notları (`03-yapilacaklar.md`), export tam kapsamları (Unity açılışıyla).
-Kullanıcıya soru: Unity kurulumu/makine planı — U1'e geçiş zamanı.
+➡️ **KULLANICIDA: Unity kurulumu** — adım adım talimat hazır:
+[`07-unity-kurulum-talimati.md`](07-unity-kurulum-talimati.md) (~20 dk, 8 adım).
+Hazırlıkların tamamı bu tarafta bitti: `com.yuvo.core` UPM paketi (package.json + asmdef,
+`noEngineReferences`), derleme çıktısı yönlendirmesi (Unity'nin `obj/*.AssemblyInfo.cs`
+tuzağı kapatıldı), Unity `.gitignore` kalıpları, Unity API'leri taklit edilerek burada
+9/9 koşulmuş duman testi scripti (`client/unity-smoke/`).
+Kullanıcı "TÜMÜ GEÇTİ" çıktısını bildirince → **U1 ekranları** (v2·07 §10): önce içerik
+boru hattı (content/*.json → StreamingAssets/Addressables + GameContent yükleyici),
+sonra Home/Ceremony/Assembly/Album, hedef 22 adımlık ritüel paritesi.
+Bu ortamda kalan işler DÜŞÜK öncelikli (`03-yapilacaklar.md`): prototip kozmetik çip
+çakışması, test iyileştirme notları, export tam kapsamları.
 
 ## Ne bitti (kanıtlarıyla)
 
@@ -36,7 +40,8 @@ Kullanıcıya soru: Unity kurulumu/makine planı — U1'e geçiş zamanı.
 | U0: sanat ihracı v1 kanıtı — 78 PNG + manifest (Chromium render, bağımlılıksız) | `tools/export-art.mjs`, `content/art/` |
 | U0: ses ihracı v1 kanıtı — 19 WAV + manifest (OfflineAudioContext şimi, 5 benzersiz cıvıltı) | `tools/export-audio.mjs`, `content/audio/` |
 | U1 çekirdeği: Yuvo.Core C# portu — GachaEngine + StateEngine + NUnit (altın vektörler 3.800 açılış bit-düzeyi bire bir; parite denetimi: GachaEngine 0 bulgu, doğrulanan sapma yok) | `client/` — `dotnet test client/Yuvo.Core.Tests` → 40/40 |
-| U1 çekirdeği: SaveService — bağımlılıksız JSON codec, load() migrasyon portu, çift yuvalı zarf; JS load() gerçek çıktılarından 6 altın fikstür + 200 girdilik fuzz | `client/Yuvo.Core/Save*.cs`, `tools/export-migration-fixtures.mjs`, `content/golden/migration/` |
+| U1 çekirdeği: SaveService — bağımlılıksız JSON codec, load() migrasyon portu, çift yuvalı zarf; JS load() gerçek çıktılarından 11 altın fikstür + 200 girdilik fuzz | `client/Yuvo.Core/Save*.cs`, `tools/export-migration-fixtures.mjs`, `content/golden/migration/` |
+| U1 köprüsü: Unity paketleme (UPM manifesti + asmdef), derleme çıktısı yönlendirmesi, kültür bağımsızlığı düzeltmesi + 5 regresyon testi, Unity duman testi scripti, kurulum talimatı | `client/Yuvo.Core/package.json`, `*.asmdef`, `client/Directory.Build.props`, `client/unity-smoke/`, `proje/07-…md` |
 | Proje yönetim katmanı | `proje/` (bu klasör) |
 
 ## Canlı referanslar
@@ -48,7 +53,7 @@ Kullanıcıya soru: Unity kurulumu/makine planı — U1'e geçiş zamanı.
 - **İhraç güncellik kapıları:** `node tools/export-content.mjs --check` ·
   `node tools/export-golden-vectors.mjs --check` · `node tools/export-art.mjs --check` ·
   `node tools/export-audio.mjs --check` · `node tools/export-migration-fixtures.mjs --check`
-- **C# çekirdek testi:** `dotnet test client/Yuvo.Core.Tests` (40 test)
+- **C# çekirdek testi:** `dotnet test client/Yuvo.Core.Tests` (50 test)
 - **Ekran görüntüleri:** `prototype/screenshots/01-18*.png` (duman testi her koşuda tazeler)
 
 ## Açık konular / bekleyen kararlar

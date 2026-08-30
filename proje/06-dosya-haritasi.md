@@ -26,7 +26,11 @@
 | `Yuvo.Core/Rng.cs` | mulberry32 — JS rand() ile bit düzeyinde özdeş |
 | `Yuvo.Core/StateEngine.cs` | state.js API'lerinin portu (newDay/ekonomi/görev/mağaza/biyom) |
 | `Yuvo.Core/GachaEngine.cs` | gacha.js portu (OpenEgg — rand tüketim sırası korunmuş) |
-| `Yuvo.Core.Tests/` | NUnit: altın vektörler (5 senaryo bit-düzeyi) + davranış + içerik testleri — `dotnet test client/Yuvo.Core.Tests` |
+| `Yuvo.Core/SaveValue.cs` · `SaveCodec.cs` · `SaveService.cs` | Bağımlılıksız JSON codec · GameState⇄JSON + `load()` migrasyon portu · çift yuvalı kalıcılık |
+| `Yuvo.Core/package.json` + `Yuvo.Core.asmdef` | Unity paket manifesti + assembly tanımı (`noEngineReferences`: çekirdek Unity'siz kalır) |
+| `Directory.Build.props` | Derleme çıktılarını `client/.build/` altına yönlendirir (Unity import'u temiz kalsın) |
+| `unity-smoke/YuvoCoreSmokeTest.cs` | Unity Editor menü komutu: RNG paritesi + kayıt katmanı duman testi (kurulum doğrulaması) |
+| `Yuvo.Core.Tests/` | NUnit: altın vektörler (5 senaryo bit-düzeyi) + davranış + içerik + kayıt/migrasyon (11 fikstür) + kültür testleri — `dotnet test client/Yuvo.Core.Tests` (50 test) |
 
 ## docs/ — v1 kılavuz (2026-08-01)
 

@@ -57,7 +57,11 @@ namespace Yuvo.Core
             MonthKeyFn = monthKeyFn ?? (() =>
             {
                 var d = DateTime.Now;
-                return d.Year + "-" + d.Month.ToString("00");
+                // Kültürden BAĞIMSIZ biçim: cihaz dili Arapça-Hint rakamları kullanan bir
+                // yerelde olsa bile ay anahtarı "2026-01" kalır. Aksi hâlde SyncMonth her
+                // açılışta ayı "değişmiş" sanıp ebeveyn harcama sayacını sıfırlardı.
+                return d.Year.ToString(System.Globalization.CultureInfo.InvariantCulture) + "-" +
+                       d.Month.ToString("00", System.Globalization.CultureInfo.InvariantCulture);
             });
             Reset(null);
         }

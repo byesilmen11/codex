@@ -15,6 +15,7 @@
 | [`04-kararlar.md`](04-kararlar.md) | **Neye, neden karar verdik?** | Numaralı karar günlüğü: tarih, karar, gerekçe, kaynak, nerede uygulandığı. Bir karar SADECE burada yazıyorsa alınmış sayılır |
 | [`05-oturum-gunlugu.md`](05-oturum-gunlugu.md) | **Ne yaptık?** | Oturum oturum tam kayıt: istek, yapılanlar, commit'ler, doğrulama, teslimat, öğrenilen dersler |
 | [`06-dosya-haritasi.md`](06-dosya-haritasi.md) | **Hangi dosya ne işe yarar?** | Deponun tamamının açıklamalı haritası |
+| [`07-unity-kurulum-talimati.md`](07-unity-kurulum-talimati.md) | **Unity'yi nasıl kurarım?** | Kullanıcının makinesinde yapılacak 8 adım (~20 dk): proje, paket bağlama, duman testi, sorun giderme |
 
 ## Oturum ritüeli (BAĞLAYICI çalışma disiplini)
 

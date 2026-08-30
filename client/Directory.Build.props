@@ -1,0 +1,11 @@
+<Project>
+  <!-- Derleme çıktıları proje klasörlerinden ÇIKARILIR (client/.build/ altına).
+       Gerekçe: Unity, paket/Assets ağacındaki her .cs dosyasını derlemeye alır;
+       obj/ içindeki üretilmiş *.AssemblyInfo.cs dosyaları "duplicate attribute"
+       hatalarına yol açar. Çıktıyı dışarı almak Unity import'unu temiz tutar
+       (proje/07-unity-kurulum-talimati.md). -->
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).build/obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory).build/bin/$(MSBuildProjectName)/</BaseOutputPath>
+  </PropertyGroup>
+</Project>
