@@ -2,7 +2,7 @@
 
 > **Yaşayan dosya.** Her iş bloğunun sonunda güncellenir; oturuma dönünce İLK bu okunur.
 
-**Son güncelleme:** 2026-08-30 · oturum O-08 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: Yuvo.Core C# portu (26/26 test + parite denetimi temiz)
+**Son güncelleme:** 2026-08-30 · oturum O-09 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: SaveService + altın migrasyon fikstürleri (40/40)
 
 ## Tek paragraf özet
 
@@ -37,7 +37,8 @@ işi**; bu ortamda editor yok.
 | U0: içerik ihracı + altın vektörler (`--check` CI kapılarıyla) | `tools/export-content.mjs`, `tools/export-golden-vectors.mjs`, `content/` |
 | U0: sanat ihracı v1 kanıtı — 78 PNG + manifest (Chromium render, bağımlılıksız) | `tools/export-art.mjs`, `content/art/` |
 | U0: ses ihracı v1 kanıtı — 19 WAV + manifest (OfflineAudioContext şimi, 5 benzersiz cıvıltı) | `tools/export-audio.mjs`, `content/audio/` |
-| U1 çekirdeği: Yuvo.Core C# portu — GachaEngine + StateEngine + NUnit (altın vektörler 3.800 açılış bit-düzeyi bire bir; parite denetimi: GachaEngine 0 bulgu, doğrulanan sapma yok) | `client/` — `dotnet test client/Yuvo.Core.Tests` → 26/26 |
+| U1 çekirdeği: Yuvo.Core C# portu — GachaEngine + StateEngine + NUnit (altın vektörler 3.800 açılış bit-düzeyi bire bir; parite denetimi: GachaEngine 0 bulgu, doğrulanan sapma yok) | `client/` — `dotnet test client/Yuvo.Core.Tests` → 40/40 |
+| U1 çekirdeği: SaveService — bağımlılıksız JSON codec, load() migrasyon portu, çift yuvalı zarf; JS load() gerçek çıktılarından 6 altın fikstür + 200 girdilik fuzz | `client/Yuvo.Core/Save*.cs`, `tools/export-migration-fixtures.mjs`, `content/golden/migration/` |
 | Proje yönetim katmanı | `proje/` (bu klasör) |
 
 ## Canlı referanslar
@@ -48,7 +49,8 @@ işi**; bu ortamda editor yok.
   (önce `node tools/build-proto.mjs`)
 - **İhraç güncellik kapıları:** `node tools/export-content.mjs --check` ·
   `node tools/export-golden-vectors.mjs --check` · `node tools/export-art.mjs --check` ·
-  `node tools/export-audio.mjs --check`
+  `node tools/export-audio.mjs --check` · `node tools/export-migration-fixtures.mjs --check`
+- **C# çekirdek testi:** `dotnet test client/Yuvo.Core.Tests` (40 test)
 - **Ekran görüntüleri:** `prototype/screenshots/01-18*.png` (duman testi her koşuda tazeler)
 
 ## Açık konular / bekleyen kararlar

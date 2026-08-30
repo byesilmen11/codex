@@ -17,8 +17,10 @@
 - ✅ `Yuvo.Core` C# portu — GachaEngine + StateEngine + NUnit katmanı (altın vektörler 5
   senaryo bit-düzeyi bire bir; parite denetimi 4 avcı + çürütücü panel: doğrulanan sapma 0;
   `dotnet test` 26/26) — `client/`, PORT-CONTRACT.md
-- 🔄 **SaveService + migrasyon fuzz** — ISaveStore arayüzü, atomik yazım, çift yuva,
-  v1/v2→v3 migrasyon portu (v2·07 §7; saf C#, dotnet test ile) ← SIRADAKİ
+- ✅ SaveService + migrasyon — SaveValue/JsonCodec (bağımlılıksız), load() portu, çift yuvalı
+  zarf, JS load() gerçek çıktılarından 6 altın fikstür + fuzz (`dotnet test` 40/40)
+- 🔄 **Migrasyon fikstür kapsam tamamlama** — eleştirmen ajanın bulduğu kapsanmamış load()
+  onarım dalları için ek fikstür vakaları ← SIRADAKİ (sonuç bekleniyor)
 - ⬜ Unity LTS proje kabuğu — `/client` Unity projesi + assembly bağları (v2·07 §13/1)
   — UNITY KURULU MAKİNE İŞİ (bu ortamda editor yok)
 - 🔵 `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar

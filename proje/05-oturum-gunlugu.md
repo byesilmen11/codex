@@ -277,3 +277,33 @@ kapıları değişmeden yeşil.
 **Commit'ler:** `cfad742` (iskelet+sözleşme), `52cfd82` (port 25/25), + bu kapanış commit'i.
 **Sıradaki:** SaveService (atomik JSON + çift yuva + migrasyon fuzz — saf C#, burada test
 edilebilir); Unity kabuğu (`/client` Unity projesi) Unity kurulu makine işi olarak notlandı.
+
+---
+
+## O-09 · 2026-08-30 · SaveService: Kalıcılık + Migrasyon (altın fikstür felsefesiyle)
+
+**İstek:** "devam" (ultracode sürüyor).
+
+**Yapılanlar:**
+- PORT-CONTRACT.md'ye **EK: SaveService sözleşmesi** yazıldı (SaveValue/JsonCodec API'si,
+  SaveCodec serileştirme şekil kuralları, load() portunun rastgelelik tüketim hizalaması,
+  ISaveStore + çift yuvalı zarf, altın migrasyon fikstür şeması, test kapsamı) — commit `f8b12bc`.
+- **Workflow (4 paralel ajan):**
+  * `SaveValue.cs` — bağımlılıksız mini JSON modeli + JsonCodec (tam gramer, hatada null,
+    derinlik 512, JSON.stringify uyumlu yazım; Core'a dış bağımlılık girmedi).
+  * `SaveCodec.cs` — GameState→JSON (defaults() anahtar sırası birebir) + `load()` migrasyon
+    portu (bilinen-anahtar birleştirme + tüm tip onarımları; v1 fillTodayEggs rastgelelik
+    hizalaması ölçülerek doğrulandı: boş depo 7, v1 n=2→6, v2→4 çağrı).
+  * `SaveService.cs` — çift yuva + zarf (sira + FNV-1a sum); hedef yuva depodan taze taranır;
+    sum, kayit'in yeniden-yazımı üzerinden; hiçbir yol fırlatmaz.
+  * `tools/export-migration-fixtures.mjs` — **migrasyona altın vektör felsefesi**: JS load()
+    GERÇEK çıktıları fikstür oldu (sabit Date=2026-01-15 + tohumlu Math.random=42 stub'ları,
+    çift koşum determinizm kanıtı, --check kapısı) → `content/golden/migration/` 6 vaka.
+  * `SaveTests.cs` — 6 MigrationGolden + RoundTrip + 6 yuva senaryosu + 200 girdilik fuzz.
+- Bütünleştirme İLK denemede geçti: **dotnet test 40/40** (26 + 14 yeni); migrasyon fikstür
+  --check ve prototip motor testi yeşil. Commit `c5e1622`.
+- Kapsam eleştirmeni (tek ajan): load() onarım dallarının 6 fikstürce kapsam haritası —
+  eksik dallar için yeni fikstür vakaları önerilecek; sonucu bu oturumda işlenir.
+
+**Sıradaki:** eleştirmen bulgularıyla fikstür kapsamını tamamla; sonra `02-durum.md` →
+Unity kabuğu (Unity kurulu makine işi) / U0 kapanışı.
