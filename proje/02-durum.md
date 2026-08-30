@@ -2,7 +2,7 @@
 
 > **Yaşayan dosya.** Her iş bloğunun sonunda güncellenir; oturuma dönünce İLK bu okunur.
 
-**Son güncelleme:** 2026-08-30 · oturum O-10 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: Unity kurulum paketi hazır (paket+asmdef+duman testi+talimat; `dotnet test` 50/50)
+**Son güncelleme:** 2026-08-30 · oturum O-11 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: Unity talimatı Windows/sürüm-seçimi uyarlaması (kullanıcı kurulumu yapıyor)
 
 ## Tek paragraf özet
 
@@ -10,8 +10,10 @@ HTML5 prototip **özellik-tamamlanmış ve yayın öncesi cilalanmış** durumda
 (FTUE → ritüel → albüm → oturum döngüsü → gün kapanışı), 2 biyom / 62 Pufi, ebeveyn DEMO
 mağazası, araştırma temelli psikolojik kancaların tamamı (P1-P6) uygulanmış; motor testi
 tümü yeşil + duman testi 55 adım sıfır konsol hatasıyla geçiyor. Unity taşıma planı yazıldı
-(`docs/v2/07`) ve U0 boru hattının içerik + altın vektör araçları bitti. Şu an U0'ın kalan
-ihraç araçlarındayız.
+(`docs/v2/07`); U0 ihraç boru hatlarının dördü de tamam (içerik/altın vektör/sanat/ses).
+**Unity çekirdeği `Yuvo.Core` bitti**: gacha+state portu (3.800 açılış bit-düzeyi altın vektör
+paritesi) + SaveService/kalıcılık (11 altın migrasyon fikstürü) + kültür bağımsızlığı —
+`dotnet test` 50/50. Şu an Unity kabuğu KULLANICIDA (talimat: `proje/07`).
 
 ## Sıradaki adım (buradan devam et)
 
@@ -39,7 +41,7 @@ Bu ortamda kalan işler DÜŞÜK öncelikli (`03-yapilacaklar.md`): prototip koz
 | U0: içerik ihracı + altın vektörler (`--check` CI kapılarıyla) | `tools/export-content.mjs`, `tools/export-golden-vectors.mjs`, `content/` |
 | U0: sanat ihracı v1 kanıtı — 78 PNG + manifest (Chromium render, bağımlılıksız) | `tools/export-art.mjs`, `content/art/` |
 | U0: ses ihracı v1 kanıtı — 19 WAV + manifest (OfflineAudioContext şimi, 5 benzersiz cıvıltı) | `tools/export-audio.mjs`, `content/audio/` |
-| U1 çekirdeği: Yuvo.Core C# portu — GachaEngine + StateEngine + NUnit (altın vektörler 3.800 açılış bit-düzeyi bire bir; parite denetimi: GachaEngine 0 bulgu, doğrulanan sapma yok) | `client/` — `dotnet test client/Yuvo.Core.Tests` → 40/40 |
+| U1 çekirdeği: Yuvo.Core C# portu — GachaEngine + StateEngine + NUnit (altın vektörler 3.800 açılış bit-düzeyi bire bir; parite denetimi: GachaEngine 0 bulgu, doğrulanan sapma yok) | `client/` — `dotnet test client/Yuvo.Core.Tests` → 50/50 |
 | U1 çekirdeği: SaveService — bağımlılıksız JSON codec, load() migrasyon portu, çift yuvalı zarf; JS load() gerçek çıktılarından 11 altın fikstür + 200 girdilik fuzz | `client/Yuvo.Core/Save*.cs`, `tools/export-migration-fixtures.mjs`, `content/golden/migration/` |
 | U1 köprüsü: Unity paketleme (UPM manifesti + asmdef), derleme çıktısı yönlendirmesi, kültür bağımsızlığı düzeltmesi + 5 regresyon testi, Unity duman testi scripti, kurulum talimatı | `client/Yuvo.Core/package.json`, `*.asmdef`, `client/Directory.Build.props`, `client/unity-smoke/`, `proje/07-…md` |
 | Proje yönetim katmanı | `proje/` (bu klasör) |
@@ -60,8 +62,7 @@ Bu ortamda kalan işler DÜŞÜK öncelikli (`03-yapilacaklar.md`): prototip koz
 
 1. **Park edilenler** (gerekçeleriyle `01-yol-haritasi.md` alt tablosu): hukuk, bölge matrisi,
    mağaza kategorisi, sosyallik, sponsorlu seriler.
-2. **Unity proje iskeleti ne zaman açılacak** — U0 ihraç araçları bitince (export-art +
-   export-audio) karar anı: repo içinde `/client` mi, ayrı repo mu (öneri: aynı repo `/client`,
-   docs/11 §7 depo yapısına uygun).
+2. ~~Unity proje iskeleti nereye~~ → KARAR: aynı repo, `client/UnityProject` (docs/11 §7);
+   çekirdek `client/Yuvo.Core` yerel UPM paketi olarak bağlanır (`file:../../Yuvo.Core`).
 3. **Bilinen küçük kozmetik pürüz:** yuvada "Sürpriz posta!" çipi tezgâhın arkasına taşabiliyor
    (ekran görüntüsü 15-16'da görünür; işlevsel değil, `03-yapilacaklar.md`'de düşük öncelik).

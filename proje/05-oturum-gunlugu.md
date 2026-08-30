@@ -355,3 +355,28 @@ temiz, dal senkron). Kullanıcı isteği: Unity kurulum talimatının hazırlanm
 **Doğrulama:** `dotnet test` **50/50** (45 + 5 kültür); prototip motor testi ve tüm ihraç
 `--check` kapıları yeşil.
 **Sıradaki:** Unity kurulumu kullanıcının makinesinde (talimat hazır) → U1 ekranları.
+
+---
+
+## O-11 · 2026-08-30 · Unity kurulum talimatı Windows'a uyarlandı
+
+**İstek:** Kullanıcı Unity'yi kurdu (ekran görüntüleri) ve "sıradaki adımları adım adım
+yönlendir" dedi.
+
+**Tespit (ekran görüntülerinden):** Hub'da İKİ editör kurulu — `6.5 (6000.5.10f1)` modülleri
+Web+Windows, `6.3 LTS (6000.3.23f1)` modülleri **Android+iOS+Windows**. Yuvo mobil olduğundan
+doğru seçim **6.3 LTS**; yanlış editörle açılsa Android hedefi hiç görünmez ve ancak U3'te
+fark edilirdi. Ayrıca talimat Unix kabuğuna göre yazılmıştı; kullanıcı Windows'ta.
+
+**Yapılanlar (`proje/07-unity-kurulum-talimati.md`):**
+- Yeni **"Hangi Unity sürümü?"** bölümü: rozet karşılaştırma tablosu + Editor Version uyarısı.
+- Windows (PowerShell) komut karşılıkları: klonlama, script kopyalama (`Copy-Item`), commit;
+  yollar `C:\Users\<kullanıcı>\Documents\codex\client\UnityProject` biçiminde verildi.
+- Adım 4'e **JSON virgül** uyarısı (manifest düzenlemesinin en sık tuzağı).
+- Adım 6'da `Assets/Editor` klasörünün Unity'de nasıl oluşturulacağı netleştirildi.
+- Sorun giderme tablosuna 4 Windows satırı: `Remove-Item` karşılığı, git/dotnet PATH,
+  **"Build Settings'te Android yok"** (yanlış editör), Visual Studio 2026 harici düzenleyici.
+
+**Doğrulama:** Doküman değişikliği; kod/motor dokunulmadı (`dotnet test` 50/50 önceki
+koşumda yeşildi). **Sıradaki:** kullanıcı 8 adımı uyguluyor → duman testi çıktısı bildirilecek
+→ U1 (içerik boru hattı + ekranlar).

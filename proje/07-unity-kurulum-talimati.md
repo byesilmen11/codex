@@ -15,19 +15,48 @@
 | Gereksinim | Not |
 |---|---|
 | **Unity Hub** | unity.com/download |
-| **Unity LTS sürümü** | Hub'ın önerdiği güncel **LTS**'i kur (Unity 6 LTS ya da 2022.3 LTS — paket `2021.3+` uyumlu, üçü de olur) |
+| **Unity LTS sürümü** | **Android + iOS modülleri kurulu olan LTS** (paket `2021.3+` uyumlu). Hub'da birden çok editör varsa → aşağıdaki "Hangi Unity sürümü?" bölümü |
 | Modüller | **Android Build Support** (SDK/NDK+OpenJDK dahil). iOS için ayrıca **iOS Build Support** (Mac gerekir) |
 | Disk | Editör + proje kütüphanesi için ~15 GB |
 | Git | Depoyu klonlamak için |
 
+## Hangi Unity sürümü? (Hub'da birden fazla editör varsa)
+
+Yuvo **mobil** bir oyundur (docs/11 §1) → projeyi **Android/iOS modülleri kurulu olan
+LTS** ile açmalısın. Hub ▸ Installs ekranında her sürümün altındaki rozetler kurulu
+modülleri gösterir.
+
+| Sürüm | Rozetler | Karar |
+|---|---|---|
+| **Unity 6.3 LTS** (`6000.3.23f1`) | Android · iOS · Windows | ✅ **BUNU KULLAN** |
+| Unity 6.5 (`6000.5.10f1`) | Web · Windows | ❌ Android/iOS modülü yok — mobil hedef listede çıkmaz |
+
+Yanlış editörle açarsan Build Settings'te Android görünmez ve bunu ancak U3'te fark
+edersin. Proje oluştururken Hub'ın **Editor Version** açılırından `6000.3.23f1` seçili
+olduğundan emin ol.
+
 ## Adımlar
 
 ### 1. Depoyu klonla ve dalı geç
-```bash
+
+**Windows (PowerShell)** — Başlat ▸ "PowerShell" yaz ▸ aç:
+```powershell
+cd $HOME\Documents
 git clone https://github.com/byesilmen11/codex.git
 cd codex
 git checkout claude/surprise-egg-collection-game-eycqiq
 ```
+Depo yolun: `C:\Users\<kullanıcı>\Documents\codex`
+
+**macOS / Linux:**
+```bash
+cd ~/Documents
+git clone https://github.com/byesilmen11/codex.git
+cd codex
+git checkout claude/surprise-egg-collection-game-eycqiq
+```
+
+> `git` bulunamazsa: git-scm.com/download/win (Git for Windows) kur, PowerShell'i kapat-aç.
 
 ### 2. (İsteğe bağlı ama önerilir) Çekirdeği Unity'siz doğrula
 .NET 8 SDK kuruluysa — Unity'ye girmeden çekirdeğin sağlam olduğunu görürsün:
@@ -37,17 +66,20 @@ dotnet test client/Yuvo.Core.Tests
 Beklenen: **Passed! … Total: 50**.
 
 ### 3. Unity projesini oluştur
-Unity Hub → **New project** →
-- Şablon: **2D (URP)** — URP yoksa düz **2D** de olur, U1'de yükseltilir
+Unity Hub → **Projects** ▸ **New project** →
+- **Editor Version: `6000.3.23f1` (6.3 LTS)** ← Android/iOS olan sürüm (yukarıdaki tabloya bak)
+- Şablon: **Universal 2D** (yoksa düz **2D**; U1'de yükseltilir)
 - Project name: `UnityProject`
-- Location: klonladığın deponun **`client/`** klasörü
-  → sonuç yolu: `<depo>/client/UnityProject`
+- Location: klonladığın deponun **`client`** klasörü
+  → Windows'ta: `C:\Users\<kullanıcı>\Documents\codex\client`
+  → sonuç yolu: `…\codex\client\UnityProject`
 
 Bu konum önemli: paket bağlantısı ve `.gitignore` kalıpları bu yola göre yazıldı.
+İlk açılış birkaç dakika sürer (paketler derlenir).
 
 ### 4. Çekirdek paketini bağla (tek satır)
-`<depo>/client/UnityProject/Packages/manifest.json` dosyasını bir metin düzenleyicide aç ve
-`"dependencies"` bloğunun İÇİNE şu satırı ekle (virgüllere dikkat):
+`…\codex\client\UnityProject\Packages\manifest.json` dosyasını **Not Defteri** (ya da
+VS Code) ile aç ve `"dependencies"` bloğunun İÇİNE, ilk satır olarak şunu ekle:
 
 ```json
 "com.yuvo.core": "file:../../Yuvo.Core",
@@ -63,7 +95,11 @@ Bu konum önemli: paket bağlantısı ve `.gitignore` kalıpları bu yola göre 
   }
 }
 ```
-Kaydet ve Unity'ye geri dön — otomatik olarak paketi alır (birkaç saniye).
+Kaydet ve Unity'ye geri dön (pencereye tıkla) — paketi otomatik alır, birkaç saniye sürer.
+
+> ⚠️ **En sık hata: JSON virgülü.** Eklediğin satırın sonunda virgül OLMALI (arkasından
+> başka satırlar geliyor). Console'da `manifest.json` / `Failed to parse` hatası çıkarsa
+> ilk bakılacak yer budur.
 
 > **Neden kopyalamıyoruz?** Kaynak tek yerde (`client/Yuvo.Core`) kalır; `dotnet test`
 > ve Unity aynı dosyaları derler, ikizlenme/sürüklenme olmaz.
@@ -73,8 +109,14 @@ Kaydet ve Unity'ye geri dön — otomatik olarak paketi alır (birkaç saniye).
 - **Console** penceresi → kırmızı hata **olmamalı** (Clear'a basıp bekle).
 
 ### 6. Duman testini çalıştır (asıl kanıt)
-1. Unity'de `Assets` altında **`Editor`** adında bir klasör oluştur.
-2. `<depo>/client/unity-smoke/YuvoCoreSmokeTest.cs` dosyasını bu klasöre **kopyala**.
+1. Unity'de **Project** penceresinde `Assets` üstüne sağ tık ▸ **Create ▸ Folder** ▸ adı
+   **`Editor`** (tam bu yazım — Unity bu klasörü editör kodu olarak tanır).
+2. `…\codex\client\unity-smoke\YuvoCoreSmokeTest.cs` dosyasını Dosya Gezgini'nden
+   `…\codex\client\UnityProject\Assets\Editor\` klasörüne **kopyala** (sürükle-bırak da olur).
+   PowerShell ile:
+   ```powershell
+   Copy-Item client\unity-smoke\YuvoCoreSmokeTest.cs client\UnityProject\Assets\Editor\
+   ```
 3. Üst menüde beliren **Yuvo ▸ Çekirdek Duman Testi** komutunu çalıştır.
 4. Console'da beklenen çıktı:
 
@@ -102,9 +144,10 @@ de aynı davranacak).
 - **Game** penceresi çözünürlüğü: **390×844** (prototiple aynı referans çerçeve)
 
 ### 8. Commit et
-```bash
+Depo klasöründe (PowerShell veya terminal, ikisinde de aynı):
+```powershell
 git add client/UnityProject
-git commit -m "Unity projesi iskeleti (U1 başlangıcı)"
+git commit -m "Unity projesi iskeleti (U1 baslangici)"
 git push
 ```
 `.gitignore` `Library/`, `Temp/`, üretilen `.csproj`/`.sln` dosyalarını zaten dışarıda tutar —
@@ -124,7 +167,10 @@ git push
 |---|---|
 | Paket görünmüyor, manifest hatası | `file:` yolu yanlış. Proje **`client/UnityProject`** altında mı? Değilse yolu düzelt: manifest.json'un bulunduğu `Packages/` klasöründen `Yuvo.Core`'a göreli yol. |
 | `The type or namespace 'Yuvo' could not be found` | Paket yüklenmemiş (yukarıdaki madde) **ya da** script `Assets/Editor` yerine paket içine konmuş. |
-| `Duplicate assembly attribute` / `AssemblyInfo` hataları | Paket klasöründe eski `bin/`–`obj/` kalıntısı var. Sil: `rm -rf client/Yuvo.Core/bin client/Yuvo.Core/obj` (yeni derlemeler zaten `client/.build/` altına gider). |
+| `Duplicate assembly attribute` / `AssemblyInfo` hataları | Paket klasöründe eski `bin/`–`obj/` kalıntısı var. **Windows:** `Remove-Item -Recurse -Force client\Yuvo.Core\bin, client\Yuvo.Core\obj` · **Unix:** `rm -rf client/Yuvo.Core/bin client/Yuvo.Core/obj` (yeni derlemeler zaten `client/.build/` altına gider). |
+| `git` / `dotnet` komutu bulunamadı (Windows) | Git for Windows (git-scm.com) ve/veya .NET 8 SDK (dotnet.microsoft.com) kur, PowerShell'i kapat-aç. Adım 2 zaten isteğe bağlı — .NET kurmadan da devam edebilirsin. |
+| Build Settings'te **Android yok** | Proje yanlış editörle açılmış (6.5 = Web+Windows). Hub ▸ Projects ▸ projenin yanındaki sürüm açılırından `6000.3.23f1` seç, yeniden aç. |
+| Kod düzenleyici açılmıyor / IntelliSense yok | Visual Studio 2026 Community zaten kurulu (Hub modül listesinde görünüyor). Unity ▸ Edit ▸ Preferences ▸ External Tools ▸ External Script Editor → Visual Studio. |
 | Duman testinde **RNG satırları hatalı** | CİDDİ: Unity çalışma zamanı `uint` aritmetiğinde sapıyor demektir; altın vektör paritesi bozulur. Ekran görüntüsüyle haber ver — `Rng.cs` ve IL2CPP ayarları birlikte incelenir. |
 | Duman testinde **JSON/kayıt satırı hatalı** | Cihaz kültürü sızmış olabilir. Hangi satırın düştüğünü ilet. |
 | Console'da URP/shader uyarıları | Zararsız; U1'de görsel boru hattı kurulurken düzelir. |
