@@ -24,8 +24,11 @@
 - ✅ Unity paketleme hazırlığı — UPM manifesti + asmdef (`noEngineReferences`), derleme
   çıktısı yönlendirmesi, Unity `.gitignore`, kültür bağımsızlığı düzeltmesi + 5 test,
   duman testi scripti (Unity API taklidiyle 9/9 koşuldu), kurulum talimatı (`proje/07`)
-- 🔄 **Unity kabuğu** — `client/UnityProject` oluşturma + paket bağlama + duman testi
-  ← **KULLANICIDA** (talimat: `proje/07-unity-kurulum-talimati.md`, ~20 dk)
+- ✅ Unity kabuğu — `client/UnityProject` oluşturuldu, `com.yuvo.core` paketi bağlandı,
+  duman testi Unity'de **9/9 geçti** (O-12; BOM ve bit-parite tuzakları belgelendi)
+- 🔄 **U1 başlangıcı** — (a) kullanıcı: proje ayarları + UnityProject commit/push;
+  (b) bu taraf: içerik yükleyici (`content/*.json` → StreamingAssets + GameContent),
+  sanat/ses tam ihracı, sonra Home/Ceremony/Assembly/Album ekranları ← SIRADAKİ
 - 🔵 `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar
   (6 seri × 8 varyant × yırtılma) + kapsül/çevre/UI/portreler. NOT: ~1.300 PNG / 15-30 MB —
   Unity projesi açılırken üretilmesi daha doğru (git şişmesin; gerekirse LFS kararı o gün)

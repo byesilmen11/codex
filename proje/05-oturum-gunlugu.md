@@ -380,3 +380,36 @@ fark edilirdi. Ayrıca talimat Unix kabuğuna göre yazılmıştı; kullanıcı 
 **Doğrulama:** Doküman değişikliği; kod/motor dokunulmadı (`dotnet test` 50/50 önceki
 koşumda yeşildi). **Sıradaki:** kullanıcı 8 adımı uyguluyor → duman testi çıktısı bildirilecek
 → U1 (içerik boru hattı + ekranlar).
+
+---
+
+## O-12 · 2026-08-30 · Unity Kurulumu TAMAMLANDI (kullanıcı makinesi) + bit-parite dersi
+
+**İstek:** "adım adım yönlendir beni" — kullanıcı Unity 6.3 LTS + 6.5 kurulu hâlde başladı.
+
+**Akış ve çözülen üç gerçek engel:**
+1. **Sürüm seçimi:** Hub'da iki editör vardı; 6.5'te Android/iOS modülü YOK. Kullanıcı
+   `6000.3.23f1 (6.3 LTS)` ile projeyi açtı → mobil hedefler korundu.
+2. **Klonlama çakışması:** `Documents\codex` adında dolu bir klasör vardı (git reddetti).
+   Eski klasör `codex-eski` olarak yeniden adlandırıldı (veri silinmeden), klon temiz yapıldı.
+3. **BOM tuzağı (benim komutumun yan etkisi):** manifest'i PowerShell
+   `Set-Content -Encoding UTF8` ile yazdırınca dosya başına U+FEFF eklendi ve Unity
+   `Failed to resolve packages … Char: 65279` ile HİÇBİR paketi yükleyemedi (belirti:
+   `ISaveStore could not be found`). 3 baytlık BOM silinerek onarıldı; doğru (BOM'suz)
+   komut ve onarım komutu talimata işlendi.
+
+**Bulgu — bit-parite dersi (kalıcı kural):** Duman testi ilk koşuda "2 HATA" verdi:
+`RNG 1. çekiliş → 0.97972826776094735` (beklenen `0.9797282677609473`). Analiz: iki yazım
+da AYNI double (bit deseni `0x1.f59ef18a00000p-1`); fark yalnız `double→metin` biçiminde
+(.NET Core 3.0+ en kısa yazım, Mono 17 basamak). Yani **RNG Unity'de doğruydu, test
+yanlıştı.** Script `BitConverter.DoubleToInt64Bits` ile bit deseni karşılaştırmasına
+geçirildi; `PORT-CONTRACT.md`'ye **kural 10** eklendi (platformlar arası sayı doğrulaması
+metin üzerinden yapılmaz).
+
+**SONUÇ:** Unity Console → **"YUVO ÇEKİRDEK DUMAN TESTİ — TÜMÜ GEÇTİ"** (9/9).
+Kanıtlananlar: `com.yuvo.core` paketi Unity'de derleniyor · mulberry32 RNG Unity çalışma
+zamanında masaüstü .NET ve JS prototipiyle BİT DÜZEYİNDE aynı · kayıt katmanı (JSON codec +
+çift yuvalı SaveService) cihaz kültüründen bağımsız çalışıyor.
+
+**Commit'ler:** `cafa607` (Windows uyarlaması), BOM belgelemesi, `72c866f` (bit-parite).
+**Sıradaki:** kullanıcı proje ayarları (portre) + Unity projesini commit/push → U1 ekranları.
