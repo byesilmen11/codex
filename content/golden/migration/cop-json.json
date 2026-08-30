@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "uretici": "tools/export-migration-fixtures.mjs",
+    "not": "ELLE DÜZENLEMEYİN — state.js load() gerçek çıktısıdır; C# SaveCodec.Load bu state'i bire bir yeniden üretmek zorundadır (PORT-CONTRACT.md EK).",
+    "stub": "Math.random = mulberry32(rngTohum, her vaka taze); Date sabit 2026-01-15 (Date.now=1768435200000, monthKey=sabitAy)."
+  },
+  "ad": "cop-json",
+  "aciklama": "Bozuk JSON (\"{{bozuk\"): JSON.parse fırlatır, catch temiz başlangıca düşer (state.js satır 189). Sonuç bos-depo ile aynı yol.",
+  "rngTohum": 42,
+  "sabitAy": "2026-01",
+  "girdi": "{{bozuk",
+  "beklenen": {
+    "version": 3,
+    "stardust": 40,
+    "kabuk": 0,
+    "day": 1,
+    "eggsAvailable": 3,
+    "extraEggsBought": 0,
+    "eggCounter": 0,
+    "pityN": 0,
+    "pityD": 0,
+    "pityE": 0,
+    "copyStreak": 0,
+    "owned": {},
+    "milestones": [],
+    "weekCrafts": 0,
+    "rewardedPlaysToday": 0,
+    "todayEggs": [
+      {
+        "seri": "gunesbahcesi",
+        "variant": 6,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 3,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 1,
+        "golden": null
+      }
+    ],
+    "firstRitualDoneToday": false,
+    "chocolates": 0,
+    "chocolateStarsToday": 0,
+    "kumbaraToday": 0,
+    "lastChocolateChoice": "ye",
+    "foilBook": {},
+    "goldenPity": 0,
+    "tools": [
+      "burgu",
+      "cekic",
+      "firlat"
+    ],
+    "activeTool": "burgu",
+    "parent": {
+      "pin": "1234",
+      "limitTL": 400,
+      "spentTL": 0,
+      "ay": "2026-01",
+      "clubActive": false,
+      "limitRaiseTs": 0
+    },
+    "kiler": {
+      "adet": 0,
+      "bugunAcilan": 0
+    },
+    "wishes": [],
+    "purchases": [],
+    "introDone": false,
+    "introGiftShown": false,
+    "activeBiome": "cayir",
+    "ormanAcik": false,
+    "sakoHidden": null,
+    "hedefPufi": null,
+    "kulucka": null,
+    "bugunAcilanlar": [],
+    "gorevler": {
+      "ac": 0,
+      "oyun": 0,
+      "albumZiyaret": false,
+      "bonusVerildi": false
+    },
+    "gorevBonusYeni": false,
+    "streak": {
+      "yildiz": 0,
+      "rozet": 0
+    },
+    "seed": 2452826761
+  }
+}

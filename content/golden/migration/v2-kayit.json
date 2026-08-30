@@ -1,0 +1,111 @@
+{
+  "_meta": {
+    "uretici": "tools/export-migration-fixtures.mjs",
+    "not": "ELLE DÜZENLEMEYİN — state.js load() gerçek çıktısıdır; C# SaveCodec.Load bu state'i bire bir yeniden üretmek zorundadır (PORT-CONTRACT.md EK).",
+    "stub": "Math.random = mulberry32(rngTohum, her vaka taze); Date sabit 2026-01-15 (Date.now=1768435200000, monthKey=sabitAy)."
+  },
+  "ad": "v2-kayit",
+  "aciklama": "v2 kaydı, bozuk vitrin: geçersiz seri → daySeries(day), variant 99→7 / -3→0 clamp, golden \"evet\"→null, kulucka \"belki\" silinir, obje olmayan öğeler düşer; tools eksikleri FREE_TOOLS ile tamamlanır, activeTool listede yoksa tools[0], lastChocolateChoice \"YE\"→\"ye\", negatif sayaçlar 0.",
+  "rngTohum": 42,
+  "sabitAy": "2026-01",
+  "girdi": "{\"version\":2,\"stardust\":90,\"kabuk\":30,\"day\":2,\"eggsAvailable\":5,\"eggCounter\":60,\"pityN\":7,\"pityD\":22,\"pityE\":41,\"copyStreak\":4,\"owned\":{\"cikcik\":2,\"pamus\":2,\"vizbiz\":2,\"molu\":2,\"gidak\":2,\"badi\":2,\"hophop\":2,\"fistik\":2},\"milestones\":[],\"todayEggs\":[{\"seri\":\"yok-boyle-seri\",\"variant\":99,\"golden\":\"evet\"},{\"seri\":\"masalormani\",\"variant\":-3,\"golden\":true,\"kulucka\":\"belki\"},\"cop\",null,{\"seri\":\"gunesbahcesi\",\"variant\":2,\"golden\":false,\"kulucka\":true}],\"firstRitualDoneToday\":\"evet\",\"chocolates\":-4,\"chocolateStarsToday\":3.7,\"kumbaraToday\":1,\"lastChocolateChoice\":\"YE\",\"foilBook\":{\"gunesbahcesi\":{\"variants\":{\"0\":2,\"3\":1},\"golden\":1}},\"goldenPity\":12,\"tools\":[\"burgu\"],\"activeTool\":\"sihir\",\"seed\":777002}",
+  "beklenen": {
+    "version": 3,
+    "stardust": 90,
+    "kabuk": 30,
+    "day": 2,
+    "eggsAvailable": 3,
+    "extraEggsBought": 0,
+    "eggCounter": 60,
+    "pityN": 7,
+    "pityD": 22,
+    "pityE": 41,
+    "copyStreak": 4,
+    "owned": {
+      "cikcik": 2,
+      "pamus": 2,
+      "vizbiz": 2,
+      "molu": 2,
+      "gidak": 2,
+      "badi": 2,
+      "hophop": 2,
+      "fistik": 2
+    },
+    "milestones": [],
+    "weekCrafts": 0,
+    "rewardedPlaysToday": 0,
+    "todayEggs": [
+      {
+        "seri": "masalormani",
+        "variant": 7,
+        "golden": null
+      },
+      {
+        "seri": "masalormani",
+        "variant": 0,
+        "golden": true
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 2,
+        "golden": null,
+        "kulucka": true
+      }
+    ],
+    "firstRitualDoneToday": false,
+    "chocolates": 0,
+    "chocolateStarsToday": 3,
+    "kumbaraToday": 1,
+    "lastChocolateChoice": "ye",
+    "foilBook": {
+      "gunesbahcesi": {
+        "variants": {
+          "0": 2,
+          "3": 1
+        },
+        "golden": 1
+      }
+    },
+    "goldenPity": 12,
+    "tools": [
+      "burgu",
+      "cekic",
+      "firlat"
+    ],
+    "activeTool": "burgu",
+    "parent": {
+      "pin": "1234",
+      "limitTL": 400,
+      "spentTL": 0,
+      "ay": "2026-01",
+      "clubActive": false,
+      "limitRaiseTs": 0
+    },
+    "kiler": {
+      "adet": 0,
+      "bugunAcilan": 0
+    },
+    "wishes": [],
+    "purchases": [],
+    "introDone": false,
+    "introGiftShown": false,
+    "activeBiome": "cayir",
+    "ormanAcik": false,
+    "sakoHidden": null,
+    "hedefPufi": null,
+    "kulucka": null,
+    "bugunAcilanlar": [],
+    "gorevler": {
+      "ac": 0,
+      "oyun": 0,
+      "albumZiyaret": false,
+      "bonusVerildi": false
+    },
+    "gorevBonusYeni": false,
+    "streak": {
+      "yildiz": 0,
+      "rozet": 0
+    },
+    "seed": 777002
+  }
+}

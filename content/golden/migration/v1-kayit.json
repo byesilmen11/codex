@@ -1,0 +1,103 @@
+{
+  "_meta": {
+    "uretici": "tools/export-migration-fixtures.mjs",
+    "not": "ELLE DÜZENLEMEYİN — state.js load() gerçek çıktısıdır; C# SaveCodec.Load bu state'i bire bir yeniden üretmek zorundadır (PORT-CONTRACT.md EK).",
+    "stub": "Math.random = mulberry32(rngTohum, her vaka taze); Date sabit 2026-01-15 (Date.now=1768435200000, monthKey=sabitAy)."
+  },
+  "ad": "v1-kayit",
+  "aciklama": "v1 kaydı: todayEggs YOK → savedHadEggs=false → fillTodayEggs(max(0, eggsAvailable|0)) 2 yumurta üretir (2 tohumlu random). Ritüel/v3 alanları varsayılanla açılır.",
+  "rngTohum": 42,
+  "sabitAy": "2026-01",
+  "girdi": "{\"version\":1,\"stardust\":155,\"kabuk\":12,\"day\":4,\"eggsAvailable\":2,\"extraEggsBought\":1,\"eggCounter\":25,\"pityN\":3,\"pityD\":12,\"pityE\":20,\"copyStreak\":2,\"owned\":{\"cikcik\":1,\"pamus\":1,\"vizbiz\":1,\"molu\":1,\"gidak\":1,\"badi\":1,\"hophop\":1,\"fistik\":1,\"boncuk\":1,\"kivrik\":1,\"toprik\":1,\"cigdem\":1},\"milestones\":[\"m10\"],\"weekCrafts\":1,\"rewardedPlaysToday\":2,\"seed\":777001}",
+  "beklenen": {
+    "version": 3,
+    "stardust": 155,
+    "kabuk": 12,
+    "day": 4,
+    "eggsAvailable": 2,
+    "extraEggsBought": 1,
+    "eggCounter": 25,
+    "pityN": 3,
+    "pityD": 12,
+    "pityE": 20,
+    "copyStreak": 2,
+    "owned": {
+      "cikcik": 1,
+      "pamus": 1,
+      "vizbiz": 1,
+      "molu": 1,
+      "gidak": 1,
+      "badi": 1,
+      "hophop": 1,
+      "fistik": 1,
+      "boncuk": 1,
+      "kivrik": 1,
+      "toprik": 1,
+      "cigdem": 1
+    },
+    "milestones": [
+      "m10"
+    ],
+    "weekCrafts": 1,
+    "rewardedPlaysToday": 2,
+    "todayEggs": [
+      {
+        "seri": "yildiztozu",
+        "variant": 6,
+        "golden": null
+      },
+      {
+        "seri": "yildiztozu",
+        "variant": 3,
+        "golden": null
+      }
+    ],
+    "firstRitualDoneToday": false,
+    "chocolates": 0,
+    "chocolateStarsToday": 0,
+    "kumbaraToday": 0,
+    "lastChocolateChoice": "ye",
+    "foilBook": {},
+    "goldenPity": 0,
+    "tools": [
+      "burgu",
+      "cekic",
+      "firlat"
+    ],
+    "activeTool": "burgu",
+    "parent": {
+      "pin": "1234",
+      "limitTL": 400,
+      "spentTL": 0,
+      "ay": "2026-01",
+      "clubActive": false,
+      "limitRaiseTs": 0
+    },
+    "kiler": {
+      "adet": 0,
+      "bugunAcilan": 0
+    },
+    "wishes": [],
+    "purchases": [],
+    "introDone": false,
+    "introGiftShown": false,
+    "activeBiome": "cayir",
+    "ormanAcik": false,
+    "sakoHidden": null,
+    "hedefPufi": null,
+    "kulucka": null,
+    "bugunAcilanlar": [],
+    "gorevler": {
+      "ac": 0,
+      "oyun": 0,
+      "albumZiyaret": false,
+      "bonusVerildi": false
+    },
+    "gorevBonusYeni": false,
+    "streak": {
+      "yildiz": 0,
+      "rozet": 0
+    },
+    "seed": 777001
+  }
+}

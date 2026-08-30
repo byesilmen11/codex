@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "uretici": "tools/export-migration-fixtures.mjs",
+    "not": "ELLE DÜZENLEMEYİN — state.js load() gerçek çıktısıdır; C# SaveCodec.Load bu state'i bire bir yeniden üretmek zorundadır (PORT-CONTRACT.md EK).",
+    "stub": "Math.random = mulberry32(rngTohum, her vaka taze); Date sabit 2026-01-15 (Date.now=1768435200000, monthKey=sabitAy)."
+  },
+  "ad": "v3-bozuk",
+  "aciklama": "v3 kaydı, bozuk ebeveyn/oturum alanları: pin \"abc\"→\"1234\", limitTL -50→varsayılan, ay \"2000-01\"→syncMonth spentTL sıfırlar, clubActive \"evet\"→false; negatif kiler 0'a; çöp wishes süzülür (yalnız pufiId string olanlar; not \"dogumgunu\" ve durum \"sonra\" korunur, diğer not/durum düşer); gorevler string / streak dizi → varsayılan; kulucka.seri sayı → null; bugunAcilanlar string → []; todayEggs [] (savedHadEggs=true) → vitrin boş kalır, eggsAvailable 0.",
+  "rngTohum": 42,
+  "sabitAy": "2026-01",
+  "girdi": "{\"version\":3,\"stardust\":12,\"kabuk\":5,\"day\":15,\"eggsAvailable\":4,\"eggCounter\":90,\"pityN\":1,\"pityD\":5,\"pityE\":10,\"copyStreak\":0,\"owned\":{\"cikcik\":1,\"pamus\":1,\"vizbiz\":1},\"milestones\":[],\"todayEggs\":[],\"parent\":{\"pin\":\"abc\",\"limitTL\":-50,\"spentTL\":123.456,\"ay\":\"2000-01\",\"clubActive\":\"evet\",\"limitRaiseTs\":-5},\"kiler\":{\"adet\":-5,\"bugunAcilan\":-2},\"wishes\":[null,42,\"cop\",{\"pufiId\":123},{\"pufiId\":\"cikcik\",\"ts\":-100,\"not\":\"dogumgunu\"},{\"pufiId\":\"pamus\",\"ts\":1300000000,\"not\":\"baskanot\",\"durum\":\"sonra\"},{\"pufiId\":\"vizbiz\",\"durum\":\"hemen\"}],\"purchases\":\"yok\",\"kulucka\":{\"seri\":42},\"hedefPufi\":\"molu\",\"bugunAcilanlar\":\"dun\",\"gorevler\":\"hepsi\",\"streak\":[1,2],\"seed\":777003}",
+  "beklenen": {
+    "version": 3,
+    "stardust": 12,
+    "kabuk": 5,
+    "day": 15,
+    "eggsAvailable": 0,
+    "extraEggsBought": 0,
+    "eggCounter": 90,
+    "pityN": 1,
+    "pityD": 5,
+    "pityE": 10,
+    "copyStreak": 0,
+    "owned": {
+      "cikcik": 1,
+      "pamus": 1,
+      "vizbiz": 1
+    },
+    "milestones": [],
+    "weekCrafts": 0,
+    "rewardedPlaysToday": 0,
+    "todayEggs": [],
+    "firstRitualDoneToday": false,
+    "chocolates": 0,
+    "chocolateStarsToday": 0,
+    "kumbaraToday": 0,
+    "lastChocolateChoice": "ye",
+    "foilBook": {},
+    "goldenPity": 0,
+    "tools": [
+      "burgu",
+      "cekic",
+      "firlat"
+    ],
+    "activeTool": "burgu",
+    "parent": {
+      "pin": "1234",
+      "limitTL": 400,
+      "spentTL": 0,
+      "ay": "2026-01",
+      "clubActive": false,
+      "limitRaiseTs": 0
+    },
+    "kiler": {
+      "adet": 0,
+      "bugunAcilan": 0
+    },
+    "wishes": [
+      {
+        "pufiId": "cikcik",
+        "ts": 0,
+        "not": "dogumgunu"
+      },
+      {
+        "pufiId": "pamus",
+        "ts": 1300000000,
+        "durum": "sonra"
+      },
+      {
+        "pufiId": "vizbiz",
+        "ts": 0
+      }
+    ],
+    "purchases": [],
+    "introDone": false,
+    "introGiftShown": false,
+    "activeBiome": "cayir",
+    "ormanAcik": false,
+    "sakoHidden": null,
+    "hedefPufi": "molu",
+    "kulucka": null,
+    "bugunAcilanlar": [],
+    "gorevler": {
+      "ac": 0,
+      "oyun": 0,
+      "albumZiyaret": false,
+      "bonusVerildi": false
+    },
+    "gorevBonusYeni": false,
+    "streak": {
+      "yildiz": 0,
+      "rozet": 0
+    },
+    "seed": 777003
+  }
+}

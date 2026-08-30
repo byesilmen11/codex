@@ -1,0 +1,170 @@
+{
+  "_meta": {
+    "uretici": "tools/export-migration-fixtures.mjs",
+    "not": "ELLE DÜZENLEMEYİN — state.js load() gerçek çıktısıdır; C# SaveCodec.Load bu state'i bire bir yeniden üretmek zorundadır (PORT-CONTRACT.md EK).",
+    "stub": "Math.random = mulberry32(rngTohum, her vaka taze); Date sabit 2026-01-15 (Date.now=1768435200000, monthKey=sabitAy)."
+  },
+  "ad": "v3-tam",
+  "aciklama": "Modern, tam v3 kaydı: kulucka + hedefPufi + sakoHidden + wish notları + bugunAcilanlar dolu, ay \"2026-01\" (syncMonth sıfırlamaz), Club aktif, orman açık. load() değerleri olduğu gibi taşımalı; tek zorunlu iş eggsAvailable=todayEggs.length senkronu ve version=3.",
+  "rngTohum": 42,
+  "sabitAy": "2026-01",
+  "girdi": "{\"version\":3,\"stardust\":210,\"kabuk\":75,\"day\":9,\"eggsAvailable\":3,\"extraEggsBought\":1,\"eggCounter\":140,\"pityN\":6,\"pityD\":18,\"pityE\":33,\"copyStreak\":3,\"owned\":{\"cikcik\":2,\"pamus\":2,\"vizbiz\":2,\"molu\":2,\"gidak\":2,\"badi\":2,\"hophop\":2,\"fistik\":2,\"boncuk\":2,\"kivrik\":2,\"toprik\":2,\"cigdem\":2,\"pirpir\":2,\"zipzip\":2,\"civil\":2,\"evcik\":2,\"dikenik\":2,\"kosti\":2,\"meke\":2,\"findik\":2,\"tostos\":1,\"mantus\":1,\"tikirti\":1,\"yosun\":1},\"milestones\":[\"m10\",\"m20\"],\"weekCrafts\":2,\"rewardedPlaysToday\":1,\"todayEggs\":[{\"seri\":\"sedefdalgalar\",\"variant\":1,\"golden\":null,\"kulucka\":true},{\"seri\":\"gunesbahcesi\",\"variant\":5,\"golden\":true},{\"seri\":\"gunesbahcesi\",\"variant\":0,\"golden\":null}],\"firstRitualDoneToday\":true,\"chocolates\":7,\"chocolateStarsToday\":12,\"kumbaraToday\":1,\"lastChocolateChoice\":\"biriktir\",\"foilBook\":{\"gunesbahcesi\":{\"variants\":{\"0\":3,\"1\":1,\"5\":2},\"golden\":2},\"sedefdalgalar\":{\"variants\":{\"4\":1},\"golden\":0}},\"goldenPity\":5,\"tools\":[\"burgu\",\"cekic\",\"firlat\",\"sihir\",\"sedefburgu\"],\"activeTool\":\"sedefburgu\",\"parent\":{\"pin\":\"4321\",\"limitTL\":750,\"spentTL\":129.98,\"ay\":\"2026-01\",\"clubActive\":true,\"limitRaiseTs\":86400000},\"kiler\":{\"adet\":3,\"bugunAcilan\":1},\"wishes\":[{\"pufiId\":\"petek\",\"ts\":1200000000,\"not\":\"dogumgunu\"},{\"pufiId\":\"benek\",\"ts\":1300000000,\"durum\":\"sonra\"}],\"purchases\":[{\"paketId\":\"p1\",\"ad\":\"Başlangıç Paketi\",\"tutar\":49.99,\"adet\":3,\"ts\":1200000000},{\"paketId\":\"p2\",\"ad\":\"Dost Paketi\",\"tutar\":89.99,\"adet\":6,\"ts\":1300000000}],\"introDone\":true,\"introGiftShown\":true,\"activeBiome\":\"orman\",\"ormanAcik\":true,\"sakoHidden\":\"fisfis\",\"hedefPufi\":\"ibik\",\"kulucka\":{\"seri\":\"yildiztozu\"},\"bugunAcilanlar\":[\"cikcik\",\"tostos\"],\"gorevler\":{\"ac\":3,\"oyun\":1,\"albumZiyaret\":true,\"bonusVerildi\":true},\"gorevBonusYeni\":false,\"streak\":{\"yildiz\":4,\"rozet\":1},\"seed\":777004}",
+  "beklenen": {
+    "version": 3,
+    "stardust": 210,
+    "kabuk": 75,
+    "day": 9,
+    "eggsAvailable": 3,
+    "extraEggsBought": 1,
+    "eggCounter": 140,
+    "pityN": 6,
+    "pityD": 18,
+    "pityE": 33,
+    "copyStreak": 3,
+    "owned": {
+      "cikcik": 2,
+      "pamus": 2,
+      "vizbiz": 2,
+      "molu": 2,
+      "gidak": 2,
+      "badi": 2,
+      "hophop": 2,
+      "fistik": 2,
+      "boncuk": 2,
+      "kivrik": 2,
+      "toprik": 2,
+      "cigdem": 2,
+      "pirpir": 2,
+      "zipzip": 2,
+      "civil": 2,
+      "evcik": 2,
+      "dikenik": 2,
+      "kosti": 2,
+      "meke": 2,
+      "findik": 2,
+      "tostos": 1,
+      "mantus": 1,
+      "tikirti": 1,
+      "yosun": 1
+    },
+    "milestones": [
+      "m10",
+      "m20"
+    ],
+    "weekCrafts": 2,
+    "rewardedPlaysToday": 1,
+    "todayEggs": [
+      {
+        "seri": "sedefdalgalar",
+        "variant": 1,
+        "golden": null,
+        "kulucka": true
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 5,
+        "golden": true
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 0,
+        "golden": null
+      }
+    ],
+    "firstRitualDoneToday": true,
+    "chocolates": 7,
+    "chocolateStarsToday": 12,
+    "kumbaraToday": 1,
+    "lastChocolateChoice": "biriktir",
+    "foilBook": {
+      "gunesbahcesi": {
+        "variants": {
+          "0": 3,
+          "1": 1,
+          "5": 2
+        },
+        "golden": 2
+      },
+      "sedefdalgalar": {
+        "variants": {
+          "4": 1
+        },
+        "golden": 0
+      }
+    },
+    "goldenPity": 5,
+    "tools": [
+      "burgu",
+      "cekic",
+      "firlat",
+      "sihir",
+      "sedefburgu"
+    ],
+    "activeTool": "sedefburgu",
+    "parent": {
+      "pin": "4321",
+      "limitTL": 750,
+      "spentTL": 129.98,
+      "ay": "2026-01",
+      "clubActive": true,
+      "limitRaiseTs": 86400000
+    },
+    "kiler": {
+      "adet": 3,
+      "bugunAcilan": 1
+    },
+    "wishes": [
+      {
+        "pufiId": "petek",
+        "ts": 1200000000,
+        "not": "dogumgunu"
+      },
+      {
+        "pufiId": "benek",
+        "ts": 1300000000,
+        "durum": "sonra"
+      }
+    ],
+    "purchases": [
+      {
+        "paketId": "p1",
+        "ad": "Başlangıç Paketi",
+        "tutar": 49.99,
+        "adet": 3,
+        "ts": 1200000000
+      },
+      {
+        "paketId": "p2",
+        "ad": "Dost Paketi",
+        "tutar": 89.99,
+        "adet": 6,
+        "ts": 1300000000
+      }
+    ],
+    "introDone": true,
+    "introGiftShown": true,
+    "activeBiome": "orman",
+    "ormanAcik": true,
+    "sakoHidden": "fisfis",
+    "hedefPufi": "ibik",
+    "kulucka": {
+      "seri": "yildiztozu"
+    },
+    "bugunAcilanlar": [
+      "cikcik",
+      "tostos"
+    ],
+    "gorevler": {
+      "ac": 3,
+      "oyun": 1,
+      "albumZiyaret": true,
+      "bonusVerildi": true
+    },
+    "gorevBonusYeni": false,
+    "streak": {
+      "yildiz": 4,
+      "rozet": 1
+    },
+    "seed": 777004
+  }
+}
