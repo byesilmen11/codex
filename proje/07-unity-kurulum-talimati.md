@@ -187,7 +187,8 @@ git push
 | `git` / `dotnet` komutu bulunamadı (Windows) | Git for Windows (git-scm.com) ve/veya .NET 8 SDK (dotnet.microsoft.com) kur, PowerShell'i kapat-aç. Adım 2 zaten isteğe bağlı — .NET kurmadan da devam edebilirsin. |
 | Build Settings'te **Android yok** | Proje yanlış editörle açılmış (6.5 = Web+Windows). Hub ▸ Projects ▸ projenin yanındaki sürüm açılırından `6000.3.23f1` seç, yeniden aç. |
 | Kod düzenleyici açılmıyor / IntelliSense yok | Visual Studio 2026 Community zaten kurulu (Hub modül listesinde görünüyor). Unity ▸ Edit ▸ Preferences ▸ External Tools ▸ External Script Editor → Visual Studio. |
-| Duman testinde **RNG satırları hatalı** | CİDDİ: Unity çalışma zamanı `uint` aritmetiğinde sapıyor demektir; altın vektör paritesi bozulur. Ekran görüntüsüyle haber ver — `Rng.cs` ve IL2CPP ayarları birlikte incelenir. |
+| Duman testinde **RNG satırları hatalı**, ama gösterilen sayı beklenenle neredeyse aynı (ör. `0.97972826776094735` ↔ `0.9797282677609473`) | Bu ESKİ script sürümünün sahte alarmı: Mono ile .NET 8 sayıyı farklı basamakla YAZAR, değer aynıdır. Güncel scripti al: `git pull` sonra `Copy-Item client\unity-smoke\YuvoCoreSmokeTest.cs client\UnityProject\Assets\Editor\ -Force` (artık bit deseni karşılaştırıyor). |
+| Duman testinde **RNG satırları hatalı** ve bit desenleri farklı | CİDDİ: Unity çalışma zamanı `uint` aritmetiğinde sapıyor demektir; altın vektör paritesi bozulur. Ekran görüntüsüyle haber ver — `Rng.cs` ve IL2CPP ayarları birlikte incelenir. |
 | Duman testinde **JSON/kayıt satırı hatalı** | Cihaz kültürü sızmış olabilir. Hangi satırın düştüğünü ilet. |
 | Console'da URP/shader uyarıları | Zararsız; U1'de görsel boru hattı kurulurken düzelir. |
 | `Failed to resolve packages … Char: 65279` (Package Manager Error) | manifest.json BOM'lu yazılmış (PowerShell `Set-Content -Encoding UTF8`). Adım 4'teki BOM onarım komutunu çalıştır, Unity'yi yeniden aç. |

@@ -33,6 +33,12 @@
    (test enjekte eder). Core'da doğrudan DateTime KULLANMA (varsayılan delege hariç).
 8. commit()/save()/refresh() çağrılarının C# karşılığı YOK (kalıcılık ayrı katman) — atla.
 9. Hata asla fırlatma stili: JS savunmacı `return false` desenleri aynen korunur.
+10. **Platformlar arası sayı doğrulaması METİN üzerinden YAPILMAZ.** `double`→metin biçimi
+    çalışma zamanına göre değişir: .NET Core 3.0+ `ToString("R")` en kısa geri-dönüştürülebilir
+    yazımı verir (`0.9797282677609473`), Unity'nin Mono'su 17 basamak yazar
+    (`0.97972826776094735`) — AYNI sayı, farklı metin. Parite testlerinde
+    `BitConverter.DoubleToInt64Bits` (C#) / bit deseni karşılaştırması kullanılır. Bu kural
+    Unity duman testinde gerçek bir sahte alarmla öğrenildi (2026-08-30, O-12).
 
 ## StateEngine API'si (imzalar SABİT)
 
