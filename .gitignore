@@ -1,4 +1,7 @@
 node_modules/
-package-lock.json
-package.json
+# Node araç bağımlılıkları depo KÖKÜNDE tutulmuyor (yerel kurulum) — yalnız kök
+# dosyaları hedeflenir; alt klasörlerdeki package.json'lar (ör. Unity UPM paket
+# manifesti client/Yuvo.Core/package.json) MUTLAKA izlenmelidir.
+/package-lock.json
+/package.json
 *.log

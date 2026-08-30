@@ -1,0 +1,11 @@
+{
+  "name": "com.yuvo.core",
+  "version": "0.1.0",
+  "displayName": "Yuvo Core",
+  "description": "Yuvo oyun çekirdeği: gacha/pity motoru, oyun durumu, ekonomi ve oturum döngüsü API'leri, kalıcılık (SaveService). UnityEngine bağımlılığı YOKTUR — saf C#, netstandard2.1. Davranış sözleşmesi: client/PORT-CONTRACT.md; doğrulama: dotnet test client/Yuvo.Core.Tests (altın vektörler + davranış + migrasyon).",
+  "unity": "2021.3",
+  "keywords": ["yuvo", "core", "gameplay"],
+  "author": {
+    "name": "Yuvo"
+  }
+}
