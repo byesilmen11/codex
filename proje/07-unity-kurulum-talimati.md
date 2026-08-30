@@ -161,8 +161,13 @@ de aynı davranacak).
   **🤖 Android** sekmesine geç ▸ *Resolution and Presentation* ▸ **Default Orientation** →
   `Portrait`. Aynısını **🍎 iOS** sekmesinde de yap. (Masaüstü sekmesinde bu alan hiç yoktur —
   orada arama.)
-- **Color Space → Linear**: *Other Settings* ▸ **Rendering** başlığı altında. Universal 2D
-  şablonunda genelde zaten `Linear`'dır; değilse değiştir (proje yeniden derlenir, 1-2 dk).
+- **Color Space → Linear**: *Other Settings* ▸ **Rendering** başlığı altında.
+  **Hangi sekmede olduğu fark etmez** — Color Space platformlar arası PAYLAŞILAN bir ayardır;
+  birinde değiştirince hepsinde değişir. (Unity paylaşılan alanları `*` ile işaretler ve
+  panelin altında *"Shared setting between multiple platforms"* notunu gösterir. `Default
+  Orientation` ise paylaşılan DEĞİLDİR, o yüzden her mobil sekmede ayrı ayarlanır.)
+  Universal 2D şablonunda genelde zaten `Linear`'dır; değilse değiştir (proje yeniden
+  derlenir, 1-2 dk).
 - **Game** penceresi çözünürlüğü: Editor'de **Game** sekmesi ▸ üstteki çözünürlük açılırı ▸
   **+** ile `390×844` ekle (prototiple aynı referans çerçeve).
 
