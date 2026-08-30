@@ -307,3 +307,14 @@ edilebilir); Unity kabuğu (`/client` Unity projesi) Unity kurulu makine işi ol
 
 **Sıradaki:** eleştirmen bulgularıyla fikstür kapsamını tamamla; sonra `02-durum.md` →
 Unity kabuğu (Unity kurulu makine işi) / U0 kapanışı.
+
+**O-09 devamı (kapsam eleştirmeni sonrası):** Eleştirmen load()'ın 57 dalını fikstür-fikstür
+haritaladı ve kapsanmayan dalları somut girdi tarifleriyle raporladı. 5 yeni altın vaka
+eklendi (`cop-dizi` — dizi girdi typeof kapısı; `v1-negatif-hak` — todayEggs dizi-değil +
+negatif hak; `v1-tasan-hak` — v1 yolunda vitrin TAVANSIZ, bilinçli JS davranışı kilidi;
+`v3-bozuk2` — konteyner tip onarımları toplu + bilinmeyen anahtar düşmesi + activeBiome
+pass-through; `v3-sinir` — null→varsayılan, round2 çıktıda, kısmi gorevler/streak,
+"load BUDAMAZ" 6-dilek kilidi + whitelist yabancı alan düşmesi + geçersiz-string kuluçka
+serisi). **11 fikstürün 11'i C#'ta İLK denemede geçti → dotnet test 45/45.**
+Sözleşmeye "tipli alan sıkılaştırması" notu eklendi (motor-imkânsız şekiller fikstür dışı;
+string-tipli geçersizler JS gibi taşınır ve kilitli). Tüm kapılar yeşil.

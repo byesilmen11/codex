@@ -1,0 +1,138 @@
+{
+  "_meta": {
+    "uretici": "tools/export-migration-fixtures.mjs",
+    "not": "ELLE DÜZENLEMEYİN — state.js load() gerçek çıktısıdır; C# SaveCodec.Load bu state'i bire bir yeniden üretmek zorundadır (PORT-CONTRACT.md EK).",
+    "stub": "Math.random = mulberry32(rngTohum, her vaka taze); Date sabit 2026-01-15 (Date.now=1768435200000, monthKey=sabitAy)."
+  },
+  "ad": "v1-tasan-hak",
+  "aciklama": "v1 yolunda vitrin TAVANSIZDIR (A4): eggsAvailable 12 → 12 yumurta üretilir; EGG_STACK_MAX=9 yalnız newDay birikiminde uygulanır, load kırpmaz. Bu JS davranışı bilinçli kilitlenir.",
+  "rngTohum": 42,
+  "sabitAy": "2026-01",
+  "girdi": "{\"version\":1,\"day\":1,\"eggsAvailable\":12,\"seed\":777006}",
+  "beklenen": {
+    "version": 3,
+    "stardust": 40,
+    "kabuk": 0,
+    "day": 1,
+    "eggsAvailable": 12,
+    "extraEggsBought": 0,
+    "eggCounter": 0,
+    "pityN": 0,
+    "pityD": 0,
+    "pityE": 0,
+    "copyStreak": 0,
+    "owned": {},
+    "milestones": [],
+    "weekCrafts": 0,
+    "rewardedPlaysToday": 0,
+    "todayEggs": [
+      {
+        "seri": "gunesbahcesi",
+        "variant": 6,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 3,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 1,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 7,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 5,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 2,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 1,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 4,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 5,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 4,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 0,
+        "golden": null
+      },
+      {
+        "seri": "gunesbahcesi",
+        "variant": 3,
+        "golden": null
+      }
+    ],
+    "firstRitualDoneToday": false,
+    "chocolates": 0,
+    "chocolateStarsToday": 0,
+    "kumbaraToday": 0,
+    "lastChocolateChoice": "ye",
+    "foilBook": {},
+    "goldenPity": 0,
+    "tools": [
+      "burgu",
+      "cekic",
+      "firlat"
+    ],
+    "activeTool": "burgu",
+    "parent": {
+      "pin": "1234",
+      "limitTL": 400,
+      "spentTL": 0,
+      "ay": "2026-01",
+      "clubActive": false,
+      "limitRaiseTs": 0
+    },
+    "kiler": {
+      "adet": 0,
+      "bugunAcilan": 0
+    },
+    "wishes": [],
+    "purchases": [],
+    "introDone": false,
+    "introGiftShown": false,
+    "activeBiome": "cayir",
+    "ormanAcik": false,
+    "sakoHidden": null,
+    "hedefPufi": null,
+    "kulucka": null,
+    "bugunAcilanlar": [],
+    "gorevler": {
+      "ac": 0,
+      "oyun": 0,
+      "albumZiyaret": false,
+      "bonusVerildi": false
+    },
+    "gorevBonusYeni": false,
+    "streak": {
+      "yildiz": 0,
+      "rozet": 0
+    },
+    "seed": 777006
+  }
+}

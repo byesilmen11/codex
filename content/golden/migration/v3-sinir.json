@@ -1,0 +1,112 @@
+{
+  "_meta": {
+    "uretici": "tools/export-migration-fixtures.mjs",
+    "not": "ELLE DÜZENLEMEYİN — state.js load() gerçek çıktısıdır; C# SaveCodec.Load bu state'i bire bir yeniden üretmek zorundadır (PORT-CONTRACT.md EK).",
+    "stub": "Math.random = mulberry32(rngTohum, her vaka taze); Date sabit 2026-01-15 (Date.now=1768435200000, monthKey=sabitAy)."
+  },
+  "ad": "v3-sinir",
+  "aciklama": "Sınır değerleri (A16-A23): saved null alan → varsayılan KORUNUR (stardust); goldenPity/kumbaraToday negatif → 0; spentTL round2 ÇIKTIDA görünür (49.999→50, ay aynı olduğundan syncMonth silmez); gorevler KISMİ (ac -2→0, oyun 2.9→2, albumZiyaret \"evet\"→false); gorevBonusYeni true KORUNUR; streak kısmi negatif → 0; kulucka geçersiz-ama-string seri OLDUĞU GİBİ kalır (B4 kilidi); 6 GEÇERLİ dilek — load BUDAMAZ (5 tavanı/7 gün süzgeci yalnız addWish'te) ve dilekteki yabancı alan (tl) whitelist ile DÜŞER.",
+  "rngTohum": 42,
+  "sabitAy": "2026-01",
+  "girdi": "{\"version\":3,\"stardust\":null,\"kabuk\":3,\"day\":5,\"eggsAvailable\":1,\"todayEggs\":[{\"seri\":\"gunesbahcesi\",\"variant\":2,\"golden\":null}],\"goldenPity\":-3,\"kumbaraToday\":-1,\"parent\":{\"pin\":\"0007\",\"limitTL\":1500,\"spentTL\":49.999,\"ay\":\"2026-01\",\"clubActive\":true,\"limitRaiseTs\":12},\"gorevler\":{\"ac\":-2,\"oyun\":2.9,\"albumZiyaret\":\"evet\"},\"gorevBonusYeni\":true,\"streak\":{\"yildiz\":-1},\"kulucka\":{\"seri\":\"yok-boyle\"},\"wishes\":[{\"pufiId\":\"cikcik\",\"ts\":1,\"not\":\"dogumgunu\"},{\"pufiId\":\"pamus\",\"ts\":2,\"durum\":\"sonra\"},{\"pufiId\":\"vizbiz\",\"ts\":3},{\"pufiId\":\"molu\",\"ts\":4},{\"pufiId\":\"gidak\",\"ts\":5},{\"pufiId\":\"badi\",\"ts\":6,\"tl\":99}],\"seed\":777008}",
+  "beklenen": {
+    "version": 3,
+    "stardust": 40,
+    "kabuk": 3,
+    "day": 5,
+    "eggsAvailable": 1,
+    "extraEggsBought": 0,
+    "eggCounter": 0,
+    "pityN": 0,
+    "pityD": 0,
+    "pityE": 0,
+    "copyStreak": 0,
+    "owned": {},
+    "milestones": [],
+    "weekCrafts": 0,
+    "rewardedPlaysToday": 0,
+    "todayEggs": [
+      {
+        "seri": "gunesbahcesi",
+        "variant": 2,
+        "golden": null
+      }
+    ],
+    "firstRitualDoneToday": false,
+    "chocolates": 0,
+    "chocolateStarsToday": 0,
+    "kumbaraToday": 0,
+    "lastChocolateChoice": "ye",
+    "foilBook": {},
+    "goldenPity": 0,
+    "tools": [
+      "burgu",
+      "cekic",
+      "firlat"
+    ],
+    "activeTool": "burgu",
+    "parent": {
+      "pin": "0007",
+      "limitTL": 1500,
+      "spentTL": 50,
+      "ay": "2026-01",
+      "clubActive": true,
+      "limitRaiseTs": 12
+    },
+    "kiler": {
+      "adet": 0,
+      "bugunAcilan": 0
+    },
+    "wishes": [
+      {
+        "pufiId": "cikcik",
+        "ts": 1,
+        "not": "dogumgunu"
+      },
+      {
+        "pufiId": "pamus",
+        "ts": 2,
+        "durum": "sonra"
+      },
+      {
+        "pufiId": "vizbiz",
+        "ts": 3
+      },
+      {
+        "pufiId": "molu",
+        "ts": 4
+      },
+      {
+        "pufiId": "gidak",
+        "ts": 5
+      },
+      {
+        "pufiId": "badi",
+        "ts": 6
+      }
+    ],
+    "purchases": [],
+    "introDone": false,
+    "introGiftShown": false,
+    "activeBiome": "cayir",
+    "ormanAcik": false,
+    "sakoHidden": null,
+    "hedefPufi": null,
+    "kulucka": {
+      "seri": "yok-boyle"
+    },
+    "bugunAcilanlar": [],
+    "gorevler": {
+      "ac": 0,
+      "oyun": 2,
+      "albumZiyaret": false,
+      "bonusVerildi": false
+    },
+    "gorevBonusYeni": true,
+    "streak": {
+      "yildiz": 0,
+      "rozet": 0
+    },
+    "seed": 777008
+  }
+}

@@ -225,6 +225,54 @@ const VAKALAR = [
       seed: 777004
     }
   }
+  ,{
+    ad: 'cop-dizi',
+    aciklama: 'Geçerli JSON ama OBJE DEĞİL (dizi): JS typeof [] === "object" kapısından geçer, hasOwnProperty hiçbir base anahtarını bulamaz → tertemiz varsayılanlar (kapsam eleştirmeni A1). savedHadEggs=false → fillTodayEggs(3).',
+    girdi: '[1,2,3]'
+  },
+  {
+    ad: 'v1-negatif-hak',
+    aciklama: 'todayEggs VAR ama dizi değil (savedHadEggs=false, A2) + eggsAvailable NEGATİF → Math.max(0,·) → 0 yumurta, RNG v1 yolunda hiç tüketilmez (A3).',
+    girdi: { version: 1, stardust: 10, day: 3, eggsAvailable: -3, todayEggs: 'cop', seed: 777005 }
+  },
+  {
+    ad: 'v1-tasan-hak',
+    aciklama: 'v1 yolunda vitrin TAVANSIZDIR (A4): eggsAvailable 12 → 12 yumurta üretilir; EGG_STACK_MAX=9 yalnız newDay birikiminde uygulanır, load kırpmaz. Bu JS davranışı bilinçli kilitlenir.',
+    girdi: { version: 1, day: 1, eggsAvailable: 12, seed: 777006 }
+  },
+  {
+    ad: 'v3-bozuk2',
+    aciklama: 'Konteyner tip onarımları toplu (A5-A15): owned/milestones/foilBook/tools/parent/kiler/wishes/gorevler yanlış tipli → varsayılanlar; activeTool sahipsiz → tools[0]; kulucka string → null; gorevBonusYeni truthy-non-true → false; streak negatifler → 0; activeBiome geçersiz STRING olduğu gibi taşınır (JS onarmaz — bilinçli kilit); bilinmeyen anahtarlar (gizliAlan/eskiV1Sayaci) düşer; todayEggs:[] → RNG-nötr, eggsAvailable 9→0.',
+    girdi: {
+      version: 3, stardust: 7, kabuk: 1, day: 3, eggsAvailable: 9,
+      owned: 'cop', milestones: 'm10', todayEggs: [],
+      foilBook: [1, 2], tools: [], activeTool: 'sihir',
+      parent: [], kiler: 'dolu', wishes: 'cop',
+      purchases: [{ paketId: 'p1', ad: 'X', tutar: 9.9, adet: 1, ts: 12 }],
+      kulucka: 'var', bugunAcilanlar: ['cikcik', 'pamus'],
+      gorevler: [1, 2], gorevBonusYeni: 'evet', streak: { yildiz: -4, rozet: -1 },
+      activeBiome: 'uzay', gizliAlan: 99, eskiV1Sayaci: 5, seed: 777007
+    }
+  },
+  {
+    ad: 'v3-sinir',
+    aciklama: 'Sınır değerleri (A16-A23): saved null alan → varsayılan KORUNUR (stardust); goldenPity/kumbaraToday negatif → 0; spentTL round2 ÇIKTIDA görünür (49.999→50, ay aynı olduğundan syncMonth silmez); gorevler KISMİ (ac -2→0, oyun 2.9→2, albumZiyaret "evet"→false); gorevBonusYeni true KORUNUR; streak kısmi negatif → 0; kulucka geçersiz-ama-string seri OLDUĞU GİBİ kalır (B4 kilidi); 6 GEÇERLİ dilek — load BUDAMAZ (5 tavanı/7 gün süzgeci yalnız addWish\'te) ve dilekteki yabancı alan (tl) whitelist ile DÜŞER.',
+    girdi: {
+      version: 3, stardust: null, kabuk: 3, day: 5, eggsAvailable: 1,
+      todayEggs: [{ seri: 'gunesbahcesi', variant: 2, golden: null }],
+      goldenPity: -3, kumbaraToday: -1,
+      parent: { pin: '0007', limitTL: 1500, spentTL: 49.999, ay: '2026-01', clubActive: true, limitRaiseTs: 12 },
+      gorevler: { ac: -2, oyun: 2.9, albumZiyaret: 'evet' },
+      gorevBonusYeni: true, streak: { yildiz: -1 },
+      kulucka: { seri: 'yok-boyle' },
+      wishes: [
+        { pufiId: 'cikcik', ts: 1, not: 'dogumgunu' }, { pufiId: 'pamus', ts: 2, durum: 'sonra' },
+        { pufiId: 'vizbiz', ts: 3 }, { pufiId: 'molu', ts: 4 },
+        { pufiId: 'gidak', ts: 5 }, { pufiId: 'badi', ts: 6, tl: 99 }
+      ],
+      seed: 777008
+    }
+  }
 ];
 
 // ---------- koşum ----------

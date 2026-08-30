@@ -302,3 +302,15 @@ overwrite)` (atomik değiştirme); `InMemorySaveStore`: sözlük. Core'a dosya k
 - Fuzz: 200 üretilmiş çöp girdi (kesik JSON, yanlış tipler, derin iç içe, boş obje) →
   JsonCodec.Parse + SaveCodec.Load HİÇ fırlatmaz; sonuç state her zaman geçerli
   (eggsAvailable==TodayEggs.Count, sayaçlar >=0). Rastgelelik: System.Random(sabit tohum).
+
+## EK notu — tipli alan sıkılaştırması (kapsam eleştirmeni sonrası, BİLİNÇLİ)
+
+JS load() bazı alanlarda HİÇ tip onarımı yapmaz ve çöpü olduğu gibi taşır (ör. sayı
+`hedefPufi`, string `day`, `bugunAcilanlar` içinde sayı/null öğe, `purchases` içinde obj
+olmayan öğe). C#'ın tipli GameState'i bu şekilleri TEMSİL EDEMEZ ve varsayılana düşürür —
+bu bilinçli bir sıkılaştırmadır: JS motoru bu şekilleri asla üretmediğinden gerçek kayıtlar
+etkilenmez, elle bozulmuş depoda C# daha güvenli davranır. Altın fikstürler bu yüzden
+motor-imkânsız şekiller İÇERMEZ (eleştirmen raporu B1-B3); string-tipli-ama-geçersiz
+değerler ise (activeBiome "uzay", kulucka.seri "yok-boyle") JS gibi olduğu gibi taşınır ve
+fikstürle KİLİTLİDİR (v3-bozuk2, v3-sinir). Kapsam: 11 fikstür / load() dallarının tam
+haritası eleştirmen raporundadır (proje/05 O-09).

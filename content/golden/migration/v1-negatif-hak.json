@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "uretici": "tools/export-migration-fixtures.mjs",
+    "not": "ELLE DÜZENLEMEYİN — state.js load() gerçek çıktısıdır; C# SaveCodec.Load bu state'i bire bir yeniden üretmek zorundadır (PORT-CONTRACT.md EK).",
+    "stub": "Math.random = mulberry32(rngTohum, her vaka taze); Date sabit 2026-01-15 (Date.now=1768435200000, monthKey=sabitAy)."
+  },
+  "ad": "v1-negatif-hak",
+  "aciklama": "todayEggs VAR ama dizi değil (savedHadEggs=false, A2) + eggsAvailable NEGATİF → Math.max(0,·) → 0 yumurta, RNG v1 yolunda hiç tüketilmez (A3).",
+  "rngTohum": 42,
+  "sabitAy": "2026-01",
+  "girdi": "{\"version\":1,\"stardust\":10,\"day\":3,\"eggsAvailable\":-3,\"todayEggs\":\"cop\",\"seed\":777005}",
+  "beklenen": {
+    "version": 3,
+    "stardust": 10,
+    "kabuk": 0,
+    "day": 3,
+    "eggsAvailable": 0,
+    "extraEggsBought": 0,
+    "eggCounter": 0,
+    "pityN": 0,
+    "pityD": 0,
+    "pityE": 0,
+    "copyStreak": 0,
+    "owned": {},
+    "milestones": [],
+    "weekCrafts": 0,
+    "rewardedPlaysToday": 0,
+    "todayEggs": [],
+    "firstRitualDoneToday": false,
+    "chocolates": 0,
+    "chocolateStarsToday": 0,
+    "kumbaraToday": 0,
+    "lastChocolateChoice": "ye",
+    "foilBook": {},
+    "goldenPity": 0,
+    "tools": [
+      "burgu",
+      "cekic",
+      "firlat"
+    ],
+    "activeTool": "burgu",
+    "parent": {
+      "pin": "1234",
+      "limitTL": 400,
+      "spentTL": 0,
+      "ay": "2026-01",
+      "clubActive": false,
+      "limitRaiseTs": 0
+    },
+    "kiler": {
+      "adet": 0,
+      "bugunAcilan": 0
+    },
+    "wishes": [],
+    "purchases": [],
+    "introDone": false,
+    "introGiftShown": false,
+    "activeBiome": "cayir",
+    "ormanAcik": false,
+    "sakoHidden": null,
+    "hedefPufi": null,
+    "kulucka": null,
+    "bugunAcilanlar": [],
+    "gorevler": {
+      "ac": 0,
+      "oyun": 0,
+      "albumZiyaret": false,
+      "bonusVerildi": false
+    },
+    "gorevBonusYeni": false,
+    "streak": {
+      "yildiz": 0,
+      "rozet": 0
+    },
+    "seed": 777005
+  }
+}
