@@ -2,7 +2,7 @@
 
 > **Yaşayan dosya.** Her iş bloğunun sonunda güncellenir; oturuma dönünce İLK bu okunur.
 
-**Son güncelleme:** 2026-08-30 · oturum O-06 · dal `claude/surprise-egg-collection-game-eycqiq` · son commit: proje yönetim katmanının kurulumu
+**Son güncelleme:** 2026-08-30 · oturum O-06 · dal `claude/surprise-egg-collection-game-eycqiq` · son iş: proje yönetim katmanı (`ecbe560`) + export-art v1
 
 ## Tek paragraf özet
 
@@ -15,10 +15,13 @@ ihraç araçlarındayız.
 
 ## Sıradaki adım (buradan devam et)
 
-➡️ **`tools/export-art.mjs` ilk sürümü** — SVG→PNG boru hattı kanıtı: yumurta (6 nadirlik ×
-crack 0-3) + 5 örnek Pufi'yi @2x/@3x PNG'ye render et (`resvg`/`sharp`), `content/art/` altına
-deterministik çıktı + `--check` modu (docs/v2/07 §5 ve §13 madde 6). Sonrası: `export-audio.mjs`
-(docs/v2/07 §6), sonra Unity proje iskeleti (U1).
+➡️ **`tools/export-audio.mjs` v1** — ses ihracı kanıtı: `audio.js` SOUNDS tanımlarından
+seçili sesleri (tap/crack/pop/fanfare + 3-5 örnek pufiChirp) offline render edip WAV olarak
+`content/audio/` altına yaz + manifest + `--check` (docs/v2/07 §6). Zorluk notu: node'da
+OfflineAudioContext yok — ya `node-web-audio-api` paketi denenir ya da WebAudio grafiği
+Chromium içinde (playwright, export-art deseni) OfflineAudioContext ile render edilip WAV
+kodlanır (önerilen: Chromium yolu, yeni bağımlılık gerektirmez). Sonrası: Unity proje
+iskeleti (`/client`, v2·07 §13/1).
 
 ## Ne bitti (kanıtlarıyla)
 
@@ -30,6 +33,7 @@ deterministik çıktı + `--check` modu (docs/v2/07 §5 ve §13 madde 6). Sonras
 | Yayın öncesi araştırma (3 paralel ajan) yazıya döküldü | `docs/v2/08-yayin-oncesi-arastirma.md` |
 | Unity taşıma planı | `docs/v2/07-unity-tasima-plani.md` |
 | U0: içerik ihracı + altın vektörler (`--check` CI kapılarıyla) | `tools/export-content.mjs`, `tools/export-golden-vectors.mjs`, `content/` |
+| U0: sanat ihracı v1 kanıtı — 78 PNG + manifest (Chromium render, bağımlılıksız) | `tools/export-art.mjs`, `content/art/` |
 | Proje yönetim katmanı | `proje/` (bu klasör) |
 
 ## Canlı referanslar
@@ -39,7 +43,7 @@ deterministik çıktı + `--check` modu (docs/v2/07 §5 ve §13 madde 6). Sonras
 - **Test komutları:** `node tools/proto-engine-test.mjs` · `node tools/proto-smoke.mjs`
   (önce `node tools/build-proto.mjs`)
 - **İhraç güncellik kapıları:** `node tools/export-content.mjs --check` ·
-  `node tools/export-golden-vectors.mjs --check`
+  `node tools/export-golden-vectors.mjs --check` · `node tools/export-art.mjs --check`
 - **Ekran görüntüleri:** `prototype/screenshots/01-18*.png` (duman testi her koşuda tazeler)
 
 ## Açık konular / bekleyen kararlar

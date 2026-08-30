@@ -198,5 +198,16 @@ kaldığımız yerden devam edilsin.
 - Kök `README.md` güncellendi (prototip/proje/content bölümleri + v2·06-08 satırları);
   `docs/v2/README.md` indeksine 08 eklendi.
 
-**Kararlar:** K-18. **Commit:** bu oturumun kapanış commit'i.
-**Sıradaki:** `02-durum.md` "Sıradaki adım" → `tools/export-art.mjs` ilk sürümü.
+**Kararlar:** K-18. **Commit:** `ecbe560`.
+
+**Devamı (aynı oturum, "kaldığımız yerden"):** `tools/export-art.mjs` v1 yazıldı — sanat
+ihracı boru hattı KANITI: 78 PNG (yumurta 6 nadirlik × crack 0-3 + 5 örnek Pufi ×
+happy/sleep/silüet, @2x/@3x) + `content/art/manifest.json` (boyut+sha256) + `--check`
+(manifest↔disk doğrular, yeniden render etmez — PNG baytları Chromium sürümüne bağlı olduğu
+için bilinçli karar). Yeni bağımlılık YOK: render playwright-core + kurulu Chromium'la
+(duman testiyle aynı ikili), şeffaf arka plan. Örnek çıktılar gözle doğrulandı (sticker
+dili, aura, crack çizgisi korunuyor). Tam kapsam (~1.300 PNG) bilinçli olarak Unity projesi
+açılışına bırakıldı (git şişmesin — `03-yapilacaklar.md` notu).
+**Doğrulama:** üretim + `--check` yeşil; 78/78 manifest tutarlı.
+**Sıradaki:** `02-durum.md` → `tools/export-audio.mjs` v1 (Chromium içinde
+OfflineAudioContext yolu önerildi).

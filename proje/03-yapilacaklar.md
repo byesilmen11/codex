@@ -9,11 +9,13 @@
 - ✅ Unity taşıma planı (`docs/v2/07`) — commit `3192049`
 - ✅ `tools/export-content.mjs` → `content/*.json` + `--check` kapısı — commit `22d1eda`
 - ✅ `tools/export-golden-vectors.mjs` → `content/golden/` 5 senaryo / 3.800 vektör — commit `22d1eda`
-- 🔄 **`tools/export-art.mjs` ilk sürümü** — SVG→PNG kanıtı: yumurta (6 nadirlik × crack 0-3)
-  + 5 örnek Pufi, @2x/@3x, deterministik çıktı + `--check` (v2·07 §5, §13/6) ← SIRADAKİ
-- ⬜ `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar
-  (6 seri × 8 varyant × yırtılma) + kapsül/çevre/UI/portreler
-- ⬜ `tools/export-audio.mjs` — SOUNDS offline render + 62 pufiChirp (v2·07 §6)
+- ✅ `tools/export-art.mjs` v1 (kanıt) — 78 PNG (yumurta 6×crack0-3 + 5 Pufi × 3 hâl, @2x/@3x)
+  + manifest + `--check`; Chromium ile render, yeni bağımlılık yok
+- 🔄 **`tools/export-audio.mjs` v1** — SOUNDS offline render kanıtı + pufiChirp örnekleri
+  (v2·07 §6) ← SIRADAKİ
+- 🔵 `export-art` tam kapsam: 62 Pufi × (happy/sleep/silüet) + oyuncak parçaları + ambalajlar
+  (6 seri × 8 varyant × yırtılma) + kapsül/çevre/UI/portreler. NOT: ~1.300 PNG / 15-30 MB —
+  Unity projesi açılırken üretilmesi daha doğru (git şişmesin; gerekirse LFS kararı o gün)
 - ⬜ Unity LTS proje iskeleti: `/client`, 4 assembly, CI (test + bağımlılık denetimi) (v2·07 §13/1)
 - ⬜ `Yuvo.Core` C# portu: GachaEngine + GameState + SaveService; NUnit altın vektör +
   davranış asertleri (v2·07 §3, §7)

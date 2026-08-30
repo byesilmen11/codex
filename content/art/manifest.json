@@ -1,0 +1,556 @@
+{
+  "_meta": {
+    "uretici": "tools/export-art.mjs",
+    "not": "ELLE DÜZENLEMEYİN — `node tools/export-art.mjs` yeniden üretir. PNG baytları Chromium sürümüne bağlıdır; --check manifest↔disk doğrular, yeniden render etmez.",
+    "kapsam": "v1 KANIT: yumurta 6 nadirlik × crack 0-3 + 5 örnek Pufi × (happy/sleep/sil), @2x/@3x. Tam kapsam: docs/v2/07 §5.",
+    "adSozlesmesi": "egg_{rarity}_crack{0-3} · pufi_{id}_{happy|sleep|sil} — Unity sprite adları bu sözleşmeyi izler."
+  },
+  "dosyalar": [
+    {
+      "dosya": "proof/egg_yaygin_crack0@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 23919,
+      "sha256": "6f64a86523dc19c31934059b073948ab599d9ae0655d2d345918c4a01a0b1857"
+    },
+    {
+      "dosya": "proof/egg_yaygin_crack0@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 45114,
+      "sha256": "7f49737bec9579ce202ed4e867a5e107b352a0ded3c41f1ea7ab39e5e02ff677"
+    },
+    {
+      "dosya": "proof/egg_yaygin_crack1@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 25100,
+      "sha256": "903d49bd9f237af1cdfd07449aa3e7c9c572b75847fd26881d429d8cdfde356d"
+    },
+    {
+      "dosya": "proof/egg_yaygin_crack1@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 46819,
+      "sha256": "6a34307ebffdf8325ece9929d836ea7f305893d221c365e7478d083c3e111a3f"
+    },
+    {
+      "dosya": "proof/egg_yaygin_crack2@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 26429,
+      "sha256": "17c28dad80d3af489c71ca47d365d688570925a1bb7a9f4bc3f4cc817adc06ee"
+    },
+    {
+      "dosya": "proof/egg_yaygin_crack2@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 48642,
+      "sha256": "2dee3e4ad931537b0ec783c596e15c9298a3d6c46e399d466d5fad77efa3e6d1"
+    },
+    {
+      "dosya": "proof/egg_yaygin_crack3@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 32995,
+      "sha256": "eaee3c6b3c14b0d05bcde30a5169ac433e7adaa5b517479845dca6efa28514a2"
+    },
+    {
+      "dosya": "proof/egg_yaygin_crack3@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 58650,
+      "sha256": "89b4f390196bf8ae0f5f7c109eee62d1f58f04709c52d47089acb2fb270dd1b3"
+    },
+    {
+      "dosya": "proof/egg_azbulunur_crack0@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 25625,
+      "sha256": "696a4701187efdf8a072b3259011ac02e29a659ddc126fb07096088b97e08aaa"
+    },
+    {
+      "dosya": "proof/egg_azbulunur_crack0@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 47722,
+      "sha256": "0b510efe576875555a85131212eed879978008daacd12a3c7df9e41d61fb8e3e"
+    },
+    {
+      "dosya": "proof/egg_azbulunur_crack1@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 26898,
+      "sha256": "62b7806fd04bf9acd56c57802fe75a755314d86801bf2595ecc64bd7d9cb1332"
+    },
+    {
+      "dosya": "proof/egg_azbulunur_crack1@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 49595,
+      "sha256": "a969655e6fdb1412a7d6bc3b4d7b8ed270c194256d28d439b4faa3e5512dbbf8"
+    },
+    {
+      "dosya": "proof/egg_azbulunur_crack2@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 28145,
+      "sha256": "d87ac42c8b11e6b8e684b2f22ea934b9ac6f2536535dc5ec9341958ff8c66cef"
+    },
+    {
+      "dosya": "proof/egg_azbulunur_crack2@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 51513,
+      "sha256": "e96ad20ac9d420f9c5d31e4b6f6ad4cebda1189f0ec2f76be31fadddf75763f3"
+    },
+    {
+      "dosya": "proof/egg_azbulunur_crack3@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 34611,
+      "sha256": "d91a7f8ffccffd2e102ae67ae202f08638a61ea58fbfb964b66f839c6c8a852e"
+    },
+    {
+      "dosya": "proof/egg_azbulunur_crack3@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 62151,
+      "sha256": "14e86124cabf4f76b424474ff2ebb0ebea0f0c379e11072a46ee209937778943"
+    },
+    {
+      "dosya": "proof/egg_nadir_crack0@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 27092,
+      "sha256": "9eb431234d5ec2fab50e7e52d58c946eff8eed3a0c3028cbc3d5d29cd7a602b1"
+    },
+    {
+      "dosya": "proof/egg_nadir_crack0@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 49212,
+      "sha256": "a7179055008ad4cfe115dfb775e08c9ef7bbc614b0eaa04f8887585eb3361e0b"
+    },
+    {
+      "dosya": "proof/egg_nadir_crack1@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 28140,
+      "sha256": "cdfd39d8a6dfedd721e6b25f1196c1d3f4f2d7db2adf1ef95f21307401a01363"
+    },
+    {
+      "dosya": "proof/egg_nadir_crack1@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 50708,
+      "sha256": "e0c0f9287b510356f847d389aeba9ce9d8f1ca5ac59438a7fe0af79af5f9cbba"
+    },
+    {
+      "dosya": "proof/egg_nadir_crack2@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 29231,
+      "sha256": "56c684b13c5b9b79d7665fc1ec5f51a07baf32fa5347c896cdae1472a3fbe1b1"
+    },
+    {
+      "dosya": "proof/egg_nadir_crack2@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 52335,
+      "sha256": "ddcca685160caa45d9469b25e816a6001ef6ddfc91ade47d4587727ad678bfdc"
+    },
+    {
+      "dosya": "proof/egg_nadir_crack3@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 36016,
+      "sha256": "5a407f9377915fc4ed7d15d24f08435f0474c49a1459df87f25cda8491466e95"
+    },
+    {
+      "dosya": "proof/egg_nadir_crack3@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 63625,
+      "sha256": "072035ec722b096279dbd80e358b59c3330716116484a32335c17cc87480161b"
+    },
+    {
+      "dosya": "proof/egg_destansi_crack0@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 28704,
+      "sha256": "662682204f0535e0894f154e81569b8fad5b5d8f0067168ba295e49bbe7eb371"
+    },
+    {
+      "dosya": "proof/egg_destansi_crack0@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 51524,
+      "sha256": "3f900e9d339b948a0ef0987acb29cfe7ed046f46fa68c513fcd4295ea04561ce"
+    },
+    {
+      "dosya": "proof/egg_destansi_crack1@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 29754,
+      "sha256": "0274db0faa1828472bf7a74825a7ddf947c269162051605b6c2c4020d42a79bd"
+    },
+    {
+      "dosya": "proof/egg_destansi_crack1@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 53272,
+      "sha256": "d2430d494e3e5315f1520e65679435ada48cab00755124df69380a8446b0e10f"
+    },
+    {
+      "dosya": "proof/egg_destansi_crack2@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 30715,
+      "sha256": "499628defaef59b6ecfdac2186baafdba24c722947c1708f813eec709a5d7e35"
+    },
+    {
+      "dosya": "proof/egg_destansi_crack2@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 54896,
+      "sha256": "7e9b7489b5550c70176bf10dffc1647b33d8156ff70bf26e6461a78b48ca1263"
+    },
+    {
+      "dosya": "proof/egg_destansi_crack3@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 37244,
+      "sha256": "2e01971566bc238eed37210fdffa9f5b45bdb7002038f9ece109ffc1cdf56e68"
+    },
+    {
+      "dosya": "proof/egg_destansi_crack3@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 66063,
+      "sha256": "c2e8fafa8df1578d92d0563be70c3f8f418e1976a7d18b859a77446f7d068d82"
+    },
+    {
+      "dosya": "proof/egg_efsanevi_crack0@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 50303,
+      "sha256": "a3ea05448165eea4e2b85906e39408237e5ac36ccb9dce659fa8daa74f769b4c"
+    },
+    {
+      "dosya": "proof/egg_efsanevi_crack0@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 90313,
+      "sha256": "d7ab5c85c5fd4027790afda1cee2fcb5bcbe05bdb8f5c19ce15df3a727dce08f"
+    },
+    {
+      "dosya": "proof/egg_efsanevi_crack1@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 51780,
+      "sha256": "a6541d5325389b131865654eb12520a3f1efb79c7397d602844ef3eddb96a132"
+    },
+    {
+      "dosya": "proof/egg_efsanevi_crack1@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 92623,
+      "sha256": "e5c89fb7f420a80f6dd1bbc046d30eea25a9d77da8aa55d7e4851925f5027db9"
+    },
+    {
+      "dosya": "proof/egg_efsanevi_crack2@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 52992,
+      "sha256": "1e7e052fd708af433ac6b86dffb0806855b0582a65b6e64c9be6af31b19fa5b3"
+    },
+    {
+      "dosya": "proof/egg_efsanevi_crack2@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 94739,
+      "sha256": "5168f4384ee6990e5796efd73c7fd17bd06d9e3b10008f40468325a8f4c3586d"
+    },
+    {
+      "dosya": "proof/egg_efsanevi_crack3@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 58414,
+      "sha256": "f0bece608cc83dbe181cda08c08ed7779820ea1e0c7ce1803e57037ef52be39a"
+    },
+    {
+      "dosya": "proof/egg_efsanevi_crack3@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 103826,
+      "sha256": "4f54625f9c34660d6a8955d2eda61f2a2a9b65d9e6d02a2700ef65d84065045b"
+    },
+    {
+      "dosya": "proof/egg_gizli_crack0@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 55906,
+      "sha256": "e4da0279bcd349c3bcb1e16748690f78974834dc3e1eb894bc381273f2999190"
+    },
+    {
+      "dosya": "proof/egg_gizli_crack0@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 102386,
+      "sha256": "3baed69c90ce0a0620848e8858fd63a2408a024fd4d105c1f5dc361f2c7f833b"
+    },
+    {
+      "dosya": "proof/egg_gizli_crack1@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 57918,
+      "sha256": "52a3c76535d55afd8a1e0a92fe294a364cc1e947ac661561ece7ef7f3c1d44a0"
+    },
+    {
+      "dosya": "proof/egg_gizli_crack1@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 105205,
+      "sha256": "4a5face72599e3a12286681c6a47aaf84578e5dec4a40ddd8e4f99d149efeffa"
+    },
+    {
+      "dosya": "proof/egg_gizli_crack2@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 58852,
+      "sha256": "6d3f505fd36221943df2c7f1be1583fa0f0b28c0f1a6ce37be33653c9c1dfb99"
+    },
+    {
+      "dosya": "proof/egg_gizli_crack2@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 107564,
+      "sha256": "5ac0349856717222afa03cb107c7b32325801de458a90de3001438dbe45490d7"
+    },
+    {
+      "dosya": "proof/egg_gizli_crack3@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 66994,
+      "sha256": "4c1145219d99db9c95b88ed2789592feb01ec8e2b4e437d752bf9e3bb58b8f4f"
+    },
+    {
+      "dosya": "proof/egg_gizli_crack3@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 120019,
+      "sha256": "90cb8efb756510f5dd70634e49116f791add59ab7a9cdb9f6c84541a6d5d7fd9"
+    },
+    {
+      "dosya": "proof/pufi_cikcik_happy@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 22177,
+      "sha256": "f6bc697a9f7c3ca353246c493efa2b47b1eba660d66a5debb17e081ad780689c"
+    },
+    {
+      "dosya": "proof/pufi_cikcik_happy@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 37787,
+      "sha256": "9e3fab25a2e7d49fc54b919c49b2233d2e9f1a63fa16c911285f08c988b809a8"
+    },
+    {
+      "dosya": "proof/pufi_cikcik_sleep@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 22077,
+      "sha256": "3cceebd297b0d9a9c501c75cf6f960d965be3acbdb60a206f8763708ab6fb74d"
+    },
+    {
+      "dosya": "proof/pufi_cikcik_sleep@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 37776,
+      "sha256": "b6cd7dab0e3e59c73eb8ac5069ea395c072471d19f607b9248ab210ba8bf3482"
+    },
+    {
+      "dosya": "proof/pufi_cikcik_sil@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 7709,
+      "sha256": "0fa94fedba8a56cfc2021c200f4263ae5851c6608d788ceaa0ec3ea9593bc35b"
+    },
+    {
+      "dosya": "proof/pufi_cikcik_sil@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 11703,
+      "sha256": "e8b7fc8e0812f2bbcfbceec0dfafaf62d1ad047f2f1d2a37f707adb5dd738744"
+    },
+    {
+      "dosya": "proof/pufi_pirpir_happy@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 29356,
+      "sha256": "6df18bd74b766a7888516285bcb4cba2807aca594ecad38799936b4ac0def74d"
+    },
+    {
+      "dosya": "proof/pufi_pirpir_happy@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 48886,
+      "sha256": "c31b8f9bdd691cedc39eb7f95a8afb10f73a596ab2b569d47b38e65a682f94ec"
+    },
+    {
+      "dosya": "proof/pufi_pirpir_sleep@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 29228,
+      "sha256": "a6c6abb2ca0d21ca8625e8139349642c0f08576058b10a405a3a0e2661f787fc"
+    },
+    {
+      "dosya": "proof/pufi_pirpir_sleep@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 48763,
+      "sha256": "4457369e11e56dfc769709c2c86b0acc71307a094f7d9afdbc40068aca8cfbf5"
+    },
+    {
+      "dosya": "proof/pufi_pirpir_sil@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 10359,
+      "sha256": "c4288c3dcb4d4a94424aa60f365a529ea3ec33328b004a67870ff4ba3afc60d3"
+    },
+    {
+      "dosya": "proof/pufi_pirpir_sil@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 16007,
+      "sha256": "aa5f645cf029c9687af01496eddecf074311b22e0a150c803312958581d8b121"
+    },
+    {
+      "dosya": "proof/pufi_petek_happy@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 30473,
+      "sha256": "88f608e6d2bb021b97768ff8108a4c0c30c324ad6954213c86586fee4474a661"
+    },
+    {
+      "dosya": "proof/pufi_petek_happy@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 50399,
+      "sha256": "c45f187ee82b2c6761b35da142bc125d0695d99a5ff817a0e2bfbdacb1f3bd71"
+    },
+    {
+      "dosya": "proof/pufi_petek_sleep@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 30345,
+      "sha256": "09550e2bfeb64d40984478ffd8408938aa201cf242e298382cdbb21cb7b1bf20"
+    },
+    {
+      "dosya": "proof/pufi_petek_sleep@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 50205,
+      "sha256": "7d5616ea4b851ff2891868c59ef394610a768473d0da9ef318855a0beb0ced60"
+    },
+    {
+      "dosya": "proof/pufi_petek_sil@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 10476,
+      "sha256": "af90cc93793ba8073a28c0fd03b539300b39a58dc0e3f9fc7a91fb677dd5777d"
+    },
+    {
+      "dosya": "proof/pufi_petek_sil@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 15973,
+      "sha256": "c6d00ee7ff479d8ab044e47bd69113c1aef8bbe7fab55f867fb7b934aad766cb"
+    },
+    {
+      "dosya": "proof/pufi_safak_happy@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 53829,
+      "sha256": "9c3fda6aacbcbb4df53ed1445fc85b488abccb561849f9af322a832e7f078248"
+    },
+    {
+      "dosya": "proof/pufi_safak_happy@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 96453,
+      "sha256": "a49722c6791c21f0ea19489813d6da90b16cf7ef6ee7022c53a362ec84aa2376"
+    },
+    {
+      "dosya": "proof/pufi_safak_sleep@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 53405,
+      "sha256": "e58a34bfd3b0d83d095665a51eaa43b1bfdadb31704015bb6a6593b4b5767618"
+    },
+    {
+      "dosya": "proof/pufi_safak_sleep@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 96495,
+      "sha256": "0720f93707b9f5abcb801620de6ded2573824cf4ccd5c0864f4da9fe7f57f218"
+    },
+    {
+      "dosya": "proof/pufi_safak_sil@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 7881,
+      "sha256": "fc3b9cec5f1d650997d6962589343cb8a16888106eee50dbc3af7c1fb738446c"
+    },
+    {
+      "dosya": "proof/pufi_safak_sil@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 11953,
+      "sha256": "fe6b72a84fc423700534d50f3844db5c094739844917c050624d7f15c5b0e9c1"
+    },
+    {
+      "dosya": "proof/pufi_gundogan_happy@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 58701,
+      "sha256": "ada9d69ce345d91d748557dff70e70e6f8afb4b491ca04e2caa5babc6754e3e6"
+    },
+    {
+      "dosya": "proof/pufi_gundogan_happy@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 103068,
+      "sha256": "91a7772795a1100d0f4d6734699ce19cef81219b72f1c479e534e72ac6174651"
+    },
+    {
+      "dosya": "proof/pufi_gundogan_sleep@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 58652,
+      "sha256": "ff3701de03b3c74f5dc0f721959be6f52b8ccda7a74322a78df95d2fda43911c"
+    },
+    {
+      "dosya": "proof/pufi_gundogan_sleep@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 102688,
+      "sha256": "97550c0f9af625a8a51207987aa8818413d09b89c28394633d27858c649b0b52"
+    },
+    {
+      "dosya": "proof/pufi_gundogan_sil@2x.png",
+      "en": 240,
+      "boy": 240,
+      "bayt": 10979,
+      "sha256": "93610d18229e07cb8a399ad0651c7f5f9b4db0f6537ab270c3b00565fd822370"
+    },
+    {
+      "dosya": "proof/pufi_gundogan_sil@3x.png",
+      "en": 360,
+      "boy": 360,
+      "bayt": 16821,
+      "sha256": "3d0abbee98163f3ac5d1abefe4ae80003ea306356cb90f91faf0a0374bd8d085"
+    }
+  ]
+}

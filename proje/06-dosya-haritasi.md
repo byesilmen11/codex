@@ -93,7 +93,9 @@
 | `tools/proto-smoke.mjs` | Duman testi: headless Chromium, 55 adım, sıfır konsol hatası, ekran görüntüleri |
 | `tools/export-content.mjs` | Prototip verisi → `content/*.json` (`--check` = CI kapısı) |
 | `tools/export-golden-vectors.mjs` | Gacha altın vektörleri → `content/golden/` (`--check`) |
+| `tools/export-art.mjs` | SVG→PNG sanat ihracı v1 (Chromium render) → `content/art/` (`--check` = manifest↔disk) |
 | `tools/economy-sim/collection_sim.py` | Monte Carlo koleksiyon simülatörü (v2·02 eğrileri) |
 | `content/*.json` | pufis / rarities / wrappers / dialogue / packs / ritual — Unity'nin okuyacağı tek kaynak |
 | `content/golden/*.json` | 5 senaryo × deterministik açılış dizileri (C# port doğrulama fikstürü) |
+| `content/art/` | Sanat ihracı: `proof/*.png` (v1 kanıt seti, 78 dosya) + `manifest.json` |
 | `package.json` | Node bağımlılıkları (playwright-core vb.) |
